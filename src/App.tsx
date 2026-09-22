@@ -1,15 +1,18 @@
 import { useState } from "react";
-import { ModelViewport, type FlowMode, type ViewMode } from "./ModelViewport";
-import { stackSizing } from "./new-model";
+import { ModelViewport, type ViewMode } from "./ModelViewport";
+import { stackSizing, type AirPath } from "./new-model";
 import { motorThermal, stackThermal, thermalColorCss } from "./temperature-model";
 
 const viewOptions: Array<{ id: ViewMode; label: string }> = [
   { id: "complete", label: "完整模型" },
   { id: "cutaway", label: "整体半剖" },
+  { id: "crossSection", label: "横向剖视" },
   { id: "exploded", label: "分解视图" },
 ];
 
-const flowOptions: Array<{ id: FlowMode; label: string; color: string }> = [
+type FlowControlId = "all" | AirPath | "off";
+const allFlows: AirPath[] = ["bypass", "supply", "reaction"];
+const flowOptions: Array<{ id: FlowControlId; label: string; color: string }> = [
   { id: "all", label: "全部气流", color: "#315e6e" },
   { id: "bypass", label: "外涵推进", color: "#087ff5" },
   { id: "supply", label: "新鲜空气", color: "#0caf78" },
@@ -19,12 +22,33 @@ const flowOptions: Array<{ id: FlowMode; label: string; color: string }> = [
 
 export function App() {
   const [viewMode, setViewMode] = useState<ViewMode>("cutaway");
-  const [flowMode, setFlowMode] = useState<FlowMode>("all");
+  const [activeFlows, setActiveFlows] = useState<AirPath[]>([...allFlows]);
   const [flowSpeed, setFlowSpeed] = useState(1.25);
   const [fanRunning, setFanRunning] = useState(true);
   const [cutPosition, setCutPosition] = useState(0);
+  const [crossCutPosition, setCrossCutPosition] = useState(940);
   const [explodeAmount, setExplodeAmount] = useState(0.65);
   const [temperatureMode, setTemperatureMode] = useState(true);
+
+  const toggleFlow = (id: FlowControlId) => {
+    if (id === "all") {
+      setActiveFlows([...allFlows]);
+      return;
+    }
+    if (id === "off") {
+      setActiveFlows([]);
+      return;
+    }
+    setActiveFlows(current => current.includes(id)
+      ? current.filter(flow => flow !== id)
+      : [...current, id]);
+  };
+
+  const flowControlActive = (id: FlowControlId) => id === "all"
+    ? activeFlows.length === allFlows.length
+    : id === "off"
+      ? activeFlows.length === 0
+      : activeFlows.includes(id);
 
   return (
     <main className="page-shell">
@@ -50,10 +74,11 @@ export function App() {
           <div className="viewport-wrap">
             <ModelViewport
               viewMode={viewMode}
-              flowMode={flowMode}
+              activeFlows={activeFlows}
               flowSpeed={flowSpeed}
               fanRunning={fanRunning}
               cutPosition={cutPosition}
+              crossCutPosition={crossCutPosition}
               explodeAmount={explodeAmount}
               temperatureMode={temperatureMode}
             />
@@ -74,7 +99,7 @@ export function App() {
             <h2>显示模式</h2>
             <div className="display-modes" role="group" aria-label="显示模式">
               <button className={!temperatureMode ? "active" : ""} onClick={() => setTemperatureMode(false)} aria-pressed={!temperatureMode}>流路模式</button>
-              <button className={temperatureMode ? "active" : ""} onClick={() => { setTemperatureMode(true); setViewMode("cutaway"); setFlowMode("all"); }} aria-pressed={temperatureMode}>温度模式</button>
+              <button className={temperatureMode ? "active" : ""} onClick={() => { setTemperatureMode(true); if (viewMode === "exploded") setViewMode("cutaway"); setActiveFlows([...allFlows]); }} aria-pressed={temperatureMode}>温度模式</button>
             </div>
           </section>
 
@@ -105,6 +130,12 @@ export function App() {
               <input type="range" min={-180} max={180} step={5} value={cutPosition} onChange={event => setCutPosition(Number(event.target.value))} />
               <small><i>背侧</i><i>正中</i><i>前侧</i></small>
             </label>}
+            {viewMode === "crossSection" && <label className="control">
+              <span><b>横向剖切位置</b><output>X = {crossCutPosition} mm</output></span>
+              <input type="range" min={-350} max={2100} step={10} value={crossCutPosition} onChange={event => setCrossCutPosition(Number(event.target.value))} />
+              <small><i>前风扇</i><i>电堆中段</i><i>尾部</i></small>
+              <p>剖切面垂直于推进轴，保留剖切位置朝尾部一侧的结构；观察方向为前风扇→尾部。</p>
+            </label>}
             {viewMode === "exploded" && <label className="control">
               <span><b>轴向分离程度</b><output>{Math.round(explodeAmount * 100)}%</output></span>
               <input type="range" min={0.15} max={1} step={0.05} value={explodeAmount} onChange={event => setExplodeAmount(Number(event.target.value))} />
@@ -117,7 +148,7 @@ export function App() {
             <h2>气流显示</h2>
             <div className="flow-grid" role="group" aria-label="气流类型">
               {flowOptions.map(option => (
-                <button key={option.id} className={`${flowMode === option.id ? "active" : ""} ${option.id === "off" ? "wide" : ""}`} onClick={() => setFlowMode(option.id)}>
+                <button key={option.id} className={`${flowControlActive(option.id) ? "active" : ""} ${option.id === "off" ? "wide" : ""}`} onClick={() => toggleFlow(option.id)} aria-pressed={flowControlActive(option.id)}>
                   <span style={{ background: option.color }} />{option.label}
                 </button>
               ))}

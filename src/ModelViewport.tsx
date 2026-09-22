@@ -6,14 +6,14 @@ import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment
 import { createAirPaths, createNewConceptPropulsion, type AirPath, type AirVisualPath } from "./new-model";
 import { airflowTemperatureC, motorThermal, stackThermal, temperatureStops, thermalColorCss } from "./temperature-model";
 
-export type ViewMode = "complete" | "cutaway" | "exploded";
-export type FlowMode = "all" | AirPath | "off";
+export type ViewMode = "complete" | "cutaway" | "crossSection" | "exploded";
 type Props = {
   viewMode: ViewMode;
-  flowMode: FlowMode;
+  activeFlows: AirPath[];
   flowSpeed: number;
   fanRunning: boolean;
   cutPosition: number;
+  crossCutPosition: number;
   explodeAmount: number;
   temperatureMode: boolean;
 };
@@ -231,13 +231,24 @@ export function ModelViewport(props: Props) {
       const vertical = THREE.MathUtils.degToRad(camera.fov);
       const horizontal = 2 * Math.atan(Math.tan(vertical / 2) * camera.aspect);
       const exploded = latest.current.viewMode === "exploded";
-      const direction = exploded ? new THREE.Vector3(-0.08, 0.15, 1) : latest.current.viewMode === "complete" ? new THREE.Vector3(0.62, 0.27, 1) : new THREE.Vector3(-0.2, 0.18, 1);
+      const crossSection = latest.current.viewMode === "crossSection";
+      const direction = exploded
+        ? new THREE.Vector3(-0.08, 0.15, 1)
+        : crossSection
+          ? new THREE.Vector3(-1, 0.10, 0.12)
+          : latest.current.viewMode === "complete"
+            ? new THREE.Vector3(0.62, 0.27, 1)
+            : new THREE.Vector3(-0.2, 0.18, 1);
       direction.normalize();
-      controls.target.set(950, 0, 0);
+      controls.target.set(crossSection ? latest.current.crossCutPosition : 950, 0, 0);
       const right = new THREE.Vector3().crossVectors(camera.up, direction).normalize();
       const up = new THREE.Vector3().crossVectors(direction, right);
       let distance = 0;
-      const xBounds = exploded ? [explodedLayout.minX - 100, explodedLayout.maxX + 100] : [-500, 2450];
+      const xBounds = exploded
+        ? [explodedLayout.minX - 100, explodedLayout.maxX + 100]
+        : crossSection
+          ? [latest.current.crossCutPosition - 40, 2450]
+          : [-500, 2450];
       for (const x of xBounds) for (const y of [-620, 620]) for (const z of [-620, 620]) {
         const corner = new THREE.Vector3(x, y, z).sub(controls.target);
         const towardCamera = corner.dot(direction);
@@ -268,7 +279,10 @@ export function ModelViewport(props: Props) {
     observer.observe(element);
     resize();
 
-    const clip = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
+    const longitudinalClip = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
+    // Keep the structure downstream of the cut, then look from the front fan
+    // toward the tail so the exposed transverse face is nearest the camera.
+    const transverseClip = new THREE.Plane(new THREE.Vector3(1, 0, 0), -latest.current.crossCutPosition);
     const materials = new Set<THREE.Material>();
     assembly.root.traverse(object => {
       const mesh = object as THREE.Mesh;
@@ -278,7 +292,7 @@ export function ModelViewport(props: Props) {
     });
 
     const clock = new THREE.Clock();
-    let frame = 0, simulationTime = 0, previousView = "", previousAmount = latest.current.explodeAmount, previousTemperatureMode = false, shaderFailed = false;
+    let frame = 0, simulationTime = 0, previousView = "", previousAmount = latest.current.explodeAmount, previousCrossCut = latest.current.crossCutPosition, previousTemperatureMode = false, shaderFailed = false;
     renderer.debug.onShaderError = () => {
       if (!shaderFailed) { shaderFailed = true; setError("气流显示加载失败，请刷新页面重试。"); }
     };
@@ -287,17 +301,26 @@ export function ModelViewport(props: Props) {
       frame = requestAnimationFrame(animate);
       const dt = Math.min(clock.getDelta(), 0.05);
       const state = latest.current;
-      clip.constant = state.cutPosition;
+      longitudinalClip.constant = state.cutPosition;
+      transverseClip.constant = -state.crossCutPosition;
 
       if (previousAmount !== state.explodeAmount) {
         explodedLayout = assembly.axialLayout(state.explodeAmount);
         previousAmount = state.explodeAmount;
         if (state.viewMode === "exploded") fit();
       }
+      if (previousCrossCut !== state.crossCutPosition) {
+        previousCrossCut = state.crossCutPosition;
+        if (state.viewMode === "crossSection") fit();
+      }
       if (previousView !== state.viewMode) {
         fit();
         previousView = state.viewMode;
-        const planes = state.viewMode === "complete" ? [] : [clip];
+        const planes = state.viewMode === "cutaway"
+          ? [longitudinalClip]
+          : state.viewMode === "crossSection"
+            ? [transverseClip]
+            : [];
         materials.forEach(material => { material.clippingPlanes = planes; material.needsUpdate = true; });
         streams.forEach(stream => { stream.material.clippingPlanes = planes; stream.material.needsUpdate = true; });
       }
@@ -322,7 +345,7 @@ export function ModelViewport(props: Props) {
       if (state.fanRunning) for (const material of assembly.inductionSpriteMaterials) material.rotation -= 4.6 * dt;
       simulationTime += dt * state.flowSpeed;
       for (const stream of streams) {
-        stream.mesh.visible = state.viewMode !== "exploded" && (state.flowMode === "all" || state.flowMode === stream.mode);
+        stream.mesh.visible = state.viewMode !== "exploded" && state.viewMode !== "crossSection" && state.activeFlows.includes(stream.mode);
         stream.material.uniforms.uTime.value = simulationTime;
         stream.material.uniforms.uTemperatureMode.value = state.temperatureMode ? 1 : 0;
       }
@@ -354,13 +377,17 @@ export function ModelViewport(props: Props) {
     };
   }, []);
 
-  const active = props.temperatureMode && props.viewMode !== "exploded"
+  const active = props.viewMode === "crossSection"
+    ? `横向剖视 · 前风扇→尾部 · X = ${props.crossCutPosition} mm · 气流已隐藏`
+    : props.temperatureMode && props.viewMode !== "exploded"
     ? "条件温度场 · 六级电堆 / 电机壳体 / 沿程气流"
     : props.viewMode === "exploded"
     ? "同轴顺序分解 · 气流已隐藏"
-    : props.flowMode === "all"
+    : props.activeFlows.length === 3
       ? "三路气流 · 入口渐扩 / 环道外缘增压 / 三级全环引射 / 尾部双壁收缩"
-      : props.flowMode === "off" ? "气流已隐藏" : flowLabels[props.flowMode];
+      : props.activeFlows.length === 0
+        ? "气流已隐藏"
+        : props.activeFlows.map(flow => flowLabels[flow]).join(" + ");
 
   return <div ref={host} className="model-host">
     {error && <div className="error" role="alert">{error}</div>}
@@ -381,7 +408,6 @@ export function ModelViewport(props: Props) {
           <span><i style={{ background: "#e78218" }} />渐扩中间主流</span>
         </>}
       </>}
-      {props.viewMode === "cutaway" && !props.temperatureMode && <span><i style={{ background: "#d6a43f" }} />主电机短轴传动；环道风扇仅外缘转子旋转</span>}
       <span className="help">拖动旋转 · 滚轮缩放 · 右键平移</span>
     </div>
   </div>;

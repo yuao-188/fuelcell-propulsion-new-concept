@@ -86,8 +86,10 @@ export function freshGalleryThickness(x: number) {
 export function freshOuterRadius(x: number) {
   // Follow the smoothly expanding inner wall, preserving the reduced annular
   // clearance rather than leaving the upper skin floating above the inlet.
-  // After stack 6 the upper wall approaches it another 24 units.
-  const extraTailContraction = 24 * THREE.MathUtils.smoothstep(x, 2050, 2340);
+  // Behind stack 6 the upper wall now turns inward more visibly, while the
+  // smoothstep keeps slope continuity at both ends and preserves a 38 mm
+  // gallery gap at the outlet so the two skins cannot intersect.
+  const extraTailContraction = 40 * THREE.MathUtils.smoothstep(x, 1980, 2340);
   return mainFlowOuterRadius(x) + freshGalleryThickness(x) - extraTailContraction;
 }
 
@@ -169,6 +171,49 @@ function bladedRotor(radius: number, hub: number, count: number, material: THREE
   }
   rotor.add(shell([[-28, hub], [28, hub]], 9, material, true));
   return rotor;
+}
+
+// Fixed outlet-guide vanes behind the main fan. Unlike the rotating blade
+// geometry above, each vane has an axial camber line: it accepts residual
+// swirl at the inlet and curves continuously toward an axial outlet angle.
+function curvedOutletGuideVanes(radius: number, hub: number, count: number, material: THREE.Material, axialChord = 72) {
+  const row = new THREE.Group();
+  const radialSegments = 12;
+  const chordSegments = 10;
+  const positions: number[] = [];
+  const indices: number[] = [];
+
+  for (let radialIndex = 0; radialIndex <= radialSegments; radialIndex++) {
+    const radialFraction = radialIndex / radialSegments;
+    const r = THREE.MathUtils.lerp(hub, radius, radialFraction);
+    for (let chordIndex = 0; chordIndex <= chordSegments; chordIndex++) {
+      const chordFraction = chordIndex / chordSegments;
+      const x = THREE.MathUtils.lerp(-axialChord / 2, axialChord / 2, chordFraction);
+      // Strong inlet turning that relaxes quadratically to zero at exit.
+      // A small spanwise reduction prevents all radii reading as one flat fin.
+      const inletTurn = THREE.MathUtils.lerp(0.24, 0.18, radialFraction);
+      const angle = inletTurn * (1 - chordFraction) * (1 - chordFraction);
+      positions.push(x, r * Math.cos(angle), r * Math.sin(angle));
+    }
+  }
+  const stride = chordSegments + 1;
+  for (let radialIndex = 0; radialIndex < radialSegments; radialIndex++) {
+    for (let chordIndex = 0; chordIndex < chordSegments; chordIndex++) {
+      const a = radialIndex * stride + chordIndex;
+      const b = a + stride;
+      indices.push(a, a + 1, b, a + 1, b + 1, b);
+    }
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  for (let index = 0; index < count; index++) {
+    const vane = new THREE.Mesh(geometry, material);
+    vane.rotation.x = index * Math.PI * 2 / count;
+    row.add(vane);
+  }
+  return row;
 }
 
 // An annular blade row attached at its outer rim. There is deliberately no
@@ -379,9 +424,9 @@ export function createNewConceptPropulsion() {
   frontFan.add(spinner(-430, -120, 124, brightSilver));
 
   const outletGuide = makePart("出口整流导叶", [-210, -230, 0]);
-  const guideRotor = bladedRotor(492, 128, 12, titanium, 24);
-  guideRotor.position.x = axialMm(38);
-  outletGuide.add(guideRotor);
+  const mainOutletGuideVanes = curvedOutletGuideVanes(492, 136, 12, titanium, 72);
+  mainOutletGuideVanes.position.x = axialMm(38);
+  outletGuide.add(mainOutletGuideVanes);
   outletGuide.add(shell([[0, 129], [78, 129]], 10, brightSilver));
 
   const driveMotor = makePart("前移加大的主驱动电机", [-80, -410, 0]);
