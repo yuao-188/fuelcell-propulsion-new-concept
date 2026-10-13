@@ -3,8 +3,8 @@ import { Maximize2, RotateCcw } from "lucide-react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
-import { createAirPaths, createNewConceptPropulsion, type AirPath, type AirVisualPath } from "./new-model";
-import { airflowTemperatureC, motorThermal, stackThermal, temperatureStops, thermalColorCss } from "./temperature-model";
+import { createAirPaths, createNewConceptPropulsion, modelBounds, tailEndX, type AirPath, type AirVisualPath } from "./new-model";
+import { stackThermal, thermalColorCss } from "./temperature-model";
 
 export type ViewMode = "complete" | "cutaway" | "crossSection" | "exploded";
 type Props = {
@@ -32,7 +32,7 @@ const flowColors: Record<AirVisualPath, number> = {
 
 type StreakStyle = "normal" | "dense" | "induction" | "propulsion";
 
-function createStreaks(curves: THREE.CatmullRomCurve3[], key: AirVisualPath, color: number, style: StreakStyle) {
+function createStreaks(curves: THREE.CatmullRomCurve3[], color: number, style: StreakStyle) {
   const samples = 256;
   const data = new Float32Array(samples * curves.length * 4);
   const phases: number[] = [], rows: number[] = [], rates: number[] = [], lengths: number[] = [];
@@ -43,7 +43,7 @@ function createStreaks(curves: THREE.CatmullRomCurve3[], key: AirVisualPath, col
     const distance = curve.getLength();
     for (let sample = 0; sample < samples; sample++) {
       const point = curve.getPointAt(sample / (samples - 1));
-      data.set([point.x, point.y, point.z, airflowTemperatureC(key, point.x, curveIndex)], (curveIndex * samples + sample) * 4);
+      data.set([point.x, point.y, point.z, 0], (curveIndex * samples + sample) * 4);
     }
     const count = Math.max(minimumCount, Math.ceil(distance / spacing));
     for (let i = 0; i < count; i++) {
@@ -70,15 +70,13 @@ function createStreaks(curves: THREE.CatmullRomCurve3[], key: AirVisualPath, col
       uPaths: { value: texture },
       uTime: { value: 0 },
       uColor: { value: new THREE.Color(color) },
-      uTemperatureMode: { value: 0 },
-      uThermalColors: { value: temperatureStops.map(stop => new THREE.Color(stop.color)) },
       uResolution: { value: new THREE.Vector2(1000, 700) },
       uWidth: { value: style === "induction" ? 3.0 : style === "propulsion" ? 2.2 : style === "dense" ? 2.3 : 1.8 },
     },
     vertexShader: `
       attribute float aPhase; attribute float aRow; attribute float aRate; attribute float aLength;
       uniform sampler2D uPaths; uniform float uTime; uniform vec2 uResolution; uniform float uWidth;
-      varying float vAcross; varying float vTemperature;
+      varying float vAcross;
       #include <clipping_planes_pars_vertex>
       vec4 path(float t) {
         float s = clamp(t, 0., 1.) * 255.; float i = floor(s);
@@ -98,24 +96,16 @@ function createStreaks(curves: THREE.CatmullRomCurve3[], key: AirVisualPath, col
         gl_Position = projectionMatrix * mvPosition;
         gl_Position.xy += n * position.x * uWidth / uResolution * gl_Position.w;
         vAcross = position.x;
-        vTemperature = headSample.w;
         #include <clipping_planes_vertex>
       }`,
     fragmentShader: `
-      uniform vec3 uColor; uniform float uTemperatureMode;
-      uniform vec3 uThermalColors[5];
-      varying float vAcross; varying float vTemperature;
+      uniform vec3 uColor;
+      varying float vAcross;
       #include <clipping_planes_pars_fragment>
-      vec3 temperatureColor(float t) {
-        if (t <= 0.) return mix(uThermalColors[0], uThermalColors[1], clamp((t + 24.) / 24., 0., 1.));
-        if (t <= 25.) return mix(uThermalColors[1], uThermalColors[2], clamp(t / 25., 0., 1.));
-        if (t <= 55.) return mix(uThermalColors[2], uThermalColors[3], clamp((t - 25.) / 30., 0., 1.));
-        return mix(uThermalColors[3], uThermalColors[4], clamp((t - 55.) / 55., 0., 1.));
-      }
       void main() {
         #include <clipping_planes_fragment>
         float alpha = .96 * (1. - smoothstep(.62, 1., abs(vAcross)));
-        gl_FragColor = vec4(mix(uColor, temperatureColor(vTemperature), uTemperatureMode), alpha);
+        gl_FragColor = vec4(uColor, alpha);
         #include <colorspace_fragment>
       }`,
     transparent: true,
@@ -201,7 +191,6 @@ export function ModelViewport(props: Props) {
       });
     };
     stackThermal.forEach((stack, index) => addThermalTarget(`环形电堆 ${index + 1}`, stack.meanC));
-    motorThermal.forEach(motor => addThermalTarget(motor.targetName, motor.shellC));
     const paths = createAirPaths();
     const streamSpecs: Array<{ key: AirVisualPath; mode: AirPath; style: StreakStyle }> = [
       { key: "bypass", mode: "bypass", style: "propulsion" },
@@ -212,19 +201,20 @@ export function ModelViewport(props: Props) {
     const streams = streamSpecs.map(spec => ({
       name: spec.key,
       mode: spec.mode,
-      ...createStreaks(paths[spec.key], spec.key, flowColors[spec.key], spec.style),
+      ...createStreaks(paths[spec.key], flowColors[spec.key], spec.style),
     }));
     streams.forEach(stream => scene.add(stream.mesh));
 
-    const grid = new THREE.GridHelper(6000, 60, 0xb6c4cb, 0xd1dbe0);
-    grid.position.set(950, -650, 0);
+    const assemblyCenterX = (modelBounds.minX + modelBounds.maxX) / 2;
+    const grid = new THREE.GridHelper(4000, 40, 0xb6c4cb, 0xd1dbe0);
+    grid.position.set(assemblyCenterX, -modelBounds.radius - 30, 0);
     scene.add(grid);
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.minDistance = 650;
     controls.maxDistance = 90000;
-    controls.target.set(950, 0, 0);
+    controls.target.set(assemblyCenterX, 0, 0);
     let explodedLayout = assembly.axialLayout(latest.current.explodeAmount);
 
     function fit() {
@@ -240,16 +230,17 @@ export function ModelViewport(props: Props) {
             ? new THREE.Vector3(0.62, 0.27, 1)
             : new THREE.Vector3(-0.2, 0.18, 1);
       direction.normalize();
-      controls.target.set(crossSection ? latest.current.crossCutPosition : 950, 0, 0);
+      controls.target.set(crossSection ? latest.current.crossCutPosition : exploded ? (explodedLayout.minX + explodedLayout.maxX) / 2 : assemblyCenterX, 0, 0);
       const right = new THREE.Vector3().crossVectors(camera.up, direction).normalize();
       const up = new THREE.Vector3().crossVectors(direction, right);
       let distance = 0;
       const xBounds = exploded
         ? [explodedLayout.minX - 100, explodedLayout.maxX + 100]
         : crossSection
-          ? [latest.current.crossCutPosition - 40, 2450]
-          : [-500, 2450];
-      for (const x of xBounds) for (const y of [-620, 620]) for (const z of [-620, 620]) {
+          ? [latest.current.crossCutPosition - 40, modelBounds.maxX + 50]
+          : [modelBounds.minX - 50, modelBounds.maxX + 50];
+      const extent = modelBounds.radius + 30;
+      for (const x of xBounds) for (const y of [-extent, extent]) for (const z of [-extent, extent]) {
         const corner = new THREE.Vector3(x, y, z).sub(controls.target);
         const towardCamera = corner.dot(direction);
         distance = Math.max(distance, towardCamera + Math.abs(corner.dot(right)) / Math.tan(horizontal / 2), towardCamera + Math.abs(corner.dot(up)) / Math.tan(vertical / 2));
@@ -259,8 +250,8 @@ export function ModelViewport(props: Props) {
     }
     reset.current = fit;
     inspectNozzles.current = () => {
-      controls.target.set(1830, 0, 0);
-      camera.position.set(3200, 540, 1500);
+      controls.target.set(tailEndX - 140, 0, 0);
+      camera.position.set(tailEndX + 1000, 480, 1000);
       controls.update();
     };
 
@@ -339,7 +330,7 @@ export function ModelViewport(props: Props) {
         part.group.position.y = 0;
         part.group.position.z = 0;
       }
-      for (const detail of assembly.cutawayDetails) detail.visible = state.viewMode !== "complete";
+      for (const detail of assembly.cutawayDetails) detail.visible = state.viewMode === "cutaway" || state.viewMode === "exploded";
       for (const hidden of assembly.cutawayHidden) hidden.visible = state.viewMode !== "cutaway";
       if (state.fanRunning) for (const rotor of assembly.rotors) rotor.group.rotation[rotor.axis] += rotor.rate * dt;
       if (state.fanRunning) for (const material of assembly.inductionSpriteMaterials) material.rotation -= 4.6 * dt;
@@ -347,7 +338,6 @@ export function ModelViewport(props: Props) {
       for (const stream of streams) {
         stream.mesh.visible = state.viewMode !== "exploded" && state.viewMode !== "crossSection" && state.activeFlows.includes(stream.mode);
         stream.material.uniforms.uTime.value = simulationTime;
-        stream.material.uniforms.uTemperatureMode.value = state.temperatureMode ? 1 : 0;
       }
       grid.visible = state.viewMode !== "exploded" && camera.position.y > -870;
       controls.update();
@@ -380,11 +370,11 @@ export function ModelViewport(props: Props) {
   const active = props.viewMode === "crossSection"
     ? `横向剖视 · 前风扇→尾部 · X = ${props.crossCutPosition} mm · 气流已隐藏`
     : props.temperatureMode && props.viewMode !== "exploded"
-    ? "条件温度场 · 六级电堆 / 电机壳体 / 沿程气流"
+    ? "三级电堆 · 设定温度 55℃ · 每级独立环形引气"
     : props.viewMode === "exploded"
     ? "同轴顺序分解 · 气流已隐藏"
     : props.activeFlows.length === 3
-      ? "三路气流 · 入口渐扩 / 环道外缘增压 / 三级全环引射 / 尾部双壁收缩"
+      ? "三路气流 · 环道外缘增压 / 逐级全环引气 / 尾部双壁收缩"
       : props.activeFlows.length === 0
         ? "气流已隐藏"
         : props.activeFlows.map(flow => flowLabels[flow]).join(" + ");
@@ -400,13 +390,12 @@ export function ModelViewport(props: Props) {
       </div>
     </div>
     <div className="legend">
-      {props.viewMode === "exploded" ? <span>前端 → 主电机与环道外缘增压级 → 六级电堆、两级区间风扇与三级环形引射器 → 双壁收缩尾部与尾锥</span> : <>
-        {props.temperatureMode ? <span className="temperature-key"><b>气流 / 部件温度</b><i className="temperature-gradient" />−24°　0°　25°　55°　110°C</span> : <>
+      {props.viewMode === "exploded" ? <span>前端 → 主电机与环道外缘增压级 → 三级电堆及各级环形引气口 → 收缩尾部与尾锥</span> : <>
+        {props.temperatureMode && <span><i style={{ background: thermalColorCss(55) }} />三级电堆均为 55℃</span>}
           <span><i style={{ background: "#087fea" }} />外涵推进气流</span>
           <span><i style={{ background: "#0caf78" }} />新鲜空气直通</span>
           <span><i style={{ background: "#17cfe3" }} />引流入堆气流</span>
           <span><i style={{ background: "#e78218" }} />渐扩中间主流</span>
-        </>}
       </>}
       <span className="help">拖动旋转 · 滚轮缩放 · 右键平移</span>
     </div>
