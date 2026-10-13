@@ -83,6 +83,23 @@ export function freshOuterRadius(x: number) {
   return mainFlowOuterRadius(x) + freshGalleryThickness(x) - extraTailContraction;
 }
 
+// The exterior skin has one continuous rising crown and one tail contraction.
+// Keep the original radius above as the reference for all existing internal
+// parts and streamlines; only the outer skin and its trim rings use this curve.
+export function freshOuterSkinRadius(x: number) {
+  if (x <= 225) return freshOuterRadius(x);
+  const hermite = (start: number, end: number, r0: number, r1: number, m0: number, m1: number) => {
+    const t = THREE.MathUtils.clamp((x - start) / (end - start), 0, 1);
+    const t2 = t * t, t3 = t2 * t;
+    return (2 * t3 - 3 * t2 + 1) * r0 + (t3 - 2 * t2 + t) * (end - start) * m0
+      + (-2 * t3 + 3 * t2) * r1 + (t3 - t2) * (end - start) * m1;
+  };
+  const inletSlope = 70 * 6 * (180 / 320) * (1 - 180 / 320) / 400 + 2 / (1870 * 1.25);
+  if (x <= 310) return hermite(225, 310, freshOuterRadius(225), 315, inletSlope, 0.14);
+  if (x <= 775) return hermite(310, 775, 315, 370, 0.14, 0);
+  return hermite(775, galleryEndX, 370, freshOuterRadius(galleryEndX), 0, 0);
+}
+
 const tailConeProfile = [
   [stackFaces.at(-1)!.rear + 31.25, 106], [stackFaces.at(-1)!.rear + 81.25, 121],
   [stackFaces.at(-1)!.rear + 128.125, 116], [stackFaces.at(-1)!.rear + 168.75, 88],
@@ -359,7 +376,7 @@ export function createNewConceptPropulsion() {
   const freshGallery = makePart("入口内壁渐扩与尾部双壁平顺收缩的新鲜空气环道", [0, 470, -130]);
   // A single smooth outer skin, including the tail contraction. Fine axial
   // sampling prevents the previously visible fold/overlap at its aft end.
-  freshGallery.add(sampledShell(0, galleryEndX, 5, freshOuterRadius, 7, brightSilver));
+  freshGallery.add(sampledShell(0, galleryEndX, 5, freshOuterSkinRadius, 7, brightSilver));
   // Split the inner wall at each ejector station so the annular injection
   // openings are real gaps rather than markings on a continuous surface.
   // Centre each 36 mm opening in its 50 mm inter-stack gap. It stays clear
@@ -373,7 +390,7 @@ export function createNewConceptPropulsion() {
   wallSegments.push([wallStart, galleryEndX]);
   wallSegments.forEach(([start, end]) => freshGallery.add(sampledShell(start, end, 5, mainFlowOuterRadius, 6, darkMetal)));
   stations.forEach(x => {
-    freshGallery.add(ring(x, freshOuterRadius(x), 3, titanium));
+    freshGallery.add(ring(x, freshOuterSkinRadius(x), 3, titanium));
     freshGallery.add(ring(x, mainFlowOuterRadius(x), 2.4, darkMetal));
   });
 

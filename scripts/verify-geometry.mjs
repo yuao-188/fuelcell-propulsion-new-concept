@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import {
   stackSizing, stackFaces, injectorLayouts, modelBounds, galleryEndX,
-  mainFlowOuterRadius, freshOuterRadius,
+  mainFlowOuterRadius, freshOuterSkinRadius,
   createNewConceptPropulsion, createAirPaths,
 } from '../src/new-model.ts';
 
@@ -38,7 +38,7 @@ for (let i=0; i<3; i++) {
   for (let x=front; x<=rear; x+=0.5) {
     const innerSkin = mainFlowOuterRadius(x)-6;
     assert.ok(innerSkin > stack.outerDiameter/2+10, `Stack ${i+1} and tie rods clear core shell at ${x}`);
-    assert.ok(freshOuterRadius(x)-7 > mainFlowOuterRadius(x)+40, 'Gallery remains open');
+    assert.ok(freshOuterSkinRadius(x)-7 > mainFlowOuterRadius(x)+40, 'Gallery remains open');
   }
 }
 
@@ -54,7 +54,7 @@ for (const [name,curves] of Object.entries(paths)) for (const curve of curves) {
     const arcPoint=curve.getPointAt(i/256);
     assert.ok([arcPoint.x,arcPoint.y,arcPoint.z].every(Number.isFinite), `${name} finite animation point`);
     if (name === 'supply' && p.x >= 0 && p.x <= galleryEndX) {
-      assert.ok(freshOuterRadius(p.x)-7-Math.hypot(p.y,p.z) > 3, 'Supply flow clears outer duct skin');
+      assert.ok(freshOuterSkinRadius(p.x)-7-Math.hypot(p.y,p.z) > 3, 'Supply flow clears outer duct skin');
     }
     previous=p.x; sampleCount++;
   }
