@@ -1,3 +1,6 @@
 node_modules/
 dist/
 *.tsbuildinfo
+dist-new-design/
+new-design/public/model.glb
+new-design/qa/

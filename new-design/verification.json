@@ -1,0 +1,249 @@
+{
+  "schema": 1,
+  "units": "relative",
+  "modules": [
+    3,
+    4,
+    4
+  ],
+  "portCounts": {
+    "air": 6,
+    "hydrogen": 6,
+    "return": 6
+  },
+  "parts": 25,
+  "solidChecks": 100,
+  "broadPhasePairs": 300,
+  "collisions": [],
+  "fluidChecks": {
+    "air/hydrogen": {
+      "intersectionVolume": 0
+    },
+    "air/return": {
+      "intersectionVolume": 0
+    },
+    "hydrogen/return": {
+      "intersectionVolume": 0
+    },
+    "completeAnodeLoop": {
+      "connectedComponents": 1,
+      "internalModuleChannels": 11,
+      "pumpConnected": true
+    },
+    "airObstruction": {
+      "solidVolumeInsideLumen": 0.000002394569656451652
+    },
+    "completeAnodeObstruction": {
+      "solidVolumeInsideLumen": 0.00006820424758225775
+    },
+    "air": {
+      "connectedComponents": 1
+    },
+    "hydrogen": {
+      "connectedComponents": 1
+    },
+    "return": {
+      "connectedComponents": 1
+    }
+  },
+  "ports": [
+    {
+      "id": "air-1--1",
+      "fluid": "air",
+      "stage": 1,
+      "face": "inner",
+      "position": [
+        525,
+        -80,
+        0
+      ]
+    },
+    {
+      "id": "air-1-1",
+      "fluid": "air",
+      "stage": 1,
+      "face": "inner",
+      "position": [
+        525,
+        80,
+        0
+      ]
+    },
+    {
+      "id": "air-2--1",
+      "fluid": "air",
+      "stage": 2,
+      "face": "inner",
+      "position": [
+        757.5,
+        -145,
+        0
+      ]
+    },
+    {
+      "id": "air-2-1",
+      "fluid": "air",
+      "stage": 2,
+      "face": "inner",
+      "position": [
+        757.5,
+        145,
+        0
+      ]
+    },
+    {
+      "id": "air-3--1",
+      "fluid": "air",
+      "stage": 3,
+      "face": "inner",
+      "position": [
+        982.5,
+        -205,
+        0
+      ]
+    },
+    {
+      "id": "air-3-1",
+      "fluid": "air",
+      "stage": 3,
+      "face": "inner",
+      "position": [
+        982.5,
+        205,
+        0
+      ]
+    },
+    {
+      "id": "feed-1-0",
+      "fluid": "hydrogen",
+      "stage": 1,
+      "face": "rear",
+      "position": [
+        590,
+        112.04739584953192,
+        -30.023009231892406
+      ]
+    },
+    {
+      "id": "feed-1-1",
+      "fluid": "hydrogen",
+      "stage": 1,
+      "face": "rear",
+      "position": [
+        590,
+        -112.04739584953194,
+        -30.02300923189236
+      ]
+    },
+    {
+      "id": "return-1-0",
+      "fluid": "return",
+      "stage": 1,
+      "face": "front",
+      "position": [
+        460,
+        112.04739584953192,
+        30.023009231892406
+      ]
+    },
+    {
+      "id": "return-1-1",
+      "fluid": "return",
+      "stage": 1,
+      "face": "front",
+      "position": [
+        460,
+        -112.04739584953191,
+        30.023009231892438
+      ]
+    },
+    {
+      "id": "feed-2-0",
+      "fluid": "hydrogen",
+      "stage": 2,
+      "face": "rear",
+      "position": [
+        815,
+        174.83257455832137,
+        -46.84624716355626
+      ]
+    },
+    {
+      "id": "feed-2-1",
+      "fluid": "hydrogen",
+      "stage": 2,
+      "face": "rear",
+      "position": [
+        815,
+        -174.8325745583214,
+        -46.846247163556185
+      ]
+    },
+    {
+      "id": "return-2-0",
+      "fluid": "return",
+      "stage": 2,
+      "face": "front",
+      "position": [
+        700,
+        174.83257455832137,
+        46.84624716355626
+      ]
+    },
+    {
+      "id": "return-2-1",
+      "fluid": "return",
+      "stage": 2,
+      "face": "front",
+      "position": [
+        700,
+        -174.83257455832134,
+        46.846247163556306
+      ]
+    },
+    {
+      "id": "feed-3-0",
+      "fluid": "hydrogen",
+      "stage": 3,
+      "face": "rear",
+      "position": [
+        1035,
+        232.78812413566547,
+        -62.3753898697075
+      ]
+    },
+    {
+      "id": "feed-3-1",
+      "fluid": "hydrogen",
+      "stage": 3,
+      "face": "rear",
+      "position": [
+        1035,
+        -232.7881241356655,
+        -62.375389869707405
+      ]
+    },
+    {
+      "id": "return-3-0",
+      "fluid": "return",
+      "stage": 3,
+      "face": "front",
+      "position": [
+        930,
+        232.78812413566547,
+        62.3753898697075
+      ]
+    },
+    {
+      "id": "return-3-1",
+      "fluid": "return",
+      "stage": 3,
+      "face": "front",
+      "position": [
+        930,
+        -232.78812413566544,
+        62.37538986970757
+      ]
+    }
+  ]
+}

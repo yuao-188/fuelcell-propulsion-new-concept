@@ -7,7 +7,11 @@
     "dev": "vite --host 127.0.0.1 --port 5174",
     "build": "tsc -b && vite build",
     "prepare:pages": "node scripts/prepare-pages.mjs",
-    "preview": "vite preview --host 127.0.0.1 --port 4174"
+    "preview": "vite preview --host 127.0.0.1 --port 4174",
+    "dev:new-design": "vite --config vite.new-design.config.ts --host 127.0.0.1 --port 5175",
+    "model:new-design": "node scripts/build-new-design-model.mjs",
+    "build:new-design": "npm run model:new-design && tsc -p new-design/tsconfig.json && vite build --config vite.new-design.config.ts",
+    "prepare:new-design": "node scripts/prepare-new-design.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "6.0.2",
@@ -18,9 +22,11 @@
     "vite": "8.0.13"
   },
   "devDependencies": {
+    "@gltf-transform/core": "^4.5.1",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@types/three": "^0.180.0",
+    "manifold-3d": "^3.5.4",
     "typescript": "5.9.3"
   }
 }

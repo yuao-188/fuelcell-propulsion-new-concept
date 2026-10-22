@@ -1,0 +1,13 @@
+import { mkdir, cp, copyFile, readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import { createHash } from 'node:crypto';
+const root = resolve(import.meta.dirname, '..');
+const oldIndex = await readFile(resolve(root, 'index.html'));
+const before = createHash('sha256').update(oldIndex).digest('hex');
+await mkdir(resolve(root, 'new-design/assets'), { recursive: true });
+await cp(resolve(root, 'dist-new-design/assets'), resolve(root, 'new-design/assets'), { recursive: true });
+await copyFile(resolve(root, 'dist-new-design/model.glb'), resolve(root, 'new-design/model.glb'));
+await copyFile(resolve(root, 'dist-new-design/index.source.html'), resolve(root, 'new-design/index.html'));
+const after = createHash('sha256').update(await readFile(resolve(root, 'index.html'))).digest('hex');
+if (before !== after) throw new Error('Original page entry changed');
+console.log('Published files prepared only under new-design/. Original entry unchanged: ' + after);
