@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { Box, Layers, MousePointer2, RotateCcw, SlidersHorizontal } from 'lucide-react';
 import ModelViewport from './ModelViewport';
 import './styles.css';
 
 type VisibilityKey = 'outerShell' | 'innerShell' | 'stacks' | 'air' | 'hydrogen' | 'return';
 type Visibility = Record<VisibilityKey, boolean>;
+type CameraView = 'perspective' | 'side' | 'front' | 'fan' | 'machinery' | 'stacks';
 
 const initialVisibility: Visibility = {
   outerShell: true,
@@ -43,7 +44,8 @@ function LayerToggle({ label, detail, color, checked, onChange }: {
 
 export default function App() {
   const [viewMode, setViewMode] = useState<'complete' | 'cutaway'>('cutaway');
-  const [cameraView, setCameraView] = useState<'perspective' | 'side' | 'front'>('perspective');
+  const [sectionDepth, setSectionDepth] = useState(50);
+  const [cameraView, setCameraView] = useState<CameraView>('perspective');
   const [visibility, setVisibility] = useState<Visibility>(initialVisibility);
   const [resetKey, setResetKey] = useState(0);
 
@@ -56,7 +58,7 @@ export default function App() {
     setResetKey(current => current + 1);
   };
 
-  const selectCamera = (view: 'perspective' | 'side' | 'front') => {
+  const selectCamera = (view: CameraView) => {
     setCameraView(view);
     // Reapply a preset even after the user has manually orbited away from it.
     setResetKey(current => current + 1);
@@ -72,19 +74,20 @@ export default function App() {
             <h1>模块化推进构型</h1>
           </div>
         </div>
-        <div className="header-note"><span aria-hidden="true" />实体结构与管路布局</div>
+        <div className="header-note"><span aria-hidden="true" />几何模型 · 结构与管路布局</div>
       </header>
 
       <main className="design-workspace">
         <section className="viewer-card" aria-label="推进构型三维模型">
           <div className="viewer-heading">
             <div className="viewer-caption"><span className="caption-dot" />整体构型</div>
-            <div className="viewer-mode">{viewMode === 'cutaway' ? '半剖视图' : '完整视图'}</div>
+            <div className="viewer-mode">{viewMode === 'cutaway' ? '剖切视图' : '完整视图'}</div>
           </div>
 
           <div className="viewer-scene">
             <ModelViewport
               viewMode={viewMode}
+              sectionDepth={sectionDepth}
               cameraView={cameraView}
               showOuterShell={visibility.outerShell}
               showInnerShell={visibility.innerShell}
@@ -97,17 +100,28 @@ export default function App() {
           </div>
 
           <div className="viewer-bottom">
-            <div className="camera-toolbar" role="toolbar" aria-label="模型视角">
-              <button type="button" className={cameraView === 'perspective' ? 'is-active' : ''}
-                aria-pressed={cameraView === 'perspective'} onClick={() => selectCamera('perspective')}>立体</button>
-              <button type="button" className={cameraView === 'side' ? 'is-active' : ''}
-                aria-pressed={cameraView === 'side'} onClick={() => selectCamera('side')}>侧视</button>
-              <button type="button" className={cameraView === 'front' ? 'is-active' : ''}
-                aria-pressed={cameraView === 'front'} onClick={() => selectCamera('front')}>正视</button>
-              <span className="toolbar-divider" aria-hidden="true" />
-              <button className="reset-button" type="button" onClick={resetView} aria-label="复位视角">
-                <RotateCcw size={15} strokeWidth={1.7} /><span>复位</span>
-              </button>
+            <div className="viewer-controls">
+              <div className="camera-toolbar" role="toolbar" aria-label="模型视角">
+                <button type="button" className={cameraView === 'perspective' ? 'is-active' : ''}
+                  aria-pressed={cameraView === 'perspective'} onClick={() => selectCamera('perspective')}>立体</button>
+                <button type="button" className={cameraView === 'side' ? 'is-active' : ''}
+                  aria-pressed={cameraView === 'side'} onClick={() => selectCamera('side')}>侧视</button>
+                <button type="button" className={cameraView === 'front' ? 'is-active' : ''}
+                  aria-pressed={cameraView === 'front'} onClick={() => selectCamera('front')}>正视</button>
+                <span className="toolbar-divider" aria-hidden="true" />
+                <button className="reset-button" type="button" onClick={resetView} aria-label="复位视角">
+                  <RotateCcw size={15} strokeWidth={1.7} /><span>复位</span>
+                </button>
+              </div>
+              <div className="detail-toolbar" role="group" aria-label="局部查看">
+                <span className="detail-toolbar-label">局部查看</span>
+                <button type="button" className={cameraView === 'fan' ? 'is-active' : ''}
+                  aria-pressed={cameraView === 'fan'} onClick={() => selectCamera('fan')}>风扇</button>
+                <button type="button" className={cameraView === 'machinery' ? 'is-active' : ''}
+                  aria-pressed={cameraView === 'machinery'} onClick={() => selectCamera('machinery')}>电机 / 增压机</button>
+                <button type="button" className={cameraView === 'stacks' ? 'is-active' : ''}
+                  aria-pressed={cameraView === 'stacks'} onClick={() => selectCamera('stacks')}>电堆</button>
+              </div>
             </div>
             <div className="viewer-hint"><MousePointer2 size={13} />拖动旋转 · 缩放查看</div>
           </div>
@@ -128,9 +142,42 @@ export default function App() {
               </button>
               <button type="button" className={viewMode === 'cutaway' ? 'is-active' : ''}
                 aria-pressed={viewMode === 'cutaway'} onClick={() => setViewMode('cutaway')}>
-                <Layers size={16} strokeWidth={1.6} />半剖
+                <Layers size={16} strokeWidth={1.6} />剖切
               </button>
             </div>
+            {viewMode === 'cutaway' && (
+              <div className="depth-control">
+                <div className="depth-heading">
+                  <label htmlFor="section-depth">剖切深度</label>
+                  <output htmlFor="section-depth">{sectionDepth}<span>%</span></output>
+                </div>
+                <input
+                  id="section-depth"
+                  className="depth-slider"
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={sectionDepth}
+                  aria-valuetext={`${sectionDepth}% 剖切深度`}
+                  aria-describedby="section-depth-limits section-depth-scope"
+                  style={{ '--section-progress': `${sectionDepth}%` } as CSSProperties}
+                  onChange={event => setSectionDepth(Number(event.currentTarget.value))}
+                />
+                <div className="depth-limits" id="section-depth-limits">
+                  <span>完整保留</span><span>全剖开</span>
+                </div>
+                <div className="depth-presets" role="group" aria-label="常用剖切深度">
+                  {[25, 50, 75].map(depth => (
+                    <button key={depth} type="button" className={sectionDepth === depth ? 'is-active' : ''}
+                      aria-pressed={sectionDepth === depth} onClick={() => setSectionDepth(depth)}>
+                      {depth}%
+                    </button>
+                  ))}
+                </div>
+                <p className="depth-scope" id="section-depth-scope">沿轴向平面剖切壳体与电堆</p>
+              </div>
+            )}
           </section>
 
           <section className="control-section structure-section" aria-labelledby="structure-label">
@@ -161,7 +208,21 @@ export default function App() {
                 </div>
               ))}
             </div>
-            <p className="scale-note">示意比例 · 展示构型与管路的空间关系</p>
+            <details className="dimension-report">
+              <summary>报告尺寸 <span>/ mm</span></summary>
+              <table>
+                <caption>电堆：内径 / 外径 × 轴向长</caption>
+                <tbody>
+                  <tr><th scope="row">整机长</th><td>2012</td></tr>
+                  <tr><th scope="row">涵道内径</th><td>Φ1000</td></tr>
+                  <tr><th scope="row">主电机</th><td>Φ300 × 193</td></tr>
+                  <tr><th scope="row">第一级</th><td>Φ160 / Φ351 × 282</td></tr>
+                  <tr><th scope="row">第二级</th><td>Φ301 / Φ434 × 375</td></tr>
+                  <tr><th scope="row">第三级</th><td>Φ384 / Φ496 × 375</td></tr>
+                </tbody>
+              </table>
+            </details>
+            <p className="scale-note">主体尺寸按构型报告<br />叶型、管径及紧固件等装配细节为示意</p>
           </section>
         </aside>
       </main>

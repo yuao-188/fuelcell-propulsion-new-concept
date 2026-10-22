@@ -5,6 +5,8 @@ import ManifoldModule from 'manifold-3d';
 import { Document, NodeIO } from '@gltf-transform/core';
 import { Matrix4, Vector3, Color } from 'three';
 import { parameters as P, colors as C } from '../new-design/parameters.mjs';
+import { buildDetailedMachinery } from './detailed-machinery.mjs';
+import { buildDetailedStack } from './detailed-stacks.mjs';
 
 const api = await ManifoldModule();
 api.setup();
@@ -94,11 +96,12 @@ const airBore=union(airVoid), airSolid=union(airOuter).subtract(airBore), airCle
 add('air-network','中央空气主管 · 六根支管 · 模块连接管','air',C.air,airSolid,{clip:true});
 
 const H=P.hydrogen;
-const feedTrunk=[[P.stacks[0].rear+50,0,-H.offset],[H.inletX,0,-H.offset]];
-const returnTrunk=roundPath([[P.stacks[0].front-35,0,H.offset],[1110,0,H.offset],[1122,0,P.pump.centerZ],[P.pump.front,0,P.pump.centerZ]],8);
-const pumpReturn=[[P.pump.rear,0,P.pump.centerZ],[1210,0,P.pump.centerZ]];
-for(let i=1;i<=20;i++) { const a=i*Math.PI/20; pumpReturn.push([1210,65*Math.sin(a),65*Math.cos(a)]); }
-pumpReturn.push([1210,0,-H.offset]);
+const feedTrunk=[[P.stacks[0].rear+H.faceOffset,0,-H.offset],[H.inletX,0,-H.offset]];
+const returnTrunk=roundPath([[P.stacks[0].front-H.faceOffset,0,H.offset],[P.pump.front-25,0,H.offset],[P.pump.front-13,0,P.pump.centerZ],[P.pump.front,0,P.pump.centerZ]],8);
+const loopX=P.pump.rear+25, loopRadius=P.pump.centerZ;
+const pumpReturn=[[P.pump.rear,0,P.pump.centerZ],[loopX,0,P.pump.centerZ]];
+for(let i=1;i<=20;i++) { const a=i*Math.PI/20; pumpReturn.push([loopX,loopRadius*Math.sin(a),loopRadius*Math.cos(a)]); }
+pumpReturn.push([loopX,0,-H.offset]);
 const feedPaths=[feedTrunk,pumpReturn], returnPaths=[returnTrunk];
 const feedInternalOuter=[], feedInternalVoid=[], returnInternalOuter=[], returnInternalVoid=[], stackCutters=[], anodeOuter=[], anodeVoid=[];
 P.stacks.forEach((s,i)=>{
@@ -108,7 +111,7 @@ P.stacks.forEach((s,i)=>{
   const cutters=[torus(xf,r,H.ringOuter+P.clearance),torus(xr,r,H.ringOuter+P.clearance)];
   for(const [j,theta] of [-15,195].entries()) {
     const port=polar(s.rear,r,theta), ringPoint=polar(xf,r,theta);
-    feedPaths.push(roundPath([[s.rear+50,0,-H.offset],[s.rear+50,port[1],port[2]],port],12));
+    feedPaths.push(roundPath([[s.rear+H.faceOffset,0,-H.offset],[s.rear+H.faceOffset,port[1],port[2]],port],4));
     fo.push(cylinder(ringPoint,port,H.outer));
     fi.push(cylinder(ringPoint,[port[0]+.1,port[1],port[2]],H.inner));
     cutters.push(cylinder([xf-1,port[1],port[2]],[s.rear+1,port[1],port[2]],H.outer+P.clearance));
@@ -116,7 +119,7 @@ P.stacks.forEach((s,i)=>{
   }
   for(const [j,theta] of [15,165].entries()) {
     const port=polar(s.front,r,theta), ringPoint=polar(xr,r,theta);
-    returnPaths.push(roundPath([port,[s.front-35,port[1],port[2]],[s.front-35,0,H.offset]],12));
+    returnPaths.push(roundPath([port,[s.front-H.faceOffset,port[1],port[2]],[s.front-H.faceOffset,0,H.offset]],4));
     ro.push(cylinder(port,ringPoint,H.outer));
     ri.push(cylinder([port[0]-.1,port[1],port[2]],ringPoint,H.inner));
     cutters.push(cylinder([s.front-1,port[1],port[2]],[xr+1,port[1],port[2]],H.outer+P.clearance));
@@ -143,11 +146,8 @@ add('hydrogen-network','氢气供给 · 泵后回接','hydrogen',C.hydrogen,feed
 add('return-network','阳极回气 · 汇集到循环泵','return',C.return,returnOuter.subtract(returnBore));
 
 P.stacks.forEach((s,i)=>{
-  const pitch=360/s.modules, cut=union([airClearance,stackCutters[i]]);
-  for(let j=0;j<s.modules;j++) {
-    const start=s.firstSeam+j*pitch+P.moduleGapDegrees/2, end=s.firstSeam+(j+1)*pitch-P.moduleGapDegrees/2;
-    add(`stack-${i+1}-${j+1}`,`第${i+1}级 · 模块${j+1}`,'stacks',C.stack,sector(s.front,s.rear,s.inner,s.outer,start,end).subtract(cut),{stage:i+1,module:j+1,laminated:true});
-  }
+  const cut=union([airClearance,stackCutters[i]]);
+  buildDetailedStack({M,P,C,union,cylinder,sector,polar,add,s,i,cut});
   // Grey sealed manifold inserts carry the internal passages across module seams.
   // Their outer diameters have matching cutouts in every neighbouring module.
   add(`anode-internal-${i+1}`,`第${i+1}级阳极供回歧管与模块内部通道`,'anodeInternal',C.internal,
@@ -156,35 +156,52 @@ P.stacks.forEach((s,i)=>{
 
 // Front machinery: main motor shaft terminates at its own motor. The compressor
 // has a separate enclosed drive with no continuation of that front shaft.
-const fanPieces=[cylinder([-45,0,0],[35,0,0],48,48,64),cylinder([-95,0,0],[-45,0,0],1,48,64)];
-for(let i=0;i<P.fan.blades;i++) {
-  const blade = new CS([[[43,-17],[310,-41],[500,-14],[496,30],[275,30],[43,17]]]).extrude(12,1,8);
-  fanPieces.push(blade.rotate([0,90,0]).translate([-6,0,0]).rotate([i*360/P.fan.blades,0,0]));
-}
-add('fan','涵道推进风扇','front',C.fan,union(fanPieces));
-add('main-motor','主电机与风扇传动轴','front',C.motor,union([cylinder([75,0,0],[265,0,0],72,72,64),cylinder([35,0,0],[75,0,0],9)]));
-add('motor-housing','两端开口的电机壳体','front',C.air,revolved([[60,105],[280,105]],7),{clip:true});
-const compressorShell=revolved([[280,105],[360,105],[405,24]],x=>7-Math.max(0,x-360)/45);
-add('compressor-casing','独立驱动同轴增压机壳体','front',C.compressor,compressorShell,{clip:true});
-const drive=cylinder([292,0,0],[337,0,0],30,30,48);
-const rotorParts=[drive,cylinder([337,0,0],[349,0,0],9),cylinder([347,0,0],[353,0,0],16)];
-for(let i=0;i<10;i++) rotorParts.push(sector(347,353,12,86,i*36,i*36+15));
-add('compressor-drive','增压机独立驱动及叶轮','front',C.motor,union(rotorParts));
-const pumpOuter=cylinder([P.pump.front,0,P.pump.centerZ],[P.pump.rear,0,P.pump.centerZ],P.pump.radius,P.pump.radius,64);
+buildDetailedMachinery({M,CS,P,C,union,cylinder,revolved,sector,add});
+const pumpOuter=union([
+  cylinder([P.pump.front,0,P.pump.centerZ],[P.pump.front+6,0,P.pump.centerZ],P.pump.radius,P.pump.radius,64),
+  cylinder([P.pump.front+6,0,P.pump.centerZ],[P.pump.rear-6,0,P.pump.centerZ],P.pump.radius-2,P.pump.radius-2,64),
+  cylinder([P.pump.rear-6,0,P.pump.centerZ],[P.pump.rear,0,P.pump.centerZ],P.pump.radius,P.pump.radius,64),
+]);
 const pumpVoid=cylinder([P.pump.front-.2,0,P.pump.centerZ],[P.pump.rear+.2,0,P.pump.centerZ],P.pump.bore);
-add('pump','阳极循环泵','pump',C.pump,pumpOuter.subtract(pumpVoid));
+const pumpBolts=[];
+for(let j=0;j<6;j++) for(const x of [P.pump.front,P.pump.rear-1]) {
+  const a=polar(x,18,j*60);a[2]+=P.pump.centerZ;
+  pumpBolts.push(cylinder(a,[a[0]+1,a[1],a[2]],2.6,2.6,6));
+}
+const pumpHardware=union(pumpBolts);
+add('pump','阳极循环泵','pump',C.pump,pumpOuter.subtract(union([pumpVoid,pumpHardware])),{metallic:.38,roughness:.3});
+add('pump-hardware','循环泵端面紧固件','pump','#bcc8cc',pumpHardware,{metallic:.85,roughness:.25});
 
 const smooth=t=>t*t*(3-2*t);
 const os=P.outerShell, ins=P.innerShell;
-const outerProfile=[[os.front,os.radius],[os.shoulder,os.radius]];
+const outerProfile=[[os.front,os.radius+10],[os.front+4,os.radius+7],[os.front+12,os.radius+3],[os.front+25,os.radius],[os.shoulder,os.radius]];
 for(let i=1;i<=24;i++) outerProfile.push([os.shoulder+(os.rear-os.shoulder)*i/24,os.radius+(os.outletRadius-os.radius)*smooth(i/24)]);
 const innerProfile=[[ins.front,ins.inletRadius],[ins.shoulder,ins.radius]];
 for(let i=1;i<=20;i++) innerProfile.push([ins.shoulder+(ins.rear-ins.shoulder)*i/20,ins.radius+(ins.outletRadius-ins.radius)*smooth(i/20)]);
-add('outer-shell','最外层涵道外壳','outerShell',C.shell,revolved(outerProfile,os.wall),{clip:true});
-add('inner-shell','渐扩与后段收缩内壳','innerShell',C.inner,revolved(innerProfile,ins.wall),{clip:true});
+const shellSolid=revolved(outerProfile,os.wall);
+const shellBands=union([revolved(outerProfile.slice(0,4),os.wall),
+  ...[550,1110,1750].map(x=>revolved([[x,os.radius],[x+3,os.radius]],1.3)),
+  revolved(outerProfile.slice(-2),os.wall)]);
+// Tiny assembly relief prevents Float32-exported coplanar seam faces from
+// producing false interpenetration when the GLB is reconstructed for inspection.
+const shellBandClearance=union([shellBands,
+  ...[550,1110,1750].map(x=>revolved([[x-.02,os.radius+.02],[x+3.02,os.radius+.02]],1.34)),
+]);
+const shellScrews=[];
+for(const x of [35,558,1118,1738]) for(let j=0;j<12;j++) {
+  const a=polar(x,os.radius-1.8,j*30),b=polar(x,os.radius,j*30);
+  const screw=cylinder(a,b,2.8,2.8,32);
+  const slot=cylinder(polar(x,os.radius-.7,j*30),polar(x,os.radius+.1,j*30),1.25,1.25,6);
+  shellScrews.push(screw.subtract(slot));
+}
+const fasteners=union(shellScrews);
+add('outer-shell','连续曲面涵道外壳','outerShell','#aab5bd',shellSolid.subtract(union([shellBandClearance,fasteners])),{clip:true,metallic:.82,roughness:.38,finish:'satin-aluminium'});
+add('outer-shell-seams','机匣滚边与分段接缝','outerShell','#d3dce0',shellBands,{clip:true,metallic:.9,roughness:.21});
+add('outer-shell-fasteners','机匣沉头紧固件','outerShell','#64727d',fasteners,{clip:true,metallic:.85,roughness:.25});
+add('inner-shell','渐扩与后段收缩内壳','innerShell','#84939f',revolved(innerProfile,ins.wall),{clip:true,metallic:.72,roughness:.35,finish:'satin-aluminium'});
 
 console.log(`Built ${parts.length} solid components. Checking exact intersections...`);
-const report={schema:1,units:P.units,modules:P.stacks.map(s=>s.modules),portCounts:{air:6,hydrogen:6,return:6},parts:parts.length,solidChecks:0,broadPhasePairs:0,collisions:[],fluidChecks:{},ports};
+const report={schema:2,units:P.units,dimensionSource:'report_构型计算_完整版.md',pumpPlacement:'inside stage 3 central cavity, as confirmed by user',envelopes:{length:os.rear-os.front,ductBore:1000,nozzleBore:2*(os.outletRadius-os.wall),motorDiameter:2*P.motor.radius,motorLength:P.motor.rear-P.motor.front,stackLength:P.stacks.at(-1).rear-P.stacks[0].front},modules:P.stacks.map(s=>s.modules),portCounts:{air:6,hydrogen:6,return:6},parts:parts.length,solidChecks:0,broadPhasePairs:0,collisions:[],fluidChecks:{},ports};
 const bounds=parts.map(p=>p.solid.boundingBox());
 for(const id of ['fan','main-motor','compressor-drive']) {
   const pieces=parts.find(p=>p.id===id).solid.decompose();
@@ -245,15 +262,18 @@ for(const part of parts) {
     positions.set(meshData.vertProperties.slice(i*meshData.numProp,i*meshData.numProp+3),i*3);
     normals.set(meshData.vertProperties.slice(i*meshData.numProp+3,i*meshData.numProp+6),i*3);
   }
-  if(!materials.has(part.color)) {
+  const metal=part.metallic??(['air','hydrogen','return'].includes(part.group)?.32:part.group==='stacks'?.22:.68);
+  const rough=part.roughness??.34;
+  const materialKey=`${part.color}/${metal}/${rough}`;
+  if(!materials.has(materialKey)) {
     const c=new Color(part.color);
-    materials.set(part.color,document.createMaterial(part.color).setBaseColorFactor([c.r,c.g,c.b,1]).setMetallicFactor(part.group==='front'?.25:.12).setRoughnessFactor(.48).setDoubleSided(true));
+    materials.set(materialKey,document.createMaterial(materialKey).setBaseColorFactor([c.r,c.g,c.b,1]).setMetallicFactor(metal).setRoughnessFactor(rough).setDoubleSided(true));
   }
   const primitive=document.createPrimitive().setAttribute('POSITION',document.createAccessor().setType('VEC3').setArray(positions).setBuffer(buffer))
     .setAttribute('NORMAL',document.createAccessor().setType('VEC3').setArray(normals).setBuffer(buffer))
-    .setIndices(document.createAccessor().setType('SCALAR').setArray(meshData.triVerts).setBuffer(buffer)).setMaterial(materials.get(part.color));
+    .setIndices(document.createAccessor().setType('SCALAR').setArray(meshData.triVerts).setBuffer(buffer)).setMaterial(materials.get(materialKey));
   const mesh=document.createMesh(part.name).addPrimitive(primitive);
-  scene.addChild(document.createNode(part.name).setMesh(mesh).setExtras({id:part.id,group:part.group,clip:part.clip||false,laminated:part.laminated||false,stage:part.stage||0,module:part.module||0}));
+  scene.addChild(document.createNode(part.name).setMesh(mesh).setExtras({id:part.id,group:part.group,clip:part.clip||false,laminated:part.laminated||false,stage:part.stage||0,module:part.module||0,finish:part.finish||'',layerPitch:part.layerPitch||0,layerOrigin:part.layerOrigin||0,layerCount:part.layerCount||0}));
 }
 await new NodeIO().write(resolve(root,'new-design/public/model.glb'),document);
 console.log(JSON.stringify({parts:parts.length,modules:11,checkedPairs:report.solidChecks,collisions:report.collisions.length,fluidChecks:report.fluidChecks},null,2));
