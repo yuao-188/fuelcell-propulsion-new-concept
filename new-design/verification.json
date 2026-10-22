@@ -1,12 +1,12 @@
 {
   "schema": 2,
   "units": "mm",
-  "dimensionSource": "report_构型计算_完整版.md",
+  "dimensionSource": "report_构型计算_完整版.md with user-specified casing and bay revisions",
   "pumpPlacement": "inside stage 3 central cavity, as confirmed by user",
   "envelopes": {
     "length": 2012,
     "ductBore": 1000,
-    "nozzleBore": 932,
+    "nozzleBore": 572,
     "motorDiameter": 300,
     "motorLength": 193,
     "stackLength": 1072
@@ -44,7 +44,7 @@
       "solidVolumeInsideLumen": -2.6147775639536144e-11
     },
     "completeAnodeObstruction": {
-      "solidVolumeInsideLumen": 0.0010683442124705819
+      "solidVolumeInsideLumen": -1.9557946713528192e-7
     },
     "air": {
       "connectedComponents": 1
@@ -257,38 +257,46 @@
     }
   ],
   "layoutOverrides": {
-    "source": "latest user sketch and open-inner-sleeve confirmation",
+    "source": "latest red outer / yellow inner outline and open-inner-sleeve confirmation",
     "intakeLength": 270,
     "compressorLength": 210,
     "intakeInnerEnds": "both open",
-    "mainInnerShellFront": 210
+    "mainInnerShellFront": 210,
+    "outerWaistRadius": 410,
+    "mainInnerShellMaximumRadius": 330
   },
   "shellGeometry": {
     "innerCurve": "cubic Hermite, zero slope at expansionStart, shoulder and rear",
+    "outerCurve": "preserved fan inlet; cubic Hermite contraction, constant waist, cubic Hermite tail contraction",
+    "outerWaist": {
+      "front": 850,
+      "rear": 1762,
+      "radius": 410
+    },
     "innerConstantRadius": {
       "front": 210,
-      "rear": 620,
-      "radius": 210
+      "rear": 900,
+      "radius": 248
     },
     "innerWall": 5,
     "stackClearances": [
       {
         "stage": 1,
-        "minimumRadialClearance": 30.209352710857814,
-        "x": 690,
-        "rearRadialClearance": 45.314324091440426
+        "minimumRadialClearance": 67.44217258041792,
+        "x": 900,
+        "rearRadialClearance": 69.19070765122157
       },
       {
         "stage": 2,
-        "minimumRadialClearance": 5.41316227068458,
+        "minimumRadialClearance": 28.74537334686667,
         "x": 992,
-        "rearRadialClearance": 39.056676210224396
+        "rearRadialClearance": 74.5962361499009
       },
       {
         "stage": 3,
-        "minimumRadialClearance": 9.743835230721402,
+        "minimumRadialClearance": 46.49169239992284,
         "x": 1387,
-        "rearRadialClearance": 28.87694935673983
+        "rearRadialClearance": 71.90837615800899
       }
     ],
     "seamStations": [
@@ -296,6 +304,18 @@
       1110,
       1750
     ],
+    "fanSweptClearance": {
+      "front": 50,
+      "rear": 210,
+      "radius": 498,
+      "minimumRadialClearance": 1.8810135399545516,
+      "x": 210,
+      "intersectionVolume": 0
+    },
+    "interShellClearance": {
+      "minimumRadialClearance": 59.67437834253013,
+      "x": 1940
+    },
     "outerAccessCovers": 3,
     "outerFasteners": 38,
     "innerFasteners": 8,
@@ -305,7 +325,7 @@
   "compressorGeometry": {
     "status": "passed",
     "scope": "Exported front machinery geometry only; no aerodynamic performance validation",
-    "modelModifiedAt": "2026-10-22T15:42:16.586Z",
+    "modelModifiedAt": "2026-10-22T16:07:19.316Z",
     "units": "mm",
     "frontParts": 15,
     "solidIntersections": {

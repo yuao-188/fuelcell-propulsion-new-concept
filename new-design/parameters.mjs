@@ -17,8 +17,10 @@ export const parameters = {
   air: { outer: 24, inner: 18, end: 1840, branchOuter: 9, branchInner: 6.5, ringInset: 18 },
   hydrogen: { outer: 6.5, inner: 4.5, offset: 55, ringInset: 36, ringOuter: 5, ringInner: 3.4, inletX: 1880, faceOffset: 7.2 },
   pump: { front: 1630, rear: 1680, centerZ: 70, radius: 25, bore: 4.5 },
-  outerShell: { front: 0, shoulder: 1762, rear: 2012, radius: 506, outletRadius: 472, wall: 6 },
-  innerShell: { front: 210, expansionStart: 620, shoulder: 1780, rear: 1940, inletRadius: 210, radius: 282, outletRadius: 218, wall: 5 },
+  // Red outline: retain the fan inlet, contract to a waist, then contract again aft.
+  outerShell: { front: 0, taperStart: 210, waistStart: 850, waistRadius: 410, shoulder: 1762, rear: 2012, radius: 506, outletRadius: 292, wall: 6 },
+  // Yellow outline: larger level forebody and a higher aft expansion peak.
+  innerShell: { front: 210, expansionStart: 900, shoulder: 1730, rear: 1940, inletRadius: 248, radius: 330, outletRadius: 250, wall: 5 },
   clearance: 0.8,
 };
 export const colors = {

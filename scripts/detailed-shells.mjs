@@ -11,23 +11,33 @@ export function buildDetailedShells({ M, CS, P, union, cylinder, revolved, polar
   if (!(ins.front < expansionStart && expansionStart < ins.shoulder && ins.shoulder < ins.rear)) {
     throw new Error('innerShell requires front < expansionStart < shoulder < rear');
   }
+  if (!(os.front + 25 <= os.taperStart && os.taperStart < os.waistStart
+      && os.waistStart < os.shoulder && os.shoulder < os.rear)) {
+    throw new Error('outerShell requires inlet < taperStart < waistStart < shoulder < rear');
+  }
   if (!(ins.wall > 2.2 && os.wall > 2.3)) throw new Error('Casing walls are too thin for the recessed details');
 
-  // These stations retain the existing outer casing and rolled inlet envelope.
+  // The unchanged inlet clears the complete rotating fan envelope. Both aft
+  // contractions meet the level waist with zero slope, rather than hard corners.
   const outerProfile = [
     [os.front, os.radius + 10], [os.front + 4, os.radius + 7],
     [os.front + 12, os.radius + 3], [os.front + 25, os.radius],
-    [os.shoulder, os.radius],
+    [os.taperStart, os.radius],
   ];
-  for (let i = 1; i <= 24; i++) {
-    const t = i / 24;
+  for (let i = 1; i <= 64; i++) {
+    const t = i / 64;
+    outerProfile.push([os.taperStart + (os.waistStart - os.taperStart) * t,
+      os.radius + (os.waistRadius - os.radius) * smooth(t)]);
+  }
+  outerProfile.push([os.shoulder, os.waistRadius]);
+  for (let i = 1; i <= 40; i++) {
+    const t = i / 40;
     outerProfile.push([os.shoulder + (os.rear - os.shoulder) * t,
-      os.radius + (os.outletRadius - os.radius) * smooth(t)]);
+      os.waistRadius + (os.outletRadius - os.waistRadius) * smooth(t)]);
   }
 
   // Cubic Hermite transitions have exactly zero slope at every join. Unlike a
   // linear loft, this retains a level forward section and no expansion shoulder.
-  // Cubic (rather than quintic) also provides useful clearance at stage 2's front.
   const innerRadius = x => x <= expansionStart ? ins.inletRadius
     : x <= ins.shoulder ? ins.inletRadius + (ins.radius - ins.inletRadius)
       * smooth((x - expansionStart) / (ins.shoulder - expansionStart))
@@ -45,6 +55,26 @@ export function buildDetailedShells({ M, CS, P, union, cylinder, revolved, polar
   const outerEnvelope = revolved(outerProfile, os.wall);
   const innerEnvelope = revolved(innerProfile, ins.wall);
 
+  // All machining details use the same sampled surface as the body. Inserting
+  // exact boundary stations preserves that piecewise-linear envelope at seats.
+  const sampledRadius = (profile, x) => {
+    const next = profile.findIndex(p => p[0] >= x);
+    if (next === 0) return profile[0][1];
+    if (next < 0) return profile.at(-1)[1];
+    const a = profile[next - 1], b = profile[next];
+    return a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]);
+  };
+  const surfaceSlope = (profile, x) => {
+    const next = Math.max(1, profile.findIndex(p => p[0] > x));
+    const a = profile[next - 1], b = profile[next];
+    return (b[1] - a[1]) / (b[0] - a[0]);
+  };
+  const profileRange = (profile, front, rear, offset = 0) => [
+    [front, sampledRadius(profile, front) + offset],
+    ...profile.filter(p => p[0] > front && p[0] < rear).map(([x, r]) => [x, r + offset]),
+    [rear, sampledRadius(profile, rear) + offset],
+  ];
+
   // A sector uses the same angular convention as polar and the main generator.
   const sector = (front, rear, inner, outer, start, end) => {
     const points = [], count = Math.ceil((end - start) / .5);
@@ -59,7 +89,6 @@ export function buildDetailedShells({ M, CS, P, union, cylinder, revolved, polar
     return new CS([points]).extrude(rear - front).rotate([0, 90, 0]).translate([front, 0, 0]);
   };
   const axialSlice = (front, rear, radius) => cylinder([front, 0, 0], [rear, 0, 0], radius, radius, 144);
-  const ring = (front, rear, radius, depth) => revolved([[front, radius], [rear, radius]], depth);
   const outerCuts = [], innerCuts = [], outerScrews = [], innerScrews = [];
 
   // End trim is taken from the existing lip and nozzle material. Axial relief
@@ -78,21 +107,22 @@ export function buildDetailedShells({ M, CS, P, union, cylinder, revolved, polar
   // No band is layered on top of the housing and the prescribed OD is retained.
   const seamStations = [550, 1110, 1750];
   for (const x of seamStations) {
-    if (x - .45 <= os.front + 25 || x + .45 >= os.shoulder) {
-      throw new Error('Outer casing seam lies outside its constant-radius section');
-    }
-    outerCuts.push(ring(x - .45, x + .45, os.radius + .05, .7));
+    outerCuts.push(revolved(profileRange(outerProfile, x - .45, x + .45, .05), .7));
   }
 
-  const countersunk = (x, r, angle, headRadius, depth, envelope, cuts, screws) => {
-    const a = polar(x, r - depth, angle), b = polar(x, r + .04, angle);
+  const countersunk = (x, r, slope, angle, headRadius, depth, envelope, cuts, screws) => {
+    // Screw axes follow the local conical surface normal; clipped heads end on
+    // the actual casing surface rather than floating over a constant-radius tube.
+    const theta = angle * Math.PI / 180, scale = Math.hypot(1, slope);
+    const n = [-slope / scale, Math.cos(theta) / scale, Math.sin(theta) / scale];
+    const origin = polar(x, r, angle), point = d => origin.map((v, i) => v + d * n[i]);
+    const a = point(-depth), b = point(.04);
     const head = cylinder(a, b, headRadius * .48, headRadius, 24).intersect(envelope);
-    const socket = cylinder(polar(x, r - .65, angle), polar(x, r + .15, angle),
-      headRadius * .36, headRadius * .36, 6);
+    const socket = cylinder(point(-.65), point(.15), headRadius * .36, headRadius * .36, 6);
     screws.push(head.subtract(socket));
     // The pocket is slightly deeper and wider than the inserted screw. It is
     // wholly inside the wall, so the remaining inner wall stays unperforated.
-    cuts.push(cylinder(polar(x, r - depth - relief, angle), polar(x, r + .12, angle),
+    cuts.push(cylinder(point(-depth - relief), point(.12),
       headRadius * .48 + .06, headRadius + .09, 24));
   };
 
@@ -101,13 +131,17 @@ export function buildDetailedShells({ M, CS, P, union, cylinder, revolved, polar
   const coverCentre = os.front + 400, covers = [], coverCuts = [];
   const coverFront = coverCentre - 48, coverRear = coverCentre + 48;
   for (const angle of [45, 165, 285]) {
-    const cover = sector(coverFront, coverRear, os.radius - 2, os.radius - .1,
-      angle - 4, angle + 4).intersect(outerEnvelope);
-    outerCuts.push(sector(coverFront - .18, coverRear + .18, os.radius - 2.15, os.radius + .2,
-      angle - 4.03, angle + 4.03));
+    const coverWedge = sector(coverFront, coverRear, 1, os.radius + 20, angle - 4, angle + 4);
+    const cover = revolved(profileRange(outerProfile, coverFront, coverRear, -.1), 1.9)
+      .intersect(coverWedge).intersect(outerEnvelope);
+    const pocketWedge = sector(coverFront - .18, coverRear + .18, 1, os.radius + 20,
+      angle - 4.03, angle + 4.03);
+    outerCuts.push(revolved(profileRange(outerProfile, coverFront - .18, coverRear + .18, .2), 2.35)
+      .intersect(pocketWedge));
     const seats = [];
     for (const x of [coverCentre - 31, coverCentre + 31]) {
-      countersunk(x, os.radius - .1, angle, 2.5, 1.35, cover, seats, outerScrews);
+      countersunk(x, sampledRadius(outerProfile, x) - .1, surfaceSlope(outerProfile, x),
+        angle, 2.5, 1.35, cover, seats, outerScrews);
     }
     coverCuts.push(...seats);
     covers.push(cover.subtract(union(seats)));
@@ -115,14 +149,14 @@ export function buildDetailedShells({ M, CS, P, union, cylinder, revolved, polar
 
   for (const x of [os.front + 40, 558, 1118, 1740]) {
     for (let j = 0; j < 8; j++) {
-      countersunk(x, os.radius, 22.5 + j * 45, 2.8, 1.8,
+      countersunk(x, sampledRadius(outerProfile, x), surfaceSlope(outerProfile, x), 22.5 + j * 45, 2.8, 1.8,
         outerEnvelope, outerCuts, outerScrews);
     }
   }
   // The inner casing remains one connected, continuous shell. Only the front
   // inspection fasteners are inset, within the flat-radius portion of its wall.
   for (let j = 0; j < 8; j++) {
-    countersunk(ins.front + 15, ins.inletRadius, 22.5 + j * 45, 2.4, 1.5,
+    countersunk(ins.front + 15, ins.inletRadius, 0, 22.5 + j * 45, 2.4, 1.5,
       innerEnvelope, innerCuts, innerScrews);
   }
 
@@ -141,30 +175,44 @@ export function buildDetailedShells({ M, CS, P, union, cylinder, revolved, polar
   add('inner-shell-fasteners', '内壳前端沉头检修紧固件', 'innerShell', '#c1cbd1', union(innerScrews),
     { clip: true, metallic: .88, roughness: .23 });
 
-  // Clearance uses the actual polyline and a conservative inscribed polygon
-  // radius, not just the analytic Hermite curve. Stack hardware is constrained
-  // by buildDetailedStack to each reported stack's radial/axial envelope.
-  const sampledRadius = x => {
-    const next = innerProfile.findIndex(p => p[0] >= x);
-    if (next === 0) return innerProfile[0][1];
-    if (next < 0) return innerProfile.at(-1)[1];
-    const a = innerProfile[next - 1], b = innerProfile[next];
-    return a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]);
-  };
+  // Conservative clearance includes the 144-sided bore's radial sag. Evaluating
+  // both profiles' knots gives the minimum of their piecewise-linear difference.
+  const polygonFactor = Math.cos(Math.PI / 144);
+  const minimumAt = (stations, gapAt) => stations.map(x => ({ x, gap: gapAt(x) }))
+    .reduce((a, b) => a.gap < b.gap ? a : b);
   const stackClearances = P.stacks.map((s, i) => {
     const stations = [s.front, s.rear, ...innerProfile.filter(p => p[0] > s.front && p[0] < s.rear).map(p => p[0])];
-    const values = stations.map(x => ({ x, gap: (sampledRadius(x) - ins.wall) * Math.cos(Math.PI / 144) - s.outer }));
-    const minimum = values.reduce((a, b) => a.gap < b.gap ? a : b);
+    const minimum = minimumAt(stations, x => (sampledRadius(innerProfile, x) - ins.wall) * polygonFactor - s.outer);
     if (minimum.gap < P.clearance) throw new Error(`Inner casing clearance too small at stack ${i + 1}: ${minimum.gap}`);
     return { stage: i + 1, minimumRadialClearance: minimum.gap, x: minimum.x,
-      rearRadialClearance: (sampledRadius(s.rear) - ins.wall) * Math.cos(Math.PI / 144) - s.outer };
+      rearRadialClearance: (sampledRadius(innerProfile, s.rear) - ins.wall) * polygonFactor - s.outer };
   });
+  const overlapFront = Math.max(ins.front, os.front), overlapRear = Math.min(ins.rear, os.rear);
+  const shellStations = [overlapFront, overlapRear, ...[...outerProfile, ...innerProfile]
+    .filter(p => p[0] > overlapFront && p[0] < overlapRear).map(p => p[0])];
+  const shellGap = minimumAt(shellStations, x => (sampledRadius(outerProfile, x) - os.wall)
+    * polygonFactor - sampledRadius(innerProfile, x));
+  if (shellGap.gap < P.clearance) throw new Error(`Outer and inner casing clearance too small: ${shellGap.gap}`);
+  const fanStations = [P.fan.front, P.fan.rear, ...outerProfile
+    .filter(p => p[0] > P.fan.front && p[0] < P.fan.rear).map(p => p[0])];
+  const fanGap = minimumAt(fanStations, x => (sampledRadius(outerProfile, x) - os.wall)
+    * polygonFactor - P.fan.radius);
+  if (fanGap.gap < P.clearance) throw new Error(`Outer casing obstructs rotating fan envelope: ${fanGap.gap}`);
+  const fanSweep = axialSlice(P.fan.front, P.fan.rear, P.fan.radius);
+  const sweptOverlap = outerEnvelope.intersect(fanSweep), sweptOverlapVolume = sweptOverlap.volume();
+  sweptOverlap.delete(); fanSweep.delete();
+  if (sweptOverlapVolume > .02) throw new Error('Outer casing intersects the full fan sweep');
   return {
     profiles: { outer: outerProfile, inner: innerProfile },
     verification: {
       innerCurve: 'cubic Hermite, zero slope at expansionStart, shoulder and rear',
+      outerCurve: 'preserved fan inlet; cubic Hermite contraction, constant waist, cubic Hermite tail contraction',
+      outerWaist: { front: os.waistStart, rear: os.shoulder, radius: os.waistRadius },
       innerConstantRadius: { front: ins.front, rear: expansionStart, radius: ins.inletRadius },
       innerWall: ins.wall, stackClearances, seamStations,
+      fanSweptClearance: { front: P.fan.front, rear: P.fan.rear, radius: P.fan.radius,
+        minimumRadialClearance: fanGap.gap, x: fanGap.x, intersectionVolume: sweptOverlapVolume },
+      interShellClearance: { minimumRadialClearance: shellGap.gap, x: shellGap.x },
       outerAccessCovers: covers.length, outerFasteners: outerScrews.length, innerFasteners: innerScrews.length,
       detailRelief: relief, detailsWithinOriginalEnvelope: true,
     },

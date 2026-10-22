@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { createEngineeringMaterials } from './materials';
 
 type Props = {
   viewMode: 'complete' | 'cutaway'; sectionDepth: number;
@@ -10,32 +11,6 @@ type Props = {
   showIntake: boolean; showIntakeInner: boolean; showCompressorCase: boolean;
   showAir: boolean; showHydrogen: boolean; showReturn: boolean; resetKey: number;
 };
-
-function layeredFinish(material:THREE.MeshStandardMaterial,origin:number) {
-  material.onBeforeCompile=shader=>{
-    shader.uniforms.layerOrigin={value:origin};
-    shader.vertexShader='varying float vLayerX;\n'+shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvLayerX=(modelMatrix*vec4(position,1.0)).x;');
-    shader.fragmentShader='varying float vLayerX; uniform float layerOrigin;\n'+shader.fragmentShader.replace('#include <color_fragment>',`#include <color_fragment>
-      float footprint=max(fwidth(vLayerX)/1.01,0.001);
-      float lod=mix(1.0,8.0,smoothstep(0.4,1.2,footprint));
-      float phase=(vLayerX-layerOrigin)/(1.01*lod);
-      float edge=1.0-smoothstep(0.10,0.10+max(fwidth(phase),0.001),abs(fract(phase)-0.5));
-      diffuseColor.rgb*=mix(0.62,1.8,edge);`);
-  };
-  material.customProgramCacheKey=()=> 'axial-plate-lod-v3';
-}
-
-function machinedFinish(material:THREE.MeshStandardMaterial) {
-  // Filter fine lathe marks in screen space so they disappear at overview scale.
-  material.onBeforeCompile=shader=>{
-    shader.vertexShader='varying float vMachiningX;\n'+shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvMachiningX=(modelMatrix*vec4(position,1.0)).x;');
-    shader.fragmentShader='varying float vMachiningX;\n'+shader.fragmentShader.replace('#include <roughnessmap_fragment>',`#include <roughnessmap_fragment>
-      float phase=vMachiningX/0.65;
-      float machiningFade=1.0-smoothstep(0.18,0.8,fwidth(phase));
-      roughnessFactor=clamp(roughnessFactor+0.035*sin(phase*6.2831853)*machiningFade,0.12,1.0);`);
-  };
-  material.customProgramCacheKey=()=> 'filtered-machining-v1';
-}
 
 export default function ModelViewport(props: Props) {
   const host=useRef<HTMLDivElement>(null), latest=useRef(props);
@@ -50,21 +25,23 @@ export default function ModelViewport(props: Props) {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
     renderer.outputColorSpace=THREE.SRGBColorSpace;
     renderer.toneMapping=THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure=1.12;
+    renderer.toneMappingExposure=.96;
     renderer.localClippingEnabled=true;
     renderer.shadowMap.enabled=true;
     renderer.shadowMap.type=THREE.PCFSoftShadowMap;
     renderer.domElement.setAttribute('aria-label','燃料电池推进系统三维模型，可拖动旋转、滚轮缩放');
     element.appendChild(renderer.domElement);
-    const scene=new THREE.Scene(); scene.background=new THREE.Color('#e8edf0');
+    const scene=new THREE.Scene(); scene.background=new THREE.Color('#e9eef1');
+    const finishes=createEngineeringMaterials(renderer);
     const camera=new THREE.PerspectiveCamera(30,1,1,18000);
     const controls=new OrbitControls(camera,renderer.domElement);
     controls.enableDamping=true; controls.dampingFactor=.09;
     controls.minDistance=180; controls.maxDistance=9000;
     controls.target.set(1000,0,0);
 
-    // Reflection cards give cylindrical metal surfaces continuous highlights.
-    const studio=new THREE.Scene(); studio.background=new THREE.Color('#35434f');
+    // Bright strips and dark flags describe curvature through reflection. A
+    // broad, uniformly bright environment would flatten metal into plastic.
+    const studio=new THREE.Scene(); studio.background=new THREE.Color('#56616a');
     const cardGeometry=new THREE.BoxGeometry(1,1,1);
     const cardMaterials:THREE.MeshBasicMaterial[]=[];
     const card=(position:number[],scale:number[],intensity:number)=>{
@@ -73,27 +50,29 @@ export default function ModelViewport(props: Props) {
       const mesh=new THREE.Mesh(cardGeometry,material);
       mesh.position.fromArray(position);mesh.scale.fromArray(scale);studio.add(mesh);
     };
-    card([0,7,0],[16,.1,3.5],5);
-    card([-7,1,2],[.1,5,10],3);
-    card([2,0,7],[12,2,.1],2.5);
-    card([3,2,-7],[8,5,.1],1.5);
-    card([0,-7,0],[16,.1,16],.3);
+    card([0,6,1],[16,.1,4],3.8);
+    card([-6,2,3],[.1,6,11],2.6);
+    card([2,1.4,7],[13,1.2,.1],3);
+    card([0,-1.6,6],[16,2.5,.1],.14);
+    card([5,3,-6],[7,4,.1],1.7);
+    card([0,-6,0],[16,.1,12],.16);
     const pmrem=new THREE.PMREMGenerator(renderer);
-    const environment=pmrem.fromScene(studio,.025);
-    scene.environment=environment.texture;scene.environmentIntensity=1.05;
+    const environment=pmrem.fromScene(studio,.04);
+    scene.environment=environment.texture;scene.environmentIntensity=.95;
     cardGeometry.dispose();cardMaterials.forEach(m=>m.dispose());
-    scene.add(new THREE.HemisphereLight('#f1f7ff','#697480',.65));
-    const key=new THREE.DirectionalLight('#fff7ec',2.6);
+    scene.add(new THREE.HemisphereLight('#edf5ff','#57636e',.38));
+    const key=new THREE.DirectionalLight('#fff5e6',2.15);
     key.position.set(100,1800,1400);key.target.position.set(1000,0,0);
     key.castShadow=true;key.shadow.mapSize.set(2048,2048);
     Object.assign(key.shadow.camera,{left:-1600,right:1600,top:1150,bottom:-1150,near:50,far:5000});
-    key.shadow.bias=-.0005;key.shadow.normalBias=1.5;key.shadow.radius=3;
+    key.shadow.bias=-.0005;key.shadow.normalBias=1.1;key.shadow.radius=3;
     scene.add(key,key.target);
-    const fill=new THREE.DirectionalLight('#d3e7ff',1.1);fill.position.set(1900,500,-1300);scene.add(fill);
+    const fill=new THREE.DirectionalLight('#cbdfea',.58);fill.position.set(1900,500,-1300);fill.target.position.set(1000,0,0);scene.add(fill,fill.target);
+    const rim=new THREE.DirectionalLight('#f0f6ff',1.05);rim.position.set(1800,1500,-1100);rim.target.position.set(1000,0,0);scene.add(rim,rim.target);
     const floor=new THREE.Mesh(new THREE.PlaneGeometry(6000,6000),new THREE.ShadowMaterial({color:'#344656',opacity:.18}));
     floor.rotation.x=-Math.PI/2;floor.position.set(1000,-520,0);floor.receiveShadow=true;scene.add(floor);
     const grid=new THREE.GridHelper(3600,48,'#c6d2d9','#d8e0e5');grid.position.set(1000,-522,0);
-    (grid.material as THREE.Material).transparent=true;(grid.material as THREE.Material).opacity=.34;scene.add(grid);
+    (grid.material as THREE.Material).transparent=true;(grid.material as THREE.Material).opacity=.25;scene.add(grid);
 
     let root:THREE.Group|undefined,cancelled=false,frame=0,dirty=true;
     controls.addEventListener('change',()=>{dirty=true;});
@@ -132,23 +111,19 @@ export default function ModelViewport(props: Props) {
       front.stencilFail=front.stencilZFail=front.stencilZPass=THREE.DecrementWrapStencilOp;
       [back,front].forEach((material,i)=>{const m=new THREE.Mesh(mesh.geometry,material);m.renderOrder=index*4+i+1;stencil.add(m);});base.dispose();
       const source=mesh.material as THREE.MeshStandardMaterial;
-      const material=new THREE.MeshStandardMaterial({color:source.color.clone().lerp(new THREE.Color('#9ba4aa'),.3),metalness:.3,roughness:.52,side:THREE.DoubleSide,stencilWrite:true,stencilRef:0,stencilFunc:THREE.NotEqualStencilFunc,stencilFail:THREE.ReplaceStencilOp,stencilZFail:THREE.ReplaceStencilOp,stencilZPass:THREE.ReplaceStencilOp});
+      const material=finishes.section(source,mesh.userData);
       const cap=new THREE.Mesh(capGeometry,material);cap.position.set(1006,0,0);cap.renderOrder=index*4+3;
-      if(mesh.userData.laminated)layeredFinish(material,mesh.userData.layerOrigin||0);
       cap.onAfterRender=()=>renderer.clearStencil();
       scene.add(stencil,cap);sections.push({source:mesh,stencil,cap});
     }
-    new GLTFLoader().load(new URL('model.glb?v=20261023-annular-intake-1',document.baseURI).href,gltf=>{
+    new GLTFLoader().load(new URL('model.glb?v=20261022-contoured-metal-2',document.baseURI).href,gltf=>{
       if(cancelled){disposeObject(gltf.scene);return;}
       root=gltf.scene;scene.add(root);
       root.traverse(item=>{
         if(!(item instanceof THREE.Mesh))return;
-        meshes.push(item);item.renderOrder=1000;item.castShadow=true;item.receiveShadow=true;
+        meshes.push(item);item.renderOrder=1000;item.castShadow=!String(item.userData.id).startsWith('stack-edges-');item.receiveShadow=true;
         const source=item.material as THREE.MeshStandardMaterial;
-        const material=new THREE.MeshPhysicalMaterial({color:source.color,metalness:source.metalness,roughness:source.roughness,side:THREE.DoubleSide,clearcoat:source.metalness<.6?.22:.08,clearcoatRoughness:.32});
-        material.clipShadows=true;item.material=material;
-        if(item.userData.laminated)layeredFinish(material,item.userData.layerOrigin||0);
-        else if(['machined','satin-aluminium','brushed-metal'].includes(item.userData.finish))machinedFinish(material);
+        item.material=finishes.create(source,item.userData);
         if(item.userData.clip||item.userData.laminated)addSection(item,sections.length);
       });
       setStatus('');priorMode='';priorDepth=-1;priorVisibility='';fit();
@@ -187,7 +162,7 @@ export default function ModelViewport(props: Props) {
       cancelled=true;cancelAnimationFrame(frame);observer.disconnect();controls.dispose();
       if(root)disposeObject(root);
       sections.forEach(({stencil,cap})=>{stencil.children.forEach(o=>((o as THREE.Mesh).material as THREE.Material).dispose());(cap.material as THREE.Material).dispose();});
-      capGeometry.dispose();disposeObject(grid);disposeObject(floor);environment.texture.dispose();pmrem.dispose();renderer.dispose();renderer.domElement.remove();
+      capGeometry.dispose();disposeObject(grid);disposeObject(floor);finishes.dispose();environment.dispose();pmrem.dispose();renderer.dispose();renderer.domElement.remove();
     };
   },[]);
   return <div className="model-viewport" style={{position:'relative'}}>

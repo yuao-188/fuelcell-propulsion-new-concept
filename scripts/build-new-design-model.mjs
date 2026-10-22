@@ -177,8 +177,8 @@ const os=P.outerShell, ins=P.innerShell;
 const shells=buildDetailedShells({M,CS,P,union,cylinder,revolved,polar,add});
 
 console.log(`Built ${parts.length} solid components. Checking exact intersections...`);
-const report={schema:2,units:P.units,dimensionSource:'report_构型计算_完整版.md',pumpPlacement:'inside stage 3 central cavity, as confirmed by user',envelopes:{length:os.rear-os.front,ductBore:1000,nozzleBore:2*(os.outletRadius-os.wall),motorDiameter:2*P.motor.radius,motorLength:P.motor.rear-P.motor.front,stackLength:P.stacks.at(-1).rear-P.stacks[0].front},modules:P.stacks.map(s=>s.modules),portCounts:{air:6,hydrogen:6,return:6},parts:parts.length,solidChecks:0,broadPhasePairs:0,collisions:[],fluidChecks:{},ports};
-report.layoutOverrides={source:'latest user sketch and open-inner-sleeve confirmation',intakeLength:P.motorHousing.rear-P.motorHousing.front,compressorLength:P.compressor.outlet-P.compressor.front,intakeInnerEnds:'both open',mainInnerShellFront:ins.front};
+const report={schema:2,units:P.units,dimensionSource:'report_构型计算_完整版.md with user-specified casing and bay revisions',pumpPlacement:'inside stage 3 central cavity, as confirmed by user',envelopes:{length:os.rear-os.front,ductBore:2*(os.radius-os.wall),nozzleBore:2*(os.outletRadius-os.wall),motorDiameter:2*P.motor.radius,motorLength:P.motor.rear-P.motor.front,stackLength:P.stacks.at(-1).rear-P.stacks[0].front},modules:P.stacks.map(s=>s.modules),portCounts:{air:6,hydrogen:6,return:6},parts:parts.length,solidChecks:0,broadPhasePairs:0,collisions:[],fluidChecks:{},ports};
+report.layoutOverrides={source:'latest red outer / yellow inner outline and open-inner-sleeve confirmation',intakeLength:P.motorHousing.rear-P.motorHousing.front,compressorLength:P.compressor.outlet-P.compressor.front,intakeInnerEnds:'both open',mainInnerShellFront:ins.front,outerWaistRadius:os.waistRadius,mainInnerShellMaximumRadius:ins.radius};
 report.shellGeometry=shells.verification;
 const bounds=parts.map(p=>p.solid.boundingBox());
 for(const id of ['fan','main-motor','compressor-drive','inner-shell']) {

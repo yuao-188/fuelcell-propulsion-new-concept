@@ -223,7 +223,7 @@ export default function App() {
                 <caption>电堆：内径 / 外径 × 轴向长</caption>
                 <tbody>
                   <tr><th scope="row">整机长</th><td>2012</td></tr>
-                  <tr><th scope="row">涵道内径</th><td>Φ1000</td></tr>
+                  <tr><th scope="row">风扇段内径</th><td>Φ1000</td></tr>
                   <tr><th scope="row">主电机</th><td>Φ300 × 193</td></tr>
                   <tr><th scope="row">第一级</th><td>Φ160 / Φ351 × 282</td></tr>
                   <tr><th scope="row">第二级</th><td>Φ301 / Φ434 × 375</td></tr>
