@@ -7,6 +7,7 @@ type Props = {
   viewMode: 'complete' | 'cutaway'; sectionDepth: number;
   cameraView: 'perspective' | 'side' | 'front' | 'fan' | 'machinery' | 'stacks';
   showOuterShell: boolean; showInnerShell: boolean; showStacks: boolean;
+  showIntake: boolean; showCompressorCase: boolean;
   showAir: boolean; showHydrogen: boolean; showReturn: boolean; resetKey: number;
 };
 
@@ -91,7 +92,7 @@ export default function ModelViewport(props: Props) {
     let priorReset=-1,priorCamera='',priorMode='',priorDepth=-1,priorVisibility='';
     function fit() {
       const view=latest.current.cameraView;
-      const direction=view==='side'?new THREE.Vector3(0,0,1):view==='front'?new THREE.Vector3(-1,0,0):view==='fan'?new THREE.Vector3(-1,.17,.5).normalize():new THREE.Vector3(-.52,.30,1).normalize();
+      const direction=view==='side'?new THREE.Vector3(0,0,1):view==='front'?new THREE.Vector3(-1,0,0):view==='fan'?new THREE.Vector3(-1,.17,.5).normalize():view==='machinery'?new THREE.Vector3(.2,.18,1).normalize():new THREE.Vector3(-.52,.30,1).normalize();
       const box=view==='fan'?[[40,220],[-505,505],[-505,505]]:view==='machinery'?[[205,705],[-180,180],[-180,180]]:view==='stacks'?[[680,1780],[-260,260],[-260,260]]:[[-12,2030],[-525,525],[-525,525]];
       const target=new THREE.Vector3((box[0][0]+box[0][1])/2,0,0);controls.target.copy(target);
       const right=new THREE.Vector3().crossVectors(camera.up,direction).normalize(),up=new THREE.Vector3().crossVectors(direction,right);
@@ -125,7 +126,7 @@ export default function ModelViewport(props: Props) {
       cap.onAfterRender=()=>renderer.clearStencil();
       scene.add(stencil,cap);sections.push({source:mesh,stencil,cap});
     }
-    new GLTFLoader().load(new URL('model.glb?v=20261022-detailed-report-2',document.baseURI).href,gltf=>{
+    new GLTFLoader().load(new URL('model.glb?v=20261022-compressor-3',document.baseURI).href,gltf=>{
       if(cancelled){disposeObject(gltf.scene);return;}
       root=gltf.scene;scene.add(root);
       root.traverse(item=>{
@@ -156,10 +157,10 @@ export default function ModelViewport(props: Props) {
         }
         priorMode=p.viewMode;priorDepth=p.sectionDepth;dirty=true;
       }
-      const visibility=[p.showOuterShell,p.showInnerShell,p.showStacks,p.showAir,p.showHydrogen,p.showReturn].join();
+      const visibility=[p.showOuterShell,p.showInnerShell,p.showStacks,p.showAir,p.showHydrogen,p.showReturn,p.showIntake,p.showCompressorCase].join();
       if(priorVisibility!==visibility){
         const visible:Record<string,boolean>={outerShell:p.showOuterShell,innerShell:p.showInnerShell,stacks:p.showStacks,air:p.showAir,hydrogen:p.showHydrogen,return:p.showReturn,anodeInternal:p.showHydrogen||p.showReturn};
-        meshes.forEach(mesh=>{mesh.visible=visible[mesh.userData.group]??true;});priorVisibility=visibility;dirty=true;
+        meshes.forEach(mesh=>{mesh.visible=mesh.userData.id==='motor-housing'?p.showIntake:mesh.userData.id==='compressor-casing'?p.showCompressorCase:visible[mesh.userData.group]??true;});priorVisibility=visibility;dirty=true;
       }
       for(const {source,stencil,cap} of sections){
         if(!source.geometry.boundingBox)source.geometry.computeBoundingBox();

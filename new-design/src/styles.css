@@ -266,3 +266,4 @@ h1 { font-size: 21px; font-weight: 600; line-height: 1.4; letter-spacing: 0.5px;
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; }
 }
+.swatch-compressor { background: #e8ba28; border-color: #cda31d; }

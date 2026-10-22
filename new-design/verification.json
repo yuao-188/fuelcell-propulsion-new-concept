@@ -21,9 +21,9 @@
     "hydrogen": 6,
     "return": 6
   },
-  "parts": 76,
-  "solidChecks": 637,
-  "broadPhasePairs": 2850,
+  "parts": 77,
+  "solidChecks": 642,
+  "broadPhasePairs": 2926,
   "collisions": [],
   "fluidChecks": {
     "air/hydrogen": {
@@ -255,5 +255,40 @@
         59.01074228337479
       ]
     }
-  ]
+  ],
+  "compressorGeometry": {
+    "status": "passed",
+    "scope": "Exported front machinery geometry only; no aerodynamic performance validation",
+    "modelModifiedAt": "2026-10-22T15:09:13.117Z",
+    "units": "mm",
+    "frontParts": 10,
+    "solidIntersections": {
+      "toleranceMm3": 0.02,
+      "candidates": 11,
+      "maximumVolumeMm3": 0.000043973419147746995,
+      "collisions": []
+    },
+    "inletToOutlet": {
+      "probeRadiusMm": 0.5,
+      "segments": 45,
+      "toleranceMm3": 0.001,
+      "maximumObstructionVolumeMm3": 0,
+      "obstructions": []
+    },
+    "formerBypass": {
+      "radiusFromAxisMm": 155,
+      "probeRadiusMm": 1,
+      "shroudIntersectionMm3": 11.361341928811823,
+      "blocked": true
+    },
+    "blueSleeve": {
+      "specifiedBoreDiameterMm": 330,
+      "measuredInnerVertexDiameterMm": 329.9999855862564,
+      "probeRadiusMm": 164.9,
+      "openBoreObstructionMm3": 0,
+      "frontMm": 210,
+      "rearMm": 570
+    },
+    "failures": []
+  }
 }

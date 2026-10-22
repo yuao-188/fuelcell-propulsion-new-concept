@@ -165,30 +165,32 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
     [[collarStart, shaftRadius + .65], [motor.front, shaftRadius + .65]]);
   add('motor-shaft-collar', '主轴定位套', 'front', darkSteel, collar, metal);
 
-  // Open blue intake sleeve: constant functional bore, relief between raised
-  // end lands and narrow axial ribs. No disk is introduced at either end.
+  // Open blue intake sleeve: constant functional bore and thin end lands.
+  // The smooth wall reads as a duct, and no disk closes either end.
   const H = P.motorHousing, housingLength = H.rear - H.front;
   const shellLand = Math.min((H.outer - H.inner) * .32, 2.4);
   const bodyRadius = H.outer - shellLand, landLength = housingLength * .055;
   const housingOuter = [[H.front, H.outer], [H.front + landLength, H.outer],
     [H.front + landLength * 1.35, bodyRadius], [H.rear - landLength * 1.35, bodyRadius],
     [H.rear - landLength, H.outer], [H.rear, H.outer]];
-  const housingPieces = [hollowLathe(housingOuter, [[H.front, H.inner], [H.rear, H.inner]])];
-  for (let i = 0; i < 12; i++) housingPieces.push(sector(H.front + landLength, H.rear - landLength,
-    bodyRadius - .3, H.outer, i * 30 - .7, i * 30 + .7));
+  const housingWall = hollowLathe(housingOuter, [[H.front, H.inner], [H.rear, H.inner]]);
   const housingHoles = [];
   for (let i = 0; i < 16; i++) {
     const t = (i + .5) * tau / 16, r = (H.inner + H.outer) / 2;
     housingHoles.push(cylinder([H.front - .05, r * Math.cos(t), r * Math.sin(t)],
       [H.front + 2.0, r * Math.cos(t), r * Math.sin(t)], (H.outer - H.inner) * .19, (H.outer - H.inner) * .19, 6));
   }
-  add('motor-housing', '蓝色开口进气筒 · 加强筋与端部螺孔', 'front', C.air,
-    union(housingPieces).subtract(union(housingHoles)), { ...paint, clip: true });
+  add('motor-housing', '蓝色中空进气筒 · 薄壁口沿与端部螺孔', 'front', C.air,
+    housingWall.subtract(union(housingHoles)), { ...paint, clip: true });
 
   // Centrifugal compressor. The rotor has an axial inlet eye, swept radial
   // vanes and a backplate. A separate motor and shaft drive the same connected
   // rotor; there is no extension of the propulsion-motor shaft into this unit.
-  const K = P.compressor, chamberLength = K.rear - K.front;
+  const K = P.compressor;
+  // A short impeller chamber leaves a visibly long aft collector within the
+  // unchanged installation length. K.rear still sets the outlet-neck datum.
+  const workingRear = K.front + (K.outlet - K.front) * .375;
+  const chamberLength = workingRear - K.front;
   const plateX = K.front + chamberLength * .76, plateThickness = chamberLength * .065;
   const impellerRadius = K.inner * .88, eyeRadius = K.inner * .255;
   const driveRadius = K.inner * .20, driveFront = K.front + chamberLength * .09;
@@ -231,14 +233,14 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
 
   const caseRadius = K.outer - Math.min(2.0, (K.outer - K.inner) * .25);
   const casingOutside = [[K.front, K.outer], [K.front + chamberLength * .08, K.outer],
-    [K.front + chamberLength * .12, caseRadius], [K.rear - chamberLength * .14, caseRadius],
-    [K.rear - chamberLength * .08, K.outer], [K.rear, K.outer]];
-  const casingInside = [[K.front, K.inner], [K.rear, K.inner]];
+    [K.front + chamberLength * .12, caseRadius], [workingRear - chamberLength * .14, caseRadius],
+    [workingRear - chamberLength * .08, K.outer], [workingRear, K.outer]];
+  const casingInside = [[K.front, K.inner], [workingRear, K.inner]];
   // The last half of the outlet section is a narrow straight neck. This leaves
   // the specified first-stack return pipes clear of the converging casing.
   const neckStart = K.outlet - (K.outletNeckLength ?? (K.outlet - K.rear) * .5);
   for (let i = 1; i <= 24; i++) {
-    const t = i / 24, x = lerp(K.rear, neckStart, t);
+    const t = i / 24, x = lerp(workingRear, neckStart, t);
     casingOutside.push([x, lerp(K.outer, P.air.outer, smooth(t))]);
     casingInside.push([x, lerp(K.inner, P.air.inner, smooth(t))]);
   }
@@ -250,13 +252,36 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
   for (let i = 0; i < 18; i++) casingParts.push(sweptRibbon(impellerRadius + 3.2, K.inner + .5,
     (i + .35) * tau / 18, .13, K.inner * .014,
     plateX - chamberLength * .13, plateX + plateThickness + chamberLength * .025));
-  for (let i = 0; i < 12; i++) casingParts.push(sector(K.front + chamberLength * .08, K.rear - chamberLength * .08,
+  for (let i = 0; i < 12; i++) casingParts.push(sector(K.front + chamberLength * .08, workingRear - chamberLength * .08,
     caseRadius - .25, K.outer, i * 30 - .8, i * 30 + .8));
   add('compressor-casing', '黄色离心增压机 · 扩压导叶与渐缩出口', 'front', C.compressor,
     union(casingParts), { ...paint, clip: true });
 
+  // This stationary cover separates the inlet plenum from the impeller's
+  // peripheral outlet. Its inner edge is the inlet eye; its downstream face
+  // follows the blade inlet surface with a positive axial running clearance.
+  // The outer edge meets the casing bore at the same revolved bearing surface,
+  // so there is no open annular bypass around the impeller. The diffuser and
+  // rear collector remain open beyond the backplate's outer radius.
+  const runningClearance = Math.max(.65, P.clearance);
+  const shroudThickness = Math.min(3, chamberLength * .075);
+  const bladeInnerRadius = eyeRadius * .94;
+  const bladeOuterRadius = impellerRadius - 1.2;
+  const eyeFaceX = plateX - chamberLength * .30 - runningClearance;
+  const rimFaceX = plateX - chamberLength * .13 - runningClearance;
+  const shroudProfile = [
+    [bladeInnerRadius, eyeFaceX],
+    [bladeOuterRadius, rimFaceX],
+    [K.inner, rimFaceX],
+    [K.inner, rimFaceX - shroudThickness],
+    [bladeInnerRadius + shroudThickness * 2, eyeFaceX - shroudThickness],
+  ];
+  const shroud = new CS([shroudProfile.reverse()]).revolve(128).rotate([0, 90, 0]);
+  add('compressor-shroud', '离心叶轮静止导流罩 · 入口眼与隔流壁', 'front', paleSteel,
+    shroud, { ...metal, clip: true });
+
   // Kept in the public signature for compatibility with the common generator.
   void revolved;
-  return { fanFront, fanRear, mainFanRadius: F.radius, impellerRadius,
+  return { fanFront, fanRear, mainFanRadius: F.radius, impellerRadius, workingRear, neckStart,
     fanBladeCount: F.blades, compressorBladeCount: 12 };
 }
