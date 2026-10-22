@@ -3,7 +3,7 @@ import { Box, Layers, MousePointer2, RotateCcw, SlidersHorizontal } from 'lucide
 import ModelViewport from './ModelViewport';
 import './styles.css';
 
-type VisibilityKey = 'outerShell' | 'innerShell' | 'intake' | 'compressorCase' | 'stacks' | 'air' | 'hydrogen' | 'return';
+type VisibilityKey = 'outerShell' | 'innerShell' | 'intake' | 'intakeInner' | 'compressorCase' | 'stacks' | 'air' | 'hydrogen' | 'return';
 type Visibility = Record<VisibilityKey, boolean>;
 type CameraView = 'perspective' | 'side' | 'front' | 'fan' | 'machinery' | 'stacks';
 
@@ -11,6 +11,7 @@ const initialVisibility: Visibility = {
   outerShell: true,
   innerShell: true,
   intake: true,
+  intakeInner: true,
   compressorCase: true,
   stacks: true,
   air: true,
@@ -94,6 +95,7 @@ export default function App() {
               showOuterShell={visibility.outerShell}
               showInnerShell={visibility.innerShell}
               showIntake={visibility.intake}
+              showIntakeInner={visibility.intakeInner}
               showCompressorCase={visibility.compressorCase}
               showStacks={visibility.stacks}
               showAir={visibility.air}
@@ -188,8 +190,9 @@ export default function App() {
             <h3 id="structure-label">结构部件</h3>
             <div className="layer-list">
               <LayerToggle label="外壳" color="swatch-outer" checked={visibility.outerShell} onChange={() => toggleLayer('outerShell')} />
-              <LayerToggle label="内壳" color="swatch-inner" checked={visibility.innerShell} onChange={() => toggleLayer('innerShell')} />
-              <LayerToggle label="蓝色进气套筒" detail="两端开口 · 电机周围留有环道" color="swatch-air" checked={visibility.intake} onChange={() => toggleLayer('intake')} />
+              <LayerToggle label="整机内壳" detail="水平延伸 · 连续渐扩与收缩" color="swatch-inner" checked={visibility.innerShell} onChange={() => toggleLayer('innerShell')} />
+              <LayerToggle label="引气外筒" detail="内外筒之间形成环形引气道" color="swatch-intake" checked={visibility.intake} onChange={() => toggleLayer('intake')} />
+              <LayerToggle label="引气内筒" detail="包围电机 · 前后均开口" color="swatch-intake-inner" checked={visibility.intakeInner} onChange={() => toggleLayer('intakeInner')} />
               <LayerToggle label="黄色压气机外壳" detail="隐藏后查看叶轮与内部导流罩" color="swatch-compressor" checked={visibility.compressorCase} onChange={() => toggleLayer('compressorCase')} />
               <LayerToggle label="电堆模块" detail="隐藏后可查看内部管路" color="swatch-stack" checked={visibility.stacks} onChange={() => toggleLayer('stacks')} />
             </div>
@@ -228,7 +231,7 @@ export default function App() {
                 </tbody>
               </table>
             </details>
-            <p className="scale-note">主体尺寸按构型报告<br />叶型、管径及紧固件等装配细节为示意</p>
+            <p className="scale-note">主机与电堆尺寸按构型报告<br />引气与机匣按新示意调整，装配细节为示意</p>
           </section>
         </aside>
       </main>

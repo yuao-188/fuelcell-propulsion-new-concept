@@ -7,6 +7,7 @@ import { Matrix4, Vector3, Color } from 'three';
 import { parameters as P, colors as C } from '../new-design/parameters.mjs';
 import { buildDetailedMachinery } from './detailed-machinery.mjs';
 import { buildDetailedStack } from './detailed-stacks.mjs';
+import { buildDetailedShells } from './detailed-shells.mjs';
 
 const api = await ManifoldModule();
 api.setup();
@@ -172,40 +173,17 @@ const pumpHardware=union(pumpBolts);
 add('pump','阳极循环泵','pump',C.pump,pumpOuter.subtract(union([pumpVoid,pumpHardware])),{metallic:.38,roughness:.3});
 add('pump-hardware','循环泵端面紧固件','pump','#bcc8cc',pumpHardware,{metallic:.85,roughness:.25});
 
-const smooth=t=>t*t*(3-2*t);
 const os=P.outerShell, ins=P.innerShell;
-const outerProfile=[[os.front,os.radius+10],[os.front+4,os.radius+7],[os.front+12,os.radius+3],[os.front+25,os.radius],[os.shoulder,os.radius]];
-for(let i=1;i<=24;i++) outerProfile.push([os.shoulder+(os.rear-os.shoulder)*i/24,os.radius+(os.outletRadius-os.radius)*smooth(i/24)]);
-const innerProfile=[[ins.front,ins.inletRadius],[ins.shoulder,ins.radius]];
-for(let i=1;i<=20;i++) innerProfile.push([ins.shoulder+(ins.rear-ins.shoulder)*i/20,ins.radius+(ins.outletRadius-ins.radius)*smooth(i/20)]);
-const shellSolid=revolved(outerProfile,os.wall);
-const shellBands=union([revolved(outerProfile.slice(0,4),os.wall),
-  ...[550,1110,1750].map(x=>revolved([[x,os.radius],[x+3,os.radius]],1.3)),
-  revolved(outerProfile.slice(-2),os.wall)]);
-// Tiny assembly relief prevents Float32-exported coplanar seam faces from
-// producing false interpenetration when the GLB is reconstructed for inspection.
-const shellBandClearance=union([shellBands,
-  ...[550,1110,1750].map(x=>revolved([[x-.02,os.radius+.02],[x+3.02,os.radius+.02]],1.34)),
-]);
-const shellScrews=[];
-for(const x of [35,558,1118,1738]) for(let j=0;j<12;j++) {
-  const a=polar(x,os.radius-1.8,j*30),b=polar(x,os.radius,j*30);
-  const screw=cylinder(a,b,2.8,2.8,32);
-  const slot=cylinder(polar(x,os.radius-.7,j*30),polar(x,os.radius+.1,j*30),1.25,1.25,6);
-  shellScrews.push(screw.subtract(slot));
-}
-const fasteners=union(shellScrews);
-add('outer-shell','连续曲面涵道外壳','outerShell','#aab5bd',shellSolid.subtract(union([shellBandClearance,fasteners])),{clip:true,metallic:.82,roughness:.38,finish:'satin-aluminium'});
-add('outer-shell-seams','机匣滚边与分段接缝','outerShell','#d3dce0',shellBands,{clip:true,metallic:.9,roughness:.21});
-add('outer-shell-fasteners','机匣沉头紧固件','outerShell','#64727d',fasteners,{clip:true,metallic:.85,roughness:.25});
-add('inner-shell','渐扩与后段收缩内壳','innerShell','#84939f',revolved(innerProfile,ins.wall),{clip:true,metallic:.72,roughness:.35,finish:'satin-aluminium'});
+const shells=buildDetailedShells({M,CS,P,union,cylinder,revolved,polar,add});
 
 console.log(`Built ${parts.length} solid components. Checking exact intersections...`);
 const report={schema:2,units:P.units,dimensionSource:'report_构型计算_完整版.md',pumpPlacement:'inside stage 3 central cavity, as confirmed by user',envelopes:{length:os.rear-os.front,ductBore:1000,nozzleBore:2*(os.outletRadius-os.wall),motorDiameter:2*P.motor.radius,motorLength:P.motor.rear-P.motor.front,stackLength:P.stacks.at(-1).rear-P.stacks[0].front},modules:P.stacks.map(s=>s.modules),portCounts:{air:6,hydrogen:6,return:6},parts:parts.length,solidChecks:0,broadPhasePairs:0,collisions:[],fluidChecks:{},ports};
+report.layoutOverrides={source:'latest user sketch and open-inner-sleeve confirmation',intakeLength:P.motorHousing.rear-P.motorHousing.front,compressorLength:P.compressor.outlet-P.compressor.front,intakeInnerEnds:'both open',mainInnerShellFront:ins.front};
+report.shellGeometry=shells.verification;
 const bounds=parts.map(p=>p.solid.boundingBox());
-for(const id of ['fan','main-motor','compressor-drive']) {
+for(const id of ['fan','main-motor','compressor-drive','inner-shell']) {
   const pieces=parts.find(p=>p.id===id).solid.decompose();
-  assert.equal(pieces.length,1,id+' must have connected shaft/hub/blades');
+  assert.equal(pieces.length,1,id+' must remain one connected component');
   pieces.forEach(s=>s.delete());
 }
 const overlap=(a,b)=>[0,1,2].every(k=>a.max[k]>b.min[k]+1e-5 && b.max[k]>a.min[k]+1e-5);

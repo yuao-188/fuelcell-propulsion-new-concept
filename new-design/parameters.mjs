@@ -4,8 +4,10 @@ export const parameters = {
   units: 'mm',
   fan: { x: 130, front: 50, rear: 210, radius: 498, hubRadius: 100, blades: 8 },
   motor: { front: 245, rear: 438, radius: 150 },
-  motorHousing: { front: 210, rear: 570, outer: 172, inner: 165 },
-  compressor: { front: 570, rear: 660, outlet: 690, outer: 172, inner: 165 },
+  // Latest user sketch reallocates this shared bay: shorter intake, longer compressor.
+  motorHousing: { front: 210, rear: 480, outer: 172, inner: 165 },
+  intakeLiner: { front: 210, rear: 480, inner: 152, outer: 156 },
+  compressor: { front: 480, rear: 660, outlet: 690, outer: 172, inner: 165 },
   stacks: [
     { front: 690, rear: 972, inner: 80, outer: 175.5, modules: 3, firstSeam: 30, cells: 279 },
     { front: 992, rear: 1367, inner: 150.5, outer: 217, modules: 4, firstSeam: 45, cells: 372 },
@@ -16,11 +18,12 @@ export const parameters = {
   hydrogen: { outer: 6.5, inner: 4.5, offset: 55, ringInset: 36, ringOuter: 5, ringInner: 3.4, inletX: 1880, faceOffset: 7.2 },
   pump: { front: 1630, rear: 1680, centerZ: 70, radius: 25, bore: 4.5 },
   outerShell: { front: 0, shoulder: 1762, rear: 2012, radius: 506, outletRadius: 472, wall: 6 },
-  innerShell: { front: 690, shoulder: 1780, rear: 1940, inletRadius: 210, radius: 282, outletRadius: 218, wall: 5 },
+  innerShell: { front: 210, expansionStart: 620, shoulder: 1780, rear: 1940, inletRadius: 210, radius: 282, outletRadius: 218, wall: 5 },
   clearance: 0.8,
 };
 export const colors = {
   shell: '#8e979d', inner: '#8b949a', fan: '#c2cbd0', motor: '#ffc400', compressor: '#f6b900',
   air: '#087ec7', hydrogen: '#00b456', return: '#98e8b0', pump: '#f28b27', stack: '#363d43',
   plate: '#bac1c5', internal: '#68767a', shaft: '#dbab27',
+  intakeOuter: '#477f9d', intakeInner: '#245670', compressorCase: '#c9a34b',
 };

@@ -13,9 +13,12 @@ const reportPath = resolve(root, 'new-design/verification.json');
 const machineIds = [
   'fan', 'fan-spinner', 'main-motor', 'motor-front-cap', 'motor-rear-cap',
   'motor-shaft-collar', 'motor-housing', 'compressor-drive', 'compressor-casing', 'compressor-shroud',
+  'intake-inner-shell', 'intake-fasteners', 'compressor-front-flange', 'compressor-rear-flange', 'compressor-fasteners',
 ];
+const hardwareComponents = { 'intake-fasteners': 16, 'compressor-fasteners': 24 };
 
 try {
+  assert.ok(P.intakeLiner, 'Double-wall intake parameters are required');
   const api = await ManifoldModule();
   api.setup();
   const { Manifold: M, Mesh } = api;
@@ -39,7 +42,7 @@ try {
     assert.equal(solid.status(), 'NoError', `${id}: invalid exported solid`);
     assert.ok(solid.volume() > 0, `${id}: empty exported solid`);
     const components = solid.decompose();
-    assert.equal(components.length, 1, `${id}: disconnected mechanical component`);
+    assert.equal(components.length, hardwareComponents[id] ?? 1, `${id}: unexpected disconnected components`);
     components.forEach(component => component.delete());
     parts.push({ id, solid, bounds: solid.boundingBox() });
   }
@@ -90,10 +93,14 @@ try {
   const entryAngle = Math.PI / 12, exitAngle = entryAngle - .52;
   const workingRear = K.front + length;
   const neckStart = K.outlet - (K.outletNeckLength ?? (K.outlet - K.rear) * .5);
+  const I = P.intakeLiner;
+  const annulusRadius = (P.motorHousing.inner + I.outer) / 2;
+  // Stay between the two physical walls until beyond the liner's OPEN aft end.
+  // Moving toward the axis earlier would incorrectly cut through the liner.
   const path = [
-    [P.motorHousing.front + .5, K.inner - 10, 0],
-    [K.front - 50, K.inner - 10, 0], [K.front, 80, 0], [K.front + 14.5, 60, 0],
-    polar(K.front + 16, 36.5, entryAngle), polar(K.front + 24, 36.5, entryAngle),
+    [P.motorHousing.front + .5, annulusRadius, 0], [I.rear + 1, annulusRadius, 0],
+    [K.front + length * .12, 80, 0],
+    polar(K.front + length * .32 + 1, 36.5, entryAngle), polar(K.front + length * .56, 36.5, entryAngle),
   ];
   for (let i = 0; i <= 32; i++) {
     const t = i / 32;
@@ -102,8 +109,9 @@ try {
   }
   path.push(
     polar(plateX - length * .13 * .45, K.inner - 12, exitAngle),
-    polar(workingRear - 6, K.inner - 12, exitAngle), polar(workingRear - 2, 80, exitAngle),
-    polar(workingRear + 25, 50, exitAngle), polar(workingRear + 45, 25, exitAngle),
+    polar(plateX + length * (.065 + .025) + 1, K.inner - 12, exitAngle), polar(workingRear - 2, 80, exitAngle),
+    polar(workingRear + (neckStart - workingRear) * .42, 50, exitAngle),
+    polar(workingRear + (neckStart - workingRear) * .75, 25, exitAngle),
     [neckStart, 0, 0], [K.outlet - .5, 0, 0],
   );
   const passage = M.union(path.slice(1).map((point, i) => cylinder(path[i], point, .5)));
@@ -138,6 +146,37 @@ try {
   if (Math.abs(innerRadius - P.motorHousing.inner) > .001 || boreObstruction > .001
     || Math.abs(housing.bounds.min[0] - P.motorHousing.front) > .001
     || Math.abs(housing.bounds.max[0] - P.motorHousing.rear) > .001) failures.push('Blue sleeve bore or open ends do not match parameters');
+
+  const liner = getPart('intake-inner-shell');
+  const linerBore = cylinder([I.front - .5, 0, 0], [I.rear + .5, 0, 0], I.inner - .1, 128);
+  const linerBoreObstruction = intersectionVolume(linerBore, liner.solid);
+  const linerMesh = liner.solid.getMesh();
+  let linerInner = Infinity, linerOuter = 0;
+  for (let i = 0; i < linerMesh.vertProperties.length; i += linerMesh.numProp) {
+    const radius = Math.hypot(linerMesh.vertProperties[i + 1], linerMesh.vertProperties[i + 2]);
+    linerInner = Math.min(linerInner, radius);
+    linerOuter = Math.max(linerOuter, radius);
+  }
+  const annularProbe = cylinder([I.front - .1, 0, 0], [I.rear + .1, 0, 0], P.motorHousing.inner - .1, 128)
+    .subtract(cylinder([I.front - .2, 0, 0], [I.rear + .2, 0, 0], I.outer + .1, 128));
+  const annularObstructions = parts.map(part => ({ id: part.id, volumeMm3: intersectionVolume(annularProbe, part.solid) }));
+  result.intakeInnerShell = {
+    specifiedInnerDiameterMm: I.inner * 2, specifiedOuterDiameterMm: I.outer * 2,
+    measuredInnerVertexDiameterMm: linerInner * 2, measuredOuterVertexDiameterMm: linerOuter * 2,
+    motorRadialClearanceMm: I.inner - P.motor.radius,
+    frontMm: liner.bounds.min[0], rearMm: liner.bounds.max[0], openBoreObstructionMm3: linerBoreObstruction,
+  };
+  result.intakeAnnulus = {
+    radialGapMm: P.motorHousing.inner - I.outer,
+    nominalAreaMm2: Math.PI * (P.motorHousing.inner ** 2 - I.outer ** 2),
+    flowProbeRadiusFromAxisMm: annulusRadius,
+    maximumObstructionVolumeMm3: Math.max(...annularObstructions.map(item => item.volumeMm3)),
+    obstructions: annularObstructions.filter(item => item.volumeMm3 > .001),
+  };
+  if (Math.abs(linerInner - I.inner) > .001 || Math.abs(linerOuter - I.outer) > .001
+    || Math.abs(liner.bounds.min[0] - I.front) > .001 || Math.abs(liner.bounds.max[0] - I.rear) > .001
+    || linerBoreObstruction > .001) failures.push('Inner liner dimensions or open ends do not match parameters');
+  if (result.intakeAnnulus.obstructions.length) failures.push('Double-wall intake annulus is obstructed');
 
   result.status = failures.length ? 'failed' : 'passed';
   result.failures = failures;

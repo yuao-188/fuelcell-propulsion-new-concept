@@ -7,7 +7,7 @@ type Props = {
   viewMode: 'complete' | 'cutaway'; sectionDepth: number;
   cameraView: 'perspective' | 'side' | 'front' | 'fan' | 'machinery' | 'stacks';
   showOuterShell: boolean; showInnerShell: boolean; showStacks: boolean;
-  showIntake: boolean; showCompressorCase: boolean;
+  showIntake: boolean; showIntakeInner: boolean; showCompressorCase: boolean;
   showAir: boolean; showHydrogen: boolean; showReturn: boolean; resetKey: number;
 };
 
@@ -23,6 +23,18 @@ function layeredFinish(material:THREE.MeshStandardMaterial,origin:number) {
       diffuseColor.rgb*=mix(0.62,1.8,edge);`);
   };
   material.customProgramCacheKey=()=> 'axial-plate-lod-v3';
+}
+
+function machinedFinish(material:THREE.MeshStandardMaterial) {
+  // Filter fine lathe marks in screen space so they disappear at overview scale.
+  material.onBeforeCompile=shader=>{
+    shader.vertexShader='varying float vMachiningX;\n'+shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvMachiningX=(modelMatrix*vec4(position,1.0)).x;');
+    shader.fragmentShader='varying float vMachiningX;\n'+shader.fragmentShader.replace('#include <roughnessmap_fragment>',`#include <roughnessmap_fragment>
+      float phase=vMachiningX/0.65;
+      float machiningFade=1.0-smoothstep(0.18,0.8,fwidth(phase));
+      roughnessFactor=clamp(roughnessFactor+0.035*sin(phase*6.2831853)*machiningFade,0.12,1.0);`);
+  };
+  material.customProgramCacheKey=()=> 'filtered-machining-v1';
 }
 
 export default function ModelViewport(props: Props) {
@@ -126,7 +138,7 @@ export default function ModelViewport(props: Props) {
       cap.onAfterRender=()=>renderer.clearStencil();
       scene.add(stencil,cap);sections.push({source:mesh,stencil,cap});
     }
-    new GLTFLoader().load(new URL('model.glb?v=20261022-compressor-3',document.baseURI).href,gltf=>{
+    new GLTFLoader().load(new URL('model.glb?v=20261023-annular-intake-1',document.baseURI).href,gltf=>{
       if(cancelled){disposeObject(gltf.scene);return;}
       root=gltf.scene;scene.add(root);
       root.traverse(item=>{
@@ -136,6 +148,7 @@ export default function ModelViewport(props: Props) {
         const material=new THREE.MeshPhysicalMaterial({color:source.color,metalness:source.metalness,roughness:source.roughness,side:THREE.DoubleSide,clearcoat:source.metalness<.6?.22:.08,clearcoatRoughness:.32});
         material.clipShadows=true;item.material=material;
         if(item.userData.laminated)layeredFinish(material,item.userData.layerOrigin||0);
+        else if(['machined','satin-aluminium','brushed-metal'].includes(item.userData.finish))machinedFinish(material);
         if(item.userData.clip||item.userData.laminated)addSection(item,sections.length);
       });
       setStatus('');priorMode='';priorDepth=-1;priorVisibility='';fit();
@@ -157,10 +170,10 @@ export default function ModelViewport(props: Props) {
         }
         priorMode=p.viewMode;priorDepth=p.sectionDepth;dirty=true;
       }
-      const visibility=[p.showOuterShell,p.showInnerShell,p.showStacks,p.showAir,p.showHydrogen,p.showReturn,p.showIntake,p.showCompressorCase].join();
+      const visibility=[p.showOuterShell,p.showInnerShell,p.showStacks,p.showAir,p.showHydrogen,p.showReturn,p.showIntake,p.showIntakeInner,p.showCompressorCase].join();
       if(priorVisibility!==visibility){
-        const visible:Record<string,boolean>={outerShell:p.showOuterShell,innerShell:p.showInnerShell,stacks:p.showStacks,air:p.showAir,hydrogen:p.showHydrogen,return:p.showReturn,anodeInternal:p.showHydrogen||p.showReturn};
-        meshes.forEach(mesh=>{mesh.visible=mesh.userData.id==='motor-housing'?p.showIntake:mesh.userData.id==='compressor-casing'?p.showCompressorCase:visible[mesh.userData.group]??true;});priorVisibility=visibility;dirty=true;
+        const visible:Record<string,boolean>={outerShell:p.showOuterShell,innerShell:p.showInnerShell,intakeOuter:p.showIntake,intakeInner:p.showIntakeInner,compressorCase:p.showCompressorCase,stacks:p.showStacks,air:p.showAir,hydrogen:p.showHydrogen,return:p.showReturn,anodeInternal:p.showHydrogen||p.showReturn};
+        meshes.forEach(mesh=>{mesh.visible=visible[mesh.userData.group]??true;});priorVisibility=visibility;dirty=true;
       }
       for(const {source,stencil,cap} of sections){
         if(!source.geometry.boundingBox)source.geometry.computeBoundingBox();

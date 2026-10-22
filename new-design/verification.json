@@ -21,9 +21,9 @@
     "hydrogen": 6,
     "return": 6
   },
-  "parts": 77,
-  "solidChecks": 642,
-  "broadPhasePairs": 2926,
+  "parts": 84,
+  "solidChecks": 700,
+  "broadPhasePairs": 3486,
   "collisions": [],
   "fluidChecks": {
     "air/hydrogen": {
@@ -41,10 +41,10 @@
       "pumpConnected": true
     },
     "airObstruction": {
-      "solidVolumeInsideLumen": -7.970482635407074e-12
+      "solidVolumeInsideLumen": -2.6147775639536144e-11
     },
     "completeAnodeObstruction": {
-      "solidVolumeInsideLumen": 0.0009955185681905648
+      "solidVolumeInsideLumen": 0.0010683442124705819
     },
     "air": {
       "connectedComponents": 1
@@ -256,21 +256,67 @@
       ]
     }
   ],
+  "layoutOverrides": {
+    "source": "latest user sketch and open-inner-sleeve confirmation",
+    "intakeLength": 270,
+    "compressorLength": 210,
+    "intakeInnerEnds": "both open",
+    "mainInnerShellFront": 210
+  },
+  "shellGeometry": {
+    "innerCurve": "cubic Hermite, zero slope at expansionStart, shoulder and rear",
+    "innerConstantRadius": {
+      "front": 210,
+      "rear": 620,
+      "radius": 210
+    },
+    "innerWall": 5,
+    "stackClearances": [
+      {
+        "stage": 1,
+        "minimumRadialClearance": 30.209352710857814,
+        "x": 690,
+        "rearRadialClearance": 45.314324091440426
+      },
+      {
+        "stage": 2,
+        "minimumRadialClearance": 5.41316227068458,
+        "x": 992,
+        "rearRadialClearance": 39.056676210224396
+      },
+      {
+        "stage": 3,
+        "minimumRadialClearance": 9.743835230721402,
+        "x": 1387,
+        "rearRadialClearance": 28.87694935673983
+      }
+    ],
+    "seamStations": [
+      550,
+      1110,
+      1750
+    ],
+    "outerAccessCovers": 3,
+    "outerFasteners": 38,
+    "innerFasteners": 8,
+    "detailRelief": 0.025,
+    "detailsWithinOriginalEnvelope": true
+  },
   "compressorGeometry": {
     "status": "passed",
     "scope": "Exported front machinery geometry only; no aerodynamic performance validation",
-    "modelModifiedAt": "2026-10-22T15:09:13.117Z",
+    "modelModifiedAt": "2026-10-22T15:42:16.586Z",
     "units": "mm",
-    "frontParts": 10,
+    "frontParts": 15,
     "solidIntersections": {
       "toleranceMm3": 0.02,
-      "candidates": 11,
-      "maximumVolumeMm3": 0.000043973419147746995,
+      "candidates": 26,
+      "maximumVolumeMm3": 0.00007312075314303002,
       "collisions": []
     },
     "inletToOutlet": {
       "probeRadiusMm": 0.5,
-      "segments": 45,
+      "segments": 44,
       "toleranceMm3": 0.001,
       "maximumObstructionVolumeMm3": 0,
       "obstructions": []
@@ -278,7 +324,7 @@
     "formerBypass": {
       "radiusFromAxisMm": 155,
       "probeRadiusMm": 1,
-      "shroudIntersectionMm3": 11.361341928811823,
+      "shroudIntersectionMm3": 12.859116699052429,
       "blocked": true
     },
     "blueSleeve": {
@@ -287,7 +333,24 @@
       "probeRadiusMm": 164.9,
       "openBoreObstructionMm3": 0,
       "frontMm": 210,
-      "rearMm": 570
+      "rearMm": 480
+    },
+    "intakeInnerShell": {
+      "specifiedInnerDiameterMm": 304,
+      "specifiedOuterDiameterMm": 312,
+      "measuredInnerVertexDiameterMm": 303.999990065039,
+      "measuredOuterVertexDiameterMm": 312.0000131721039,
+      "motorRadialClearanceMm": 2,
+      "frontMm": 210,
+      "rearMm": 480,
+      "openBoreObstructionMm3": 0
+    },
+    "intakeAnnulus": {
+      "radialGapMm": 9,
+      "nominalAreaMm2": 9076.061176220912,
+      "flowProbeRadiusFromAxisMm": 160.5,
+      "maximumObstructionVolumeMm3": 0,
+      "obstructions": []
     },
     "failures": []
   }

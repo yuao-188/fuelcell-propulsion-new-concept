@@ -266,4 +266,6 @@ h1 { font-size: 21px; font-weight: 600; line-height: 1.4; letter-spacing: 0.5px;
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; }
 }
-.swatch-compressor { background: #e8ba28; border-color: #cda31d; }
+.swatch-intake { background: #477f9d; border-color: #3c718d; }
+.swatch-intake-inner { background: #245670; border-color: #204a60; }
+.swatch-compressor { background: #c9a34b; border-color: #b79240; }

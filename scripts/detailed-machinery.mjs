@@ -175,13 +175,32 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
     [H.rear - landLength, H.outer], [H.rear, H.outer]];
   const housingWall = hollowLathe(housingOuter, [[H.front, H.inner], [H.rear, H.inner]]);
   const housingHoles = [];
+  const intakeScrews = [];
   for (let i = 0; i < 16; i++) {
     const t = (i + .5) * tau / 16, r = (H.inner + H.outer) / 2;
-    housingHoles.push(cylinder([H.front - .05, r * Math.cos(t), r * Math.sin(t)],
-      [H.front + 2.0, r * Math.cos(t), r * Math.sin(t)], (H.outer - H.inner) * .19, (H.outer - H.inner) * .19, 6));
+    const point = x => [x, r * Math.cos(t), r * Math.sin(t)];
+    const holeRadius = (H.outer - H.inner) * .19;
+    housingHoles.push(cylinder(point(H.front - .05), point(H.front + 2), holeRadius, holeRadius, 24));
+    intakeScrews.push(cylinder(point(H.front + .15), point(H.front + 2), holeRadius - .22, holeRadius - .22, 24)
+      .subtract(cylinder(point(H.front + .1), point(H.front + .8), holeRadius * .42, holeRadius * .42, 6)));
   }
-  add('motor-housing', '蓝色中空进气筒 · 薄壁口沿与端部螺孔', 'front', C.air,
-    housingWall.subtract(union(housingHoles)), { ...paint, clip: true });
+  const housingSeams = [H.front + landLength * 2, H.rear - landLength * 2].map(x =>
+    hollowLathe([[x - .22, bodyRadius + .1], [x + .22, bodyRadius + .1]],
+      [[x - .22, bodyRadius - .55], [x + .22, bodyRadius - .55]]));
+  add('motor-housing', '蓝色中空进气筒 · 薄壁口沿与端部螺孔', 'intakeOuter', C.intakeOuter ?? '#587c8e',
+    housingWall.subtract(union([...housingHoles, ...housingSeams])),
+    { metallic: .68, roughness: .3, finish: 'satin-blue-metal', clip: true });
+  add('intake-fasteners', '引气外壳口沿沉头紧固件', 'intakeOuter', darkSteel, union(intakeScrews),
+    { ...metal, clip: true });
+
+  // The motor bay remains open at both ends. Its independent liner creates a
+  // real annular intake passage with the outer sleeve, without a solid tail cap.
+  const I = P.intakeLiner;
+  if (I) {
+    const liner = hollowLathe([[I.front, I.outer], [I.rear, I.outer]], [[I.front, I.inner], [I.rear, I.inner]]);
+    add('intake-inner-shell', '引气内壳 · 两端开口电机套筒', 'intakeInner', C.intakeInner ?? '#355565', liner,
+      { metallic: .7, roughness: .32, finish: 'satin-blue-metal', clip: true });
+  }
 
   // Centrifugal compressor. The rotor has an axial inlet eye, swept radial
   // vanes and a backplate. A separate motor and shaft drive the same connected
@@ -252,10 +271,39 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
   for (let i = 0; i < 18; i++) casingParts.push(sweptRibbon(impellerRadius + 3.2, K.inner + .5,
     (i + .35) * tau / 18, .13, K.inner * .014,
     plateX - chamberLength * .13, plateX + plateThickness + chamberLength * .025));
-  for (let i = 0; i < 12; i++) casingParts.push(sector(K.front + chamberLength * .08, workingRear - chamberLength * .08,
-    caseRadius - .25, K.outer, i * 30 - .8, i * 30 + .8));
-  add('compressor-casing', '黄色离心增压机 · 扩压导叶与渐缩出口', 'front', C.compressor,
-    union(casingParts), { ...paint, clip: true });
+  // Two machined mounting bands occupy the existing casing envelope. Their
+  // mating grooves include a small assembly gap so GLB quantisation does not
+  // turn coincident surfaces into overlapping solids or flickering surfaces.
+  const flangeDepth = Math.min(3, chamberLength * .06);
+  const flangeInner = K.inner + 1.2, flangeGap = .04;
+  const flangeLocations = [K.front + 1, workingRear - 1 - flangeDepth];
+  const flangeParts = [], flangeSlots = [], compressorScrews = [];
+  for (const [i, x] of flangeLocations.entries()) {
+    const outerProfile = [[x, K.outer - .7], [x + .45, K.outer],
+      [x + flangeDepth - .45, K.outer], [x + flangeDepth, K.outer - .7]];
+    const flange = hollowLathe(outerProfile, [[x, flangeInner], [x + flangeDepth, flangeInner]]);
+    flangeSlots.push(hollowLathe([[x - flangeGap, K.outer + flangeGap], [x + flangeDepth + flangeGap, K.outer + flangeGap]],
+      [[x - flangeGap, flangeInner - flangeGap], [x + flangeDepth + flangeGap, flangeInner - flangeGap]]));
+    const headVoids = [], heads = [];
+    for (let j = 0; j < 12; j++) {
+      const angle = (j + .5) * tau / 12;
+      const point = radius => [x + flangeDepth / 2, radius * Math.cos(angle), radius * Math.sin(angle)];
+      const head = cylinder(point(K.outer - 2.6), point(K.outer - .2), .95, .95, 24)
+        .subtract(cylinder(point(K.outer - .85), point(K.outer), .42, .42, 6));
+      heads.push(head);
+      headVoids.push(cylinder(point(K.outer - 2.65), point(K.outer + .05), 1.02, 1.02, 24));
+    }
+    flangeParts.push(flange.subtract(union(headVoids)));
+    compressorScrews.push(...heads);
+    add(i === 0 ? 'compressor-front-flange' : 'compressor-rear-flange',
+      i === 0 ? '增压机前部金属法兰' : '增压机后部金属法兰', 'compressorCase', paleSteel,
+      flangeParts.at(-1), { ...metal, clip: true });
+  }
+  add('compressor-casing', '香槟金离心增压机 · 分段机匣与渐缩集气壳', 'compressorCase', C.compressorCase ?? '#b6a77c',
+    union(casingParts).subtract(union(flangeSlots)),
+    { metallic: .64, roughness: .31, finish: 'satin-champagne-metal', clip: true });
+  add('compressor-fasteners', '增压机法兰沉头紧固件', 'compressorCase', darkSteel, union(compressorScrews),
+    { ...metal, clip: true });
 
   // This stationary cover separates the inlet plenum from the impeller's
   // peripheral outlet. Its inner edge is the inlet eye; its downstream face
