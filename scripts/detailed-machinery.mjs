@@ -1,3 +1,5 @@
+import { buildTwoStageCompressor } from './two-stage-compressor.mjs';
+
 /**
  * Detailed, watertight front machinery. All installation envelopes come from P.
  * Blade sections, bolts, cooling ribs and the centrifugal impeller are schematic
@@ -58,10 +60,12 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
     const rootRadius = F.hubRadius * .78;
     for (let k = 0; k <= spanSegments; k++) {
       const s = k / spanSegments;
-      const chord = s <= .58
-        ? lerp(F.hubRadius * .50, F.radius * .38, smooth(s / .58))
-        : lerp(F.radius * .38, F.radius * .24, smooth((s - .58) / .42));
-      const beta = lerp(38, 16, s) * Math.PI / 180;
+      // The visible midspan and tip have similar chord. Only the buried/root
+      // region narrows enough to keep twelve neighbouring blades separate.
+      const chord = s <= .45
+        ? lerp(F.hubRadius * .60, F.radius * .273, smooth(s / .45))
+        : lerp(F.radius * .273, F.radius * .285, smooth((s - .45) / .55));
+      const beta = lerp(36, 17, s) * Math.PI / 180;
       const sweep = .035 + .23 * s * s;
       // Tangential section coordinates increase the swept radius. The centre
       // is pulled inward near the tip so every vertex stays within F.radius.
@@ -96,28 +100,84 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
     return closedMesh(vertices, triangles);
   }
 
-  // Main fan: eight broad swept airfoils with a real root buried in the hub.
+  // Main fan: twelve broad swept airfoils with a real root buried in the hub.
   const F = P.fan, fanFront = F.front ?? F.x - (P.motorHousing.front - F.x);
   const fanRear = F.rear ?? P.motorHousing.front, fanLength = fanRear - fanFront;
   const hubFront = F.x - fanLength * .125, hubRear = fanRear - fanLength * .075;
   const blade = fanBlade();
   const fanPieces = [axisCylinder(hubFront, hubRear, F.hubRadius),
     solidLathe([[hubRear, F.hubRadius], [fanRear, F.hubRadius * .46]])];
-  for (let i = 0; i < F.blades; i++) fanPieces.push(blade.rotate([i * 360 / F.blades, 0, 0]));
+  const fanBladeCount = 12;
+  for (let i = 0; i < fanBladeCount; i++) fanPieces.push(blade.rotate([i * 360 / fanBladeCount, 0, 0]));
   const grooveFront = hubRear - fanLength * .045, grooveRear = hubRear - fanLength * .025;
   const hubGroove = axisCylinder(grooveFront, grooveRear, F.hubRadius + .2)
     .subtract(axisCylinder(grooveFront - .1, grooveRear + .1, F.hubRadius * .978));
   const fanSolid = union(fanPieces).subtract(hubGroove);
-  add('fan', '宽弦后掠扭转风扇 · 实体翼型与轮毂', 'front', steel, fanSolid, { ...metal, rotor: 'main' });
+  add('fan', '十二叶宽弦后掠扭转风扇', 'front', steel, fanSolid, { ...metal, rotor: 'main', bladeCount: fanBladeCount });
 
   const nose = [];
   for (let i = 0; i <= 28; i++) {
     const t = i / 28;
-    nose.push([lerp(fanFront, hubFront, t), Math.max(.35, F.hubRadius * Math.sqrt(1 - (1 - t) ** 2))]);
+    nose.push([lerp(fanFront, hubFront, t), Math.max(.35, F.hubRadius * t)]);
   }
-  add('fan-spinner', '金属整流罩', 'front', paleSteel, solidLathe(nose), metal);
+  add('fan-spinner', '锥形金属整流罩', 'front', paleSteel, solidLathe(nose), metal);
   // This recessed annular groove is cut into the hub itself, never laid on top
   // of another part. The separate spinner meets it at the shared end plane.
+
+  // Downstream fixed vanes span only the passage outside the grey inner casing.
+  // Their small integral feet stop short of both shells; no blue intake wall is
+  // crossed and no unapproved socket is cut into the shared casing generator.
+  const statorFront = fanRear + 25, statorRear = fanRear + 75;
+  const os = P.outerShell, ins = P.innerShell;
+  const outerBore = x => {
+    const step = (os.waistStart - os.taperStart) / 64;
+    const station = Math.max(0, Math.min(63, Math.floor((x - os.taperStart) / step)));
+    const a = os.taperStart + station * step, b = a + step;
+    const radius = q => os.radius + (os.waistRadius - os.radius) * smooth((q - os.taperStart) / (os.waistStart - os.taperStart));
+    return lerp(radius(a), radius(b), (x - a) / step) - os.wall;
+  };
+  const statorRoot = ins.inletRadius + .06;
+  const statorTip = x => outerBore(x) * Math.cos(Math.PI / 144) - .12;
+  const statorVertices = [], statorTriangles = [], statorPerimeter = [];
+  const statorSpans = 12, statorChords = 22;
+  for (let j = 0; j <= statorChords; j++) statorPerimeter.push([(1 - Math.cos(j * Math.PI / statorChords)) / 2, 1]);
+  for (let j = statorChords - 1; j > 0; j--) statorPerimeter.push([(1 - Math.cos(j * Math.PI / statorChords)) / 2, -1]);
+  const statorRing = statorPerimeter.length;
+  for (let k = 0; k <= statorSpans; k++) {
+    const span = k / statorSpans;
+    for (const [u, side] of statorPerimeter) {
+      const x = lerp(statorFront, statorRear, u), r = lerp(statorRoot, statorTip(x), span);
+      const thickness = 5 * .09 * (statorRear - statorFront) * Math.max(0,
+        .2969 * Math.sqrt(u) - .1260 * u - .3516 * u ** 2 + .2843 * u ** 3 - .1036 * u ** 4);
+      const tangent = lerp(8, 4, span) * (1 - u) + 4 * Math.sin(Math.PI * u) + side * thickness;
+      statorVertices.push(x, Math.sqrt(r * r - tangent * tangent), tangent);
+    }
+  }
+  for (let k = 0; k < statorSpans; k++) for (let j = 0; j < statorRing; j++) {
+    const a = k * statorRing + j, b = k * statorRing + (j + 1) % statorRing;
+    const c = (k + 1) * statorRing + j, d = (k + 1) * statorRing + (j + 1) % statorRing;
+    statorTriangles.push(a, c, b, b, c, d);
+  }
+  for (const k of [0, statorSpans]) {
+    const center = [0, 0, 0];
+    for (let j = 0; j < statorRing; j++) for (let a = 0; a < 3; a++) center[a] += statorVertices[(k * statorRing + j) * 3 + a] / statorRing;
+    const ci = statorVertices.length / 3; statorVertices.push(...center);
+    for (let j = 0; j < statorRing; j++) {
+      const a = k * statorRing + j, b = k * statorRing + (j + 1) % statorRing;
+      statorTriangles.push(...(k === 0 ? [ci, a, b] : [ci, b, a]));
+    }
+  }
+  const footFront = statorFront + 7, footRear = statorRear - 7;
+  const tipFootProfile = Array.from({ length: 19 }, (_, i) => {
+    const x = lerp(footFront, footRear, i / 18); return [x, statorTip(x)];
+  });
+  const statorFoot = sector(footFront, footRear, statorRoot, statorRoot + 2.8, -1.2, 3.3);
+  const statorTipFoot = hollowLathe(tipFootProfile, tipFootProfile.map(([x, r]) => [x, r - 2.8]))
+    .intersect(sector(footFront, footRear, 1, os.radius, -.6, 1.9));
+  const oneStator = union([closedMesh(statorVertices, statorTriangles), statorFoot, statorTipFoot]);
+  add('fan-stators', '十八叶后静叶 · 内外端安装脚', 'front', steel,
+    union(Array.from({ length: 18 }, (_, i) => oneStator.rotate([i * 20, 0, 0]))),
+    { ...metal, clip: true, stationary: true, bladeCount: 18, components: 18 });
 
   const motor = P.motor, motorLength = motor.rear - motor.front;
   const shaftRadius = motor.radius * .12;
@@ -202,134 +262,8 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
       { metallic: .7, roughness: .32, finish: 'satin-blue-metal', clip: true });
   }
 
-  // Centrifugal compressor. The rotor has an axial inlet eye, swept radial
-  // vanes and a backplate. A separate motor and shaft drive the same connected
-  // rotor; there is no extension of the propulsion-motor shaft into this unit.
-  const K = P.compressor;
-  // A short impeller chamber leaves a visibly long aft collector within the
-  // unchanged installation length. K.rear still sets the outlet-neck datum.
-  const workingRear = K.front + (K.outlet - K.front) * .375;
-  const chamberLength = workingRear - K.front;
-  const plateX = K.front + chamberLength * .76, plateThickness = chamberLength * .065;
-  const impellerRadius = K.inner * .88, eyeRadius = K.inner * .255;
-  const driveRadius = K.inner * .20, driveFront = K.front + chamberLength * .09;
-  const driveRear = K.front + chamberLength * .32, smallShaft = K.inner * .075;
-  const rotorPieces = [axisCylinder(driveFront, driveRear, driveRadius, 64),
-    axisCylinder(driveRear, plateX + plateThickness, smallShaft, 48),
-    axisCylinder(plateX, plateX + plateThickness, impellerRadius, 128),
-    solidLathe([[K.front + chamberLength * .40, smallShaft * 1.15],
-      [K.front + chamberLength * .56, eyeRadius * .74], [plateX, eyeRadius]])];
-
-  function sweptRibbon(inner, outer, baseAngle, sweep, width, start, end, variableHeight = false) {
-    const profile = [], steps = 28;
-    for (const side of [1, -1]) for (let j = 0; j <= steps; j++) {
-      const t = side === 1 ? j / steps : 1 - j / steps;
-      const r = lerp(inner, outer, t), angle = baseAngle + sweep * t * t + side * width / (2 * r);
-      profile.push([-r * Math.sin(angle), r * Math.cos(angle)]);
-    }
-    let signedArea = 0;
-    for (let i = 0; i < profile.length; i++) {
-      const a = profile[i], b = profile[(i + 1) % profile.length];
-      signedArea += a[0] * b[1] - a[1] * b[0];
-    }
-    if (signedArea < 0) profile.reverse();
-    let vane = new CS([profile]).extrude(1).rotate([0, 90, 0]);
-    if (variableHeight) {
-      vane = vane.warp(v => {
-        const t = clamp((Math.hypot(v[1], v[2]) - inner) / (outer - inner), 0, 1);
-        const height = lerp(chamberLength * .30, chamberLength * .13, t);
-        v[0] = plateX - height * (1 - v[0]) + .25 * v[0];
-      });
-    } else vane = vane.scale([end - start, 1, 1]).translate([start, 0, 0]);
-    return vane;
-  }
-  for (let i = 0; i < 12; i++) {
-    rotorPieces.push(sweptRibbon(eyeRadius * .94, impellerRadius - 1.2,
-      i * tau / 12, -.52, K.inner * .020, 0, 0, true));
-  }
-  add('compressor-drive', '独立驱动离心叶轮 · 后弯叶片与背盘', 'front', steel, union(rotorPieces),
-    { ...metal, rotor: 'compressor' });
-
-  const caseRadius = K.outer - Math.min(2.0, (K.outer - K.inner) * .25);
-  const casingOutside = [[K.front, K.outer], [K.front + chamberLength * .08, K.outer],
-    [K.front + chamberLength * .12, caseRadius], [workingRear - chamberLength * .14, caseRadius],
-    [workingRear - chamberLength * .08, K.outer], [workingRear, K.outer]];
-  const casingInside = [[K.front, K.inner], [workingRear, K.inner]];
-  // The last half of the outlet section is a narrow straight neck. This leaves
-  // the specified first-stack return pipes clear of the converging casing.
-  const neckStart = K.outlet - (K.outletNeckLength ?? (K.outlet - K.rear) * .5);
-  for (let i = 1; i <= 24; i++) {
-    const t = i / 24, x = lerp(workingRear, neckStart, t);
-    casingOutside.push([x, lerp(K.outer, P.air.outer, smooth(t))]);
-    casingInside.push([x, lerp(K.inner, P.air.inner, smooth(t))]);
-  }
-  casingOutside.push([K.outlet, P.air.outer]);
-  casingInside.push([K.outlet, P.air.inner]);
-  const casingParts = [hollowLathe(casingOutside, casingInside)];
-  // Stationary diffuser vanes are fused only to their own casing. Their inner
-  // tips have a positive radial gap to the rotating impeller/backplate.
-  for (let i = 0; i < 18; i++) casingParts.push(sweptRibbon(impellerRadius + 3.2, K.inner + .5,
-    (i + .35) * tau / 18, .13, K.inner * .014,
-    plateX - chamberLength * .13, plateX + plateThickness + chamberLength * .025));
-  // Two machined mounting bands occupy the existing casing envelope. Their
-  // mating grooves include a small assembly gap so GLB quantisation does not
-  // turn coincident surfaces into overlapping solids or flickering surfaces.
-  const flangeDepth = Math.min(3, chamberLength * .06);
-  const flangeInner = K.inner + 1.2, flangeGap = .04;
-  const flangeLocations = [K.front + 1, workingRear - 1 - flangeDepth];
-  const flangeParts = [], flangeSlots = [], compressorScrews = [];
-  for (const [i, x] of flangeLocations.entries()) {
-    const outerProfile = [[x, K.outer - .7], [x + .45, K.outer],
-      [x + flangeDepth - .45, K.outer], [x + flangeDepth, K.outer - .7]];
-    const flange = hollowLathe(outerProfile, [[x, flangeInner], [x + flangeDepth, flangeInner]]);
-    flangeSlots.push(hollowLathe([[x - flangeGap, K.outer + flangeGap], [x + flangeDepth + flangeGap, K.outer + flangeGap]],
-      [[x - flangeGap, flangeInner - flangeGap], [x + flangeDepth + flangeGap, flangeInner - flangeGap]]));
-    const headVoids = [], heads = [];
-    for (let j = 0; j < 12; j++) {
-      const angle = (j + .5) * tau / 12;
-      const point = radius => [x + flangeDepth / 2, radius * Math.cos(angle), radius * Math.sin(angle)];
-      const head = cylinder(point(K.outer - 2.6), point(K.outer - .2), .95, .95, 24)
-        .subtract(cylinder(point(K.outer - .85), point(K.outer), .42, .42, 6));
-      heads.push(head);
-      headVoids.push(cylinder(point(K.outer - 2.65), point(K.outer + .05), 1.02, 1.02, 24));
-    }
-    flangeParts.push(flange.subtract(union(headVoids)));
-    compressorScrews.push(...heads);
-    add(i === 0 ? 'compressor-front-flange' : 'compressor-rear-flange',
-      i === 0 ? '增压机前部金属法兰' : '增压机后部金属法兰', 'compressorCase', paleSteel,
-      flangeParts.at(-1), { ...metal, clip: true });
-  }
-  add('compressor-casing', '香槟金离心增压机 · 分段机匣与渐缩集气壳', 'compressorCase', C.compressorCase ?? '#b6a77c',
-    union(casingParts).subtract(union(flangeSlots)),
-    { metallic: .64, roughness: .31, finish: 'satin-champagne-metal', clip: true });
-  add('compressor-fasteners', '增压机法兰沉头紧固件', 'compressorCase', darkSteel, union(compressorScrews),
-    { ...metal, clip: true });
-
-  // This stationary cover separates the inlet plenum from the impeller's
-  // peripheral outlet. Its inner edge is the inlet eye; its downstream face
-  // follows the blade inlet surface with a positive axial running clearance.
-  // The outer edge meets the casing bore at the same revolved bearing surface,
-  // so there is no open annular bypass around the impeller. The diffuser and
-  // rear collector remain open beyond the backplate's outer radius.
-  const runningClearance = Math.max(.65, P.clearance);
-  const shroudThickness = Math.min(3, chamberLength * .075);
-  const bladeInnerRadius = eyeRadius * .94;
-  const bladeOuterRadius = impellerRadius - 1.2;
-  const eyeFaceX = plateX - chamberLength * .30 - runningClearance;
-  const rimFaceX = plateX - chamberLength * .13 - runningClearance;
-  const shroudProfile = [
-    [bladeInnerRadius, eyeFaceX],
-    [bladeOuterRadius, rimFaceX],
-    [K.inner, rimFaceX],
-    [K.inner, rimFaceX - shroudThickness],
-    [bladeInnerRadius + shroudThickness * 2, eyeFaceX - shroudThickness],
-  ];
-  const shroud = new CS([shroudProfile.reverse()]).revolve(128).rotate([0, 90, 0]);
-  add('compressor-shroud', '离心叶轮静止导流罩 · 入口眼与隔流壁', 'front', paleSteel,
-    shroud, { ...metal, clip: true });
-
-  // Kept in the public signature for compatibility with the common generator.
+  const compressor = buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCylinder, solidLathe, hollowLathe, add });
   void revolved;
-  return { fanFront, fanRear, mainFanRadius: F.radius, impellerRadius, workingRear, neckStart,
-    fanBladeCount: F.blades, compressorBladeCount: 12 };
+  return { fanFront, fanRear, mainFanRadius: F.radius, fanBladeCount,
+    fanStatorCount: 18, statorFront, statorRear, ...compressor };
 }

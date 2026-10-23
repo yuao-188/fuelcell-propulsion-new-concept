@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-type SurfaceData = { id?: string; group?: string; finish?: string; laminated?: boolean; layerOrigin?: number; layerPitch?: number; edgeLodStride?: number };
+type SurfaceData = { id?: string; group?: string; finish?: string };
 type Finish = {
   color: THREE.ColorRepresentation; metalness: number; roughness: number;
   grain: 'brushed' | 'blasted'; scale: number; variation: number; relief: number; reflection: number;
@@ -38,23 +38,29 @@ function grainTexture(kind: Finish['grain'], renderer: THREE.WebGLRenderer) {
   return texture;
 }
 
+const isGraphitePlate = (data: SurfaceData) => ['graphite-plates', 'radial-cell-plate'].includes(data.finish ?? '')
+  || /^stack-\d+-\d+$/.test(data.id ?? '');
+
 function surfaceFinish(source: THREE.MeshStandardMaterial, data: SurfaceData): Finish {
   const id = data.id ?? '', group = data.group ?? '';
   const base: Finish = { color: source.color.clone(), metalness: .78, roughness: .34,
     grain: 'brushed', scale: 180, variation: .17, relief: .035, reflection: 1.05 };
-  if (data.laminated) return { ...base, color: '#414b50', metalness: .12, roughness: .68,
-    grain: 'blasted', scale: 95, variation: .1, relief: .016, reflection: .65 };
-  if (id.startsWith('stack-edges-')) return { ...base, color: '#4e5b62', metalness: .38, roughness: .48,
-    scale: 120, variation: .1, relief: .012, reflection: .85 };
+  // Plate spacing comes entirely from the radial solids and open axial slots.
+  if (isGraphitePlate(data)) return { ...base, color: '#414b50', metalness: .16, roughness: .56,
+    grain: 'blasted', scale: 95, variation: .08, relief: .012, reflection: .7 };
+  if (data.finish === 'insulating-seal' || id.startsWith('stack-seals-')) return { ...base,
+    color: '#253138', metalness: .03, roughness: .76, grain: 'blasted', variation: .05, relief: .006, reflection: .5 };
   if (id.includes('fastener') || id.includes('washer')) return { ...base, color: '#77858e',
     metalness: .94, roughness: .27, scale: 100, variation: .1, relief: .012 };
-  if (id.includes('flange') || id.includes('cap') || id.startsWith('stack-frames-') || id === 'compressor-shroud') {
+  if (id.includes('flange') || id.includes('cap') || id.startsWith('stack-frames-') || id.startsWith('compressor-shroud-') || id === 'compressor-return-channel') {
     return { ...base, color: '#a9b5bd', metalness: .93, roughness: .28, variation: .14, relief: .024, reflection: 1.15 };
   }
-  if (id === 'fan' || id === 'fan-spinner' || id === 'compressor-drive') return { ...base,
+  if (id === 'fan' || id === 'fan-spinner' || id === 'fan-stators' || id.startsWith('compressor-rotor-')) return { ...base,
     color: '#aebbc5', metalness: .96, roughness: .235, variation: .12, relief: .014, reflection: 1.2 };
   if (id === 'main-motor') return { ...base, color: '#ad8a46', metalness: .84, roughness: .33,
     grain: 'blasted', scale: 145, variation: .15, relief: .025, reflection: 1.05 };
+  if (id.startsWith('compressor-motor-')) return { ...base, color: '#566975', metalness: .78, roughness: .32,
+    grain: 'blasted', scale: 100, variation: .12, relief: .015 };
   if (group === 'compressorCase') return { ...base, color: '#b49a62', metalness: .82, roughness: .31,
     grain: 'blasted', scale: 145, variation: .16, relief: .025, reflection: 1.1 };
   if (group === 'outerShell') return { ...base, color: id.includes('seam') ? '#b9c3ca' : '#96a4ae',
@@ -69,20 +75,24 @@ function surfaceFinish(source: THREE.MeshStandardMaterial, data: SurfaceData): F
     grain: 'blasted', scale: 90, variation: .075, relief: .009, reflection: .85 };
   if (group === 'anodeInternal') return { ...base, color: '#657780', metalness: .72, roughness: .4,
     scale: 90, variation: .11, relief: .018 };
+  if (['cathodeExhaust', 'cathodeDrain', 'anodeDrain'].includes(group)) return { ...base,
+    metalness: .55, roughness: .33, grain: 'blasted', scale: 90, variation: .08, relief: .009 };
+  if (['cathodeSeparator', 'anodeSeparator'].includes(group)) return { ...base,
+    metalness: .8, roughness: .3, scale: 100, variation: .12, relief: .018 };
+  if (group === 'wiring') return { ...base, metalness: .06, roughness: .61,
+    grain: 'blasted', scale: 80, variation: .04, relief: .004, reflection: .65 };
   return base;
 }
 
 export function createEngineeringMaterials(renderer: THREE.WebGLRenderer) {
   const textures = { brushed: grainTexture('brushed', renderer), blasted: grainTexture('blasted', renderer) };
 
-  function applyFinish(material: THREE.MeshPhysicalMaterial, finish: Finish, data: SurfaceData, section = false) {
+  function applyFinish(material: THREE.MeshPhysicalMaterial, finish: Finish, section = false) {
     material.dithering = true;
     material.onBeforeCompile = shader => {
       Object.assign(shader.uniforms, {
         finishGrain: { value: textures[finish.grain] }, finishScale: { value: finish.scale },
         finishVariation: { value: finish.variation }, finishRelief: { value: section ? 0 : finish.relief * .3 },
-        layerOrigin: { value: data.layerOrigin ?? 0 }, layerPitch: { value: data.layerPitch || 1.01 },
-        layerGroupStride: { value: data.edgeLodStride || 8 },
       });
       shader.vertexShader = `varying vec3 vFinishPosition;
 varying vec3 vFinishNormal;
@@ -92,7 +102,7 @@ ${shader.vertexShader}`.replace('#include <begin_vertex>', `#include <begin_vert
       shader.fragmentShader = `varying vec3 vFinishPosition;
 varying vec3 vFinishNormal;
 uniform sampler2D finishGrain;
-uniform float finishScale,finishVariation,finishRelief,layerOrigin,layerPitch,layerGroupStride;
+uniform float finishScale,finishVariation,finishRelief;
 ${shader.fragmentShader}`;
       // World-space triplanar projection needs no UVs and does not change the
       // imported geometry. Automatic mip filtering keeps fine grain stable.
@@ -116,24 +126,8 @@ ${shader.fragmentShader}`;
     vec3 grainNormal=normalize(abs(grainDet)*normal-grainGradient);
     normal=normalize(normal+clamp(grainNormal-normal,vec3(-0.018),vec3(0.018)));
   }`);
-      if (data.laminated) {
-        // Fine 1.01 mm layers are filtered at distance. Low-contrast overview
-        // lines align with the existing every-eighth-layer physical edge LOD.
-        shader.fragmentShader = shader.fragmentShader.replace('#include <color_fragment>', `#include <color_fragment>
-  float layerPhase=(vFinishPosition.x-layerOrigin)/layerPitch-0.5;
-  float layerFootprint=max(fwidth(layerPhase),0.0001);
-  float layerVisibility=1.0-smoothstep(0.35,0.9,layerFootprint);
-  float layerDistance=abs(fract(layerPhase+0.5)-0.5);
-  float layerGroove=1.0-smoothstep(0.055,0.055+layerFootprint*0.7,layerDistance);
-  float groupPhase=layerPhase/layerGroupStride;
-  float groupFootprint=max(fwidth(groupPhase),0.0001);
-  float groupDistance=abs(fract(groupPhase+0.5)-0.5);
-  float groupLine=1.0-smoothstep(0.025,0.025+groupFootprint*0.8,groupDistance);
-  float groupVisibility=(1.0-layerVisibility)*(1.0-smoothstep(0.65,1.3,groupFootprint));
-  diffuseColor.rgb*=1.0-0.24*layerGroove*layerVisibility-0.15*groupLine*groupVisibility;`);
-      }
     };
-    material.customProgramCacheKey = () => `engineering-metal-v3-${data.laminated ? 'laminated' : 'solid'}`;
+    material.customProgramCacheKey = () => 'engineering-metal-v4-physical-plates';
   }
 
   const create = (source: THREE.MeshStandardMaterial, data: SurfaceData) => {
@@ -142,18 +136,18 @@ ${shader.fragmentShader}`;
       roughness: finish.roughness, envMapIntensity: finish.reflection, side: THREE.DoubleSide,
       clearcoat: 0, clearcoatRoughness: .5 });
     material.clipShadows = true;
-    applyFinish(material, finish, data);
+    applyFinish(material, finish);
     return material;
   };
   const section = (source: THREE.MeshStandardMaterial, data: SurfaceData) => {
     const finish = surfaceFinish(source, data);
     const material = new THREE.MeshPhysicalMaterial({
-      color: source.color, metalness: data.laminated ? .1 : Math.min(source.metalness, .65),
-      roughness: data.laminated ? .64 : .46, envMapIntensity: .9, side: THREE.DoubleSide,
+      color: source.color, metalness: isGraphitePlate(data) ? .1 : Math.min(source.metalness, .65),
+      roughness: isGraphitePlate(data) ? .64 : .46, envMapIntensity: .9, side: THREE.DoubleSide,
       stencilWrite: true, stencilRef: 0, stencilFunc: THREE.NotEqualStencilFunc,
       stencilFail: THREE.ReplaceStencilOp, stencilZFail: THREE.ReplaceStencilOp, stencilZPass: THREE.ReplaceStencilOp,
     });
-    applyFinish(material, { ...finish, variation: finish.variation * .55 }, data, true);
+    applyFinish(material, { ...finish, variation: finish.variation * .55 }, true);
     return material;
   };
   return { create, section, dispose: () => Object.values(textures).forEach(texture => texture.dispose()) };

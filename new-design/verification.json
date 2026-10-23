@@ -1,8 +1,9 @@
 {
-  "schema": 2,
+  "schema": 3,
   "units": "mm",
-  "dimensionSource": "report_构型计算_完整版.md with user-specified casing and bay revisions",
-  "pumpPlacement": "inside stage 3 central cavity, as confirmed by user",
+  "dimensionSource": "user-confirmed circumferential cells and revised assembly, 2026-10-23",
+  "performanceScope": "geometry only; prior thermal/power results are not recalculated",
+  "pumpPlacement": "stage 3 central cavity",
   "envelopes": {
     "length": 2012,
     "ductBore": 1000,
@@ -17,253 +18,1273 @@
     4
   ],
   "portCounts": {
-    "air": 6,
-    "hydrogen": 6,
-    "return": 6
+    "air": 11,
+    "hydrogen": 11,
+    "return": 11,
+    "cathode": 11
   },
-  "parts": 84,
-  "solidChecks": 700,
-  "broadPhasePairs": 3486,
+  "parts": 99,
+  "solidChecks": 1099,
+  "broadPhasePairs": 4851,
   "collisions": [],
   "fluidChecks": {
-    "air/hydrogen": {
+    "gasSeparation": {
       "intersectionVolume": 0
     },
-    "air/return": {
-      "intersectionVolume": 0
-    },
-    "hydrogen/return": {
-      "intersectionVolume": 0
-    },
-    "completeAnodeLoop": {
+    "completeCathode": {
       "connectedComponents": 1,
-      "internalModuleChannels": 11,
-      "pumpConnected": true
+      "obstructions": []
     },
-    "airObstruction": {
-      "solidVolumeInsideLumen": -2.6147775639536144e-11
+    "completeAnode": {
+      "connectedComponents": 1,
+      "obstructions": []
     },
-    "completeAnodeObstruction": {
-      "solidVolumeInsideLumen": -1.9557946713528192e-7
+    "1-1-air-port": {
+      "connectedVolume": 86.37524214806534
     },
-    "air": {
-      "connectedComponents": 1
+    "1-1-air-channel": {
+      "connectedVolume": 43.26076053322393
     },
-    "hydrogen": {
-      "connectedComponents": 1
+    "1-1-cathode-midpoint": {
+      "connectedVolume": 5.39385722310117
     },
-    "return": {
-      "connectedComponents": 1
+    "1-1-wet-channel": {
+      "connectedVolume": 43.26043923531832
+    },
+    "1-1-wet-port": {
+      "connectedVolume": 57.35693558935399
+    },
+    "1-1-feed-port": {
+      "connectedVolume": 9.244941907093946
+    },
+    "1-1-feed-channel": {
+      "connectedVolume": 22.608109344987003
+    },
+    "1-1-anode-midpoint": {
+      "connectedVolume": 4.532338361078069
+    },
+    "1-1-return-channel": {
+      "connectedVolume": 22.608109344987113
+    },
+    "1-1-return-port": {
+      "connectedVolume": 9.244941907094569
+    },
+    "1-2-air-port": {
+      "connectedVolume": 86.37544350570727
+    },
+    "1-2-air-channel": {
+      "connectedVolume": 43.260803493776436
+    },
+    "1-2-cathode-midpoint": {
+      "connectedVolume": 5.393857223100999
+    },
+    "1-2-wet-channel": {
+      "connectedVolume": 43.260482039335564
+    },
+    "1-2-wet-port": {
+      "connectedVolume": 57.35690801458012
+    },
+    "1-2-feed-port": {
+      "connectedVolume": 9.24506289360185
+    },
+    "1-2-feed-channel": {
+      "connectedVolume": 22.608108601333715
+    },
+    "1-2-anode-midpoint": {
+      "connectedVolume": 4.532338361078062
+    },
+    "1-2-return-channel": {
+      "connectedVolume": 22.608108601333775
+    },
+    "1-2-return-port": {
+      "connectedVolume": 9.245063746423865
+    },
+    "1-3-air-port": {
+      "connectedVolume": 86.37544350576724
+    },
+    "1-3-air-channel": {
+      "connectedVolume": 43.2608034031464
+    },
+    "1-3-cathode-midpoint": {
+      "connectedVolume": 5.393857223100998
+    },
+    "1-3-wet-channel": {
+      "connectedVolume": 43.26048231932198
+    },
+    "1-3-wet-port": {
+      "connectedVolume": 57.35693217950571
+    },
+    "1-3-feed-port": {
+      "connectedVolume": 9.245063746424071
+    },
+    "1-3-feed-channel": {
+      "connectedVolume": 22.60809691497709
+    },
+    "1-3-anode-midpoint": {
+      "connectedVolume": 4.532338361078033
+    },
+    "1-3-return-channel": {
+      "connectedVolume": 22.608096914976972
+    },
+    "1-3-return-port": {
+      "connectedVolume": 9.245062893602109
+    },
+    "2-1-air-port": {
+      "connectedVolume": 86.41193323010224
+    },
+    "2-1-air-channel": {
+      "connectedVolume": 43.27361689962975
+    },
+    "2-1-cathode-midpoint": {
+      "connectedVolume": 5.393857223104988
+    },
+    "2-1-wet-channel": {
+      "connectedVolume": 43.27361681184762
+    },
+    "2-1-wet-port": {
+      "connectedVolume": 57.70095521242624
+    },
+    "2-1-feed-port": {
+      "connectedVolume": 9.247711682414902
+    },
+    "2-1-feed-channel": {
+      "connectedVolume": 22.569620527404663
+    },
+    "2-1-anode-midpoint": {
+      "connectedVolume": 4.532338361081433
+    },
+    "2-1-return-channel": {
+      "connectedVolume": 22.569575842146275
+    },
+    "2-1-return-port": {
+      "connectedVolume": 9.247762796113214
+    },
+    "2-2-air-port": {
+      "connectedVolume": 86.41193224361858
+    },
+    "2-2-air-channel": {
+      "connectedVolume": 43.27361689962952
+    },
+    "2-2-cathode-midpoint": {
+      "connectedVolume": 5.393857223105467
+    },
+    "2-2-wet-channel": {
+      "connectedVolume": 43.273616894758405
+    },
+    "2-2-wet-port": {
+      "connectedVolume": 57.70095521242531
+    },
+    "2-2-feed-port": {
+      "connectedVolume": 9.24771168241549
+    },
+    "2-2-feed-channel": {
+      "connectedVolume": 22.569620527404968
+    },
+    "2-2-anode-midpoint": {
+      "connectedVolume": 4.532338361081264
+    },
+    "2-2-return-channel": {
+      "connectedVolume": 22.569575842146257
+    },
+    "2-2-return-port": {
+      "connectedVolume": 9.24776279611366
+    },
+    "2-3-air-port": {
+      "connectedVolume": 86.41193224361845
+    },
+    "2-3-air-channel": {
+      "connectedVolume": 43.273616899629616
+    },
+    "2-3-cathode-midpoint": {
+      "connectedVolume": 5.39385722310505
+    },
+    "2-3-wet-channel": {
+      "connectedVolume": 43.273616894758206
+    },
+    "2-3-wet-port": {
+      "connectedVolume": 57.70095521242627
+    },
+    "2-3-feed-port": {
+      "connectedVolume": 9.24771168241525
+    },
+    "2-3-feed-channel": {
+      "connectedVolume": 22.56962052740423
+    },
+    "2-3-anode-midpoint": {
+      "connectedVolume": 4.53233836108142
+    },
+    "2-3-return-channel": {
+      "connectedVolume": 22.569575842146094
+    },
+    "2-3-return-port": {
+      "connectedVolume": 9.247762796113605
+    },
+    "2-4-air-port": {
+      "connectedVolume": 86.41193224361822
+    },
+    "2-4-air-channel": {
+      "connectedVolume": 43.27361689962953
+    },
+    "2-4-cathode-midpoint": {
+      "connectedVolume": 5.393857223105472
+    },
+    "2-4-wet-channel": {
+      "connectedVolume": 43.27361689475841
+    },
+    "2-4-wet-port": {
+      "connectedVolume": 57.700955212426884
+    },
+    "2-4-feed-port": {
+      "connectedVolume": 9.247711682415453
+    },
+    "2-4-feed-channel": {
+      "connectedVolume": 22.569620527404126
+    },
+    "2-4-anode-midpoint": {
+      "connectedVolume": 4.532338361081348
+    },
+    "2-4-return-channel": {
+      "connectedVolume": 22.56957584214604
+    },
+    "2-4-return-port": {
+      "connectedVolume": 9.247762796113697
+    },
+    "3-1-air-port": {
+      "connectedVolume": 86.4119332301022
+    },
+    "3-1-air-channel": {
+      "connectedVolume": 43.27361689962995
+    },
+    "3-1-cathode-midpoint": {
+      "connectedVolume": 5.393857223105091
+    },
+    "3-1-wet-channel": {
+      "connectedVolume": 43.2736168118478
+    },
+    "3-1-wet-port": {
+      "connectedVolume": 57.70095521242618
+    },
+    "3-1-feed-port": {
+      "connectedVolume": 9.247711682415124
+    },
+    "3-1-feed-channel": {
+      "connectedVolume": 22.56962052740459
+    },
+    "3-1-anode-midpoint": {
+      "connectedVolume": 4.532338361081688
+    },
+    "3-1-return-channel": {
+      "connectedVolume": 22.569620527404602
+    },
+    "3-1-return-port": {
+      "connectedVolume": 9.24771168241546
+    },
+    "3-2-air-port": {
+      "connectedVolume": 86.41193224361858
+    },
+    "3-2-air-channel": {
+      "connectedVolume": 43.27361689962932
+    },
+    "3-2-cathode-midpoint": {
+      "connectedVolume": 5.393857223105176
+    },
+    "3-2-wet-channel": {
+      "connectedVolume": 43.273616894758305
+    },
+    "3-2-wet-port": {
+      "connectedVolume": 57.7009552124256
+    },
+    "3-2-feed-port": {
+      "connectedVolume": 9.247711682415451
+    },
+    "3-2-feed-channel": {
+      "connectedVolume": 22.569620527405345
+    },
+    "3-2-anode-midpoint": {
+      "connectedVolume": 4.532338361081301
+    },
+    "3-2-return-channel": {
+      "connectedVolume": 22.569620527404496
+    },
+    "3-2-return-port": {
+      "connectedVolume": 9.247711682415819
+    },
+    "3-3-air-port": {
+      "connectedVolume": 86.41193224361861
+    },
+    "3-3-air-channel": {
+      "connectedVolume": 43.27361689962999
+    },
+    "3-3-cathode-midpoint": {
+      "connectedVolume": 5.393857223105323
+    },
+    "3-3-wet-channel": {
+      "connectedVolume": 43.27361689475816
+    },
+    "3-3-wet-port": {
+      "connectedVolume": 57.700955212426145
+    },
+    "3-3-feed-port": {
+      "connectedVolume": 9.247711682415591
+    },
+    "3-3-feed-channel": {
+      "connectedVolume": 22.56962052740433
+    },
+    "3-3-anode-midpoint": {
+      "connectedVolume": 4.532338361081671
+    },
+    "3-3-return-channel": {
+      "connectedVolume": 22.5696205274039
+    },
+    "3-3-return-port": {
+      "connectedVolume": 9.247711682415956
+    },
+    "3-4-air-port": {
+      "connectedVolume": 86.41193224361817
+    },
+    "3-4-air-channel": {
+      "connectedVolume": 43.273616899629324
+    },
+    "3-4-cathode-midpoint": {
+      "connectedVolume": 5.393857223105181
+    },
+    "3-4-wet-channel": {
+      "connectedVolume": 43.27361689475815
+    },
+    "3-4-wet-port": {
+      "connectedVolume": 57.700955212427836
+    },
+    "3-4-feed-port": {
+      "connectedVolume": 9.247711682415563
+    },
+    "3-4-feed-channel": {
+      "connectedVolume": 22.56962052740425
+    },
+    "3-4-anode-midpoint": {
+      "connectedVolume": 4.532338361081165
+    },
+    "3-4-return-channel": {
+      "connectedVolume": 22.569620527404016
+    },
+    "3-4-return-port": {
+      "connectedVolume": 9.247711682415842
     }
   },
   "ports": [
     {
-      "id": "air-1--1",
-      "fluid": "air",
-      "stage": 1,
-      "face": "inner",
-      "position": [
-        831,
-        -80,
-        0
-      ]
-    },
-    {
       "id": "air-1-1",
       "fluid": "air",
+      "medium": "air",
       "stage": 1,
-      "face": "inner",
+      "module": 1,
       "position": [
-        831,
-        80,
-        0
-      ]
+        780.24,
+        7.83773951454306e-15,
+        128
+      ],
+      "direction": [
+        0,
+        6.123233995736766e-17,
+        1
+      ],
+      "inner": 6.5,
+      "outer": 9
     },
     {
-      "id": "air-2--1",
-      "fluid": "air",
-      "stage": 2,
-      "face": "inner",
+      "id": "cathode-1-1",
+      "fluid": "cathode",
+      "medium": "cathode",
+      "stage": 1,
+      "module": 1,
       "position": [
-        1179.5,
-        -150.5,
-        0
-      ]
+        847.9200000000001,
+        33.128837773122655,
+        123.63850576500074
+      ],
+      "direction": [
+        0,
+        -0.25881904510252074,
+        -0.9659258262890683
+      ],
+      "inner": 4.5,
+      "outer": 7
     },
     {
-      "id": "air-2-1",
-      "fluid": "air",
-      "stage": 2,
-      "face": "inner",
-      "position": [
-        1179.5,
-        150.5,
-        0
-      ]
-    },
-    {
-      "id": "air-3--1",
-      "fluid": "air",
-      "stage": 3,
-      "face": "inner",
-      "position": [
-        1574.5,
-        -192,
-        0
-      ]
-    },
-    {
-      "id": "air-3-1",
-      "fluid": "air",
-      "stage": 3,
-      "face": "inner",
-      "position": [
-        1574.5,
-        192,
-        0
-      ]
-    },
-    {
-      "id": "feed-1-0",
+      "id": "hydrogen-1-1",
       "fluid": "hydrogen",
+      "medium": "hydrogen",
       "stage": 1,
-      "face": "rear",
+      "module": 1,
       "position": [
         972,
-        112.04739584953192,
-        -30.023009231892406
-      ]
-    },
-    {
-      "id": "feed-1-1",
-      "fluid": "hydrogen",
-      "stage": 1,
-      "face": "rear",
-      "position": [
-        972,
-        -112.04739584953194,
-        -30.02300923189236
-      ]
-    },
-    {
-      "id": "return-1-0",
-      "fluid": "return",
-      "stage": 1,
-      "face": "front",
-      "position": [
-        690,
-        112.04739584953192,
-        30.023009231892406
-      ]
+        8.143901214329898e-15,
+        133
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "inner": 2.2,
+      "outer": 3.8
     },
     {
       "id": "return-1-1",
       "fluid": "return",
+      "medium": "return",
       "stage": 1,
-      "face": "front",
+      "module": 1,
       "position": [
         690,
-        -112.04739584953191,
-        30.023009231892438
-      ]
+        8.143901214329898e-15,
+        133
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "inner": 2.2,
+      "outer": 3.8
     },
     {
-      "id": "feed-2-0",
-      "fluid": "hydrogen",
-      "stage": 2,
-      "face": "rear",
+      "id": "air-1-2",
+      "fluid": "air",
+      "medium": "air",
+      "stage": 1,
+      "module": 2,
       "position": [
-        1367,
-        180.14516660291125,
-        -48.26975191162012
-      ]
+        780.24,
+        -110.8512516844082,
+        -63.99999999999992
+      ],
+      "direction": [
+        0,
+        -0.866025403784439,
+        -0.4999999999999994
+      ],
+      "inner": 6.5,
+      "outer": 9
     },
     {
-      "id": "feed-2-1",
-      "fluid": "hydrogen",
-      "stage": 2,
-      "face": "rear",
+      "id": "cathode-1-2",
+      "fluid": "cathode",
+      "medium": "cathode",
+      "stage": 1,
+      "module": 2,
       "position": [
-        1367,
-        -180.14516660291127,
-        -48.26975191162005
-      ]
+        847.9200000000001,
+        -123.63850576500077,
+        -33.12883777312255
+      ],
+      "direction": [
+        0,
+        0.9659258262890684,
+        0.25881904510252035
+      ],
+      "inner": 4.5,
+      "outer": 7
     },
     {
-      "id": "return-2-0",
+      "id": "hydrogen-1-2",
+      "fluid": "hydrogen",
+      "medium": "hydrogen",
+      "stage": 1,
+      "module": 2,
+      "position": [
+        972,
+        -115.1813787033304,
+        -66.49999999999991
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "inner": 2.2,
+      "outer": 3.8
+    },
+    {
+      "id": "return-1-2",
       "fluid": "return",
-      "stage": 2,
-      "face": "front",
+      "medium": "return",
+      "stage": 1,
+      "module": 2,
       "position": [
-        992,
-        180.14516660291125,
-        48.26975191162012
-      ]
+        690,
+        -115.1813787033304,
+        -66.49999999999991
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "inner": 2.2,
+      "outer": 3.8
+    },
+    {
+      "id": "air-1-3",
+      "fluid": "air",
+      "medium": "air",
+      "stage": 1,
+      "module": 3,
+      "position": [
+        780.24,
+        110.85125168440811,
+        -64.00000000000006
+      ],
+      "direction": [
+        0,
+        0.8660254037844379,
+        -0.5000000000000012
+      ],
+      "inner": 6.5,
+      "outer": 9
+    },
+    {
+      "id": "cathode-1-3",
+      "fluid": "cathode",
+      "medium": "cathode",
+      "stage": 1,
+      "module": 3,
+      "position": [
+        847.9200000000001,
+        90.50966799187799,
+        -90.50966799187819
+      ],
+      "direction": [
+        0,
+        -0.7071067811865468,
+        0.7071067811865483
+      ],
+      "inner": 4.5,
+      "outer": 7
+    },
+    {
+      "id": "hydrogen-1-3",
+      "fluid": "hydrogen",
+      "medium": "hydrogen",
+      "stage": 1,
+      "module": 3,
+      "position": [
+        972,
+        115.18137870333031,
+        -66.50000000000006
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "inner": 2.2,
+      "outer": 3.8
+    },
+    {
+      "id": "return-1-3",
+      "fluid": "return",
+      "medium": "return",
+      "stage": 1,
+      "module": 3,
+      "position": [
+        690,
+        115.18137870333031,
+        -66.50000000000006
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "inner": 2.2,
+      "outer": 3.8
+    },
+    {
+      "id": "air-2-1",
+      "fluid": "air",
+      "medium": "air",
+      "stage": 2,
+      "module": 1,
+      "position": [
+        1112,
+        1.432836755002403e-14,
+        234
+      ],
+      "direction": [
+        0,
+        6.123233995736766e-17,
+        1
+      ],
+      "inner": 6.5,
+      "outer": 9
+    },
+    {
+      "id": "cathode-2-1",
+      "fluid": "cathode",
+      "medium": "cathode",
+      "stage": 2,
+      "module": 1,
+      "position": [
+        1202,
+        60.56365655398985,
+        226.02664335164198
+      ],
+      "direction": [
+        0,
+        -0.25881904510252074,
+        -0.9659258262890683
+      ],
+      "inner": 4.5,
+      "outer": 7
+    },
+    {
+      "id": "hydrogen-2-1",
+      "fluid": "hydrogen",
+      "medium": "hydrogen",
+      "stage": 2,
+      "module": 1,
+      "position": [
+        1367,
+        1.4634529249810872e-14,
+        239
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "inner": 2.2,
+      "outer": 3.8
     },
     {
       "id": "return-2-1",
       "fluid": "return",
+      "medium": "return",
       "stage": 2,
-      "face": "front",
+      "module": 1,
       "position": [
         992,
-        -180.14516660291122,
-        48.26975191162017
-      ]
+        1.4634529249810872e-14,
+        239
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "inner": 2.2,
+      "outer": 3.8
     },
     {
-      "id": "feed-3-0",
-      "fluid": "hydrogen",
-      "stage": 3,
-      "face": "rear",
+      "id": "air-2-2",
+      "fluid": "air",
+      "medium": "air",
+      "stage": 2,
+      "module": 2,
       "position": [
-        1762,
-        220.23108839390758,
-        -59.010742283374725
-      ]
+        1112,
+        -234,
+        2.865673510004806e-14
+      ],
+      "direction": [
+        0,
+        -1,
+        1.2246467991473532e-16
+      ],
+      "inner": 6.5,
+      "outer": 9
     },
     {
-      "id": "feed-3-1",
-      "fluid": "hydrogen",
-      "stage": 3,
-      "face": "rear",
+      "id": "cathode-2-2",
+      "fluid": "cathode",
+      "medium": "cathode",
+      "stage": 2,
+      "module": 2,
       "position": [
-        1762,
-        -220.2310883939076,
-        -59.01074228337464
-      ]
+        1202,
+        -226.02664335164195,
+        60.563656553989915
+      ],
+      "direction": [
+        0,
+        0.9659258262890682,
+        -0.258819045102521
+      ],
+      "inner": 4.5,
+      "outer": 7
     },
     {
-      "id": "return-3-0",
+      "id": "hydrogen-2-2",
+      "fluid": "hydrogen",
+      "medium": "hydrogen",
+      "stage": 2,
+      "module": 2,
+      "position": [
+        1367,
+        -239,
+        2.9269058499621745e-14
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "inner": 2.2,
+      "outer": 3.8
+    },
+    {
+      "id": "return-2-2",
       "fluid": "return",
-      "stage": 3,
-      "face": "front",
+      "medium": "return",
+      "stage": 2,
+      "module": 2,
       "position": [
-        1387,
-        220.23108839390758,
-        59.010742283374725
-      ]
+        992,
+        -239,
+        2.9269058499621745e-14
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "inner": 2.2,
+      "outer": 3.8
+    },
+    {
+      "id": "air-2-3",
+      "fluid": "air",
+      "medium": "air",
+      "stage": 2,
+      "module": 3,
+      "position": [
+        1112,
+        -4.2985102650072094e-14,
+        -234
+      ],
+      "direction": [
+        0,
+        -1.8369701987210297e-16,
+        -1
+      ],
+      "inner": 6.5,
+      "outer": 9
+    },
+    {
+      "id": "cathode-2-3",
+      "fluid": "cathode",
+      "medium": "cathode",
+      "stage": 2,
+      "module": 3,
+      "position": [
+        1202,
+        -60.56365655398983,
+        -226.02664335164198
+      ],
+      "direction": [
+        0,
+        0.25881904510252063,
+        0.9659258262890683
+      ],
+      "inner": 4.5,
+      "outer": 7
+    },
+    {
+      "id": "hydrogen-2-3",
+      "fluid": "hydrogen",
+      "medium": "hydrogen",
+      "stage": 2,
+      "module": 3,
+      "position": [
+        1367,
+        -4.390358774943261e-14,
+        -239
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "inner": 2.2,
+      "outer": 3.8
+    },
+    {
+      "id": "return-2-3",
+      "fluid": "return",
+      "medium": "return",
+      "stage": 2,
+      "module": 3,
+      "position": [
+        992,
+        -4.390358774943261e-14,
+        -239
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "inner": 2.2,
+      "outer": 3.8
+    },
+    {
+      "id": "air-2-4",
+      "fluid": "air",
+      "medium": "air",
+      "stage": 2,
+      "module": 4,
+      "position": [
+        1112,
+        234,
+        -5.731347020009613e-14
+      ],
+      "direction": [
+        0,
+        1,
+        -2.4492935982947064e-16
+      ],
+      "inner": 6.5,
+      "outer": 9
+    },
+    {
+      "id": "cathode-2-4",
+      "fluid": "cathode",
+      "medium": "cathode",
+      "stage": 2,
+      "module": 4,
+      "position": [
+        1202,
+        226.02664335164198,
+        -60.56365655398984
+      ],
+      "direction": [
+        0,
+        -0.9659258262890683,
+        0.2588190451025207
+      ],
+      "inner": 4.5,
+      "outer": 7
+    },
+    {
+      "id": "hydrogen-2-4",
+      "fluid": "hydrogen",
+      "medium": "hydrogen",
+      "stage": 2,
+      "module": 4,
+      "position": [
+        1367,
+        239,
+        -5.853811699924349e-14
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "inner": 2.2,
+      "outer": 3.8
+    },
+    {
+      "id": "return-2-4",
+      "fluid": "return",
+      "medium": "return",
+      "stage": 2,
+      "module": 4,
+      "position": [
+        992,
+        239,
+        -5.853811699924349e-14
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "inner": 2.2,
+      "outer": 3.8
+    },
+    {
+      "id": "air-3-1",
+      "fluid": "air",
+      "medium": "air",
+      "stage": 3,
+      "module": 1,
+      "position": [
+        1507,
+        1.432836755002403e-14,
+        234
+      ],
+      "direction": [
+        0,
+        6.123233995736766e-17,
+        1
+      ],
+      "inner": 6.5,
+      "outer": 9
+    },
+    {
+      "id": "cathode-3-1",
+      "fluid": "cathode",
+      "medium": "cathode",
+      "stage": 3,
+      "module": 1,
+      "position": [
+        1597,
+        60.56365655398985,
+        226.02664335164198
+      ],
+      "direction": [
+        0,
+        -0.25881904510252074,
+        -0.9659258262890683
+      ],
+      "inner": 4.5,
+      "outer": 7
+    },
+    {
+      "id": "hydrogen-3-1",
+      "fluid": "hydrogen",
+      "medium": "hydrogen",
+      "stage": 3,
+      "module": 1,
+      "position": [
+        1762,
+        1.4634529249810872e-14,
+        239
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "inner": 2.2,
+      "outer": 3.8
     },
     {
       "id": "return-3-1",
       "fluid": "return",
+      "medium": "return",
       "stage": 3,
-      "face": "front",
+      "module": 1,
       "position": [
         1387,
-        -220.23108839390756,
-        59.01074228337479
-      ]
+        1.4634529249810872e-14,
+        239
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "inner": 2.2,
+      "outer": 3.8
+    },
+    {
+      "id": "air-3-2",
+      "fluid": "air",
+      "medium": "air",
+      "stage": 3,
+      "module": 2,
+      "position": [
+        1507,
+        -234,
+        2.865673510004806e-14
+      ],
+      "direction": [
+        0,
+        -1,
+        1.2246467991473532e-16
+      ],
+      "inner": 6.5,
+      "outer": 9
+    },
+    {
+      "id": "cathode-3-2",
+      "fluid": "cathode",
+      "medium": "cathode",
+      "stage": 3,
+      "module": 2,
+      "position": [
+        1597,
+        -226.02664335164195,
+        60.563656553989915
+      ],
+      "direction": [
+        0,
+        0.9659258262890682,
+        -0.258819045102521
+      ],
+      "inner": 4.5,
+      "outer": 7
+    },
+    {
+      "id": "hydrogen-3-2",
+      "fluid": "hydrogen",
+      "medium": "hydrogen",
+      "stage": 3,
+      "module": 2,
+      "position": [
+        1762,
+        -239,
+        2.9269058499621745e-14
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "inner": 2.2,
+      "outer": 3.8
+    },
+    {
+      "id": "return-3-2",
+      "fluid": "return",
+      "medium": "return",
+      "stage": 3,
+      "module": 2,
+      "position": [
+        1387,
+        -239,
+        2.9269058499621745e-14
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "inner": 2.2,
+      "outer": 3.8
+    },
+    {
+      "id": "air-3-3",
+      "fluid": "air",
+      "medium": "air",
+      "stage": 3,
+      "module": 3,
+      "position": [
+        1507,
+        -4.2985102650072094e-14,
+        -234
+      ],
+      "direction": [
+        0,
+        -1.8369701987210297e-16,
+        -1
+      ],
+      "inner": 6.5,
+      "outer": 9
+    },
+    {
+      "id": "cathode-3-3",
+      "fluid": "cathode",
+      "medium": "cathode",
+      "stage": 3,
+      "module": 3,
+      "position": [
+        1597,
+        -60.56365655398983,
+        -226.02664335164198
+      ],
+      "direction": [
+        0,
+        0.25881904510252063,
+        0.9659258262890683
+      ],
+      "inner": 4.5,
+      "outer": 7
+    },
+    {
+      "id": "hydrogen-3-3",
+      "fluid": "hydrogen",
+      "medium": "hydrogen",
+      "stage": 3,
+      "module": 3,
+      "position": [
+        1762,
+        -4.390358774943261e-14,
+        -239
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "inner": 2.2,
+      "outer": 3.8
+    },
+    {
+      "id": "return-3-3",
+      "fluid": "return",
+      "medium": "return",
+      "stage": 3,
+      "module": 3,
+      "position": [
+        1387,
+        -4.390358774943261e-14,
+        -239
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "inner": 2.2,
+      "outer": 3.8
+    },
+    {
+      "id": "air-3-4",
+      "fluid": "air",
+      "medium": "air",
+      "stage": 3,
+      "module": 4,
+      "position": [
+        1507,
+        234,
+        -5.731347020009613e-14
+      ],
+      "direction": [
+        0,
+        1,
+        -2.4492935982947064e-16
+      ],
+      "inner": 6.5,
+      "outer": 9
+    },
+    {
+      "id": "cathode-3-4",
+      "fluid": "cathode",
+      "medium": "cathode",
+      "stage": 3,
+      "module": 4,
+      "position": [
+        1597,
+        226.02664335164198,
+        -60.56365655398984
+      ],
+      "direction": [
+        0,
+        -0.9659258262890683,
+        0.2588190451025207
+      ],
+      "inner": 4.5,
+      "outer": 7
+    },
+    {
+      "id": "hydrogen-3-4",
+      "fluid": "hydrogen",
+      "medium": "hydrogen",
+      "stage": 3,
+      "module": 4,
+      "position": [
+        1762,
+        239,
+        -5.853811699924349e-14
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "inner": 2.2,
+      "outer": 3.8
+    },
+    {
+      "id": "return-3-4",
+      "fluid": "return",
+      "medium": "return",
+      "stage": 3,
+      "module": 4,
+      "position": [
+        1387,
+        239,
+        -5.853811699924349e-14
+      ],
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "inner": 2.2,
+      "outer": 3.8
     }
   ],
+  "stackChecks": [
+    {
+      "stage": 1,
+      "modules": 3,
+      "physicalCellsPerModule": [
+        279,
+        279,
+        279
+      ],
+      "totalPhysicalCells": 837,
+      "plateThickness": 0.55,
+      "nominalInnerCoolingGap": 0.46,
+      "constructedInnerCoolingGap": 0.4602,
+      "numericRelief": 0.0002,
+      "outerCoolingGap": 1.160749184309911,
+      "cellInner": 138,
+      "cellOuter": 233.7,
+      "axialCoolingLength": 282,
+      "coolingDirection": "front-to-rear",
+      "moduleGapAtInner": 1,
+      "moduleGapAtOuter": 1.8492265625,
+      "sideFrameMinimumThickness": 2.3213971842793497
+    },
+    {
+      "stage": 2,
+      "modules": 4,
+      "physicalCellsPerModule": [
+        372,
+        372,
+        372,
+        372
+      ],
+      "totalPhysicalCells": 1488,
+      "plateThickness": 0.55,
+      "nominalInnerCoolingGap": 0.46,
+      "constructedInnerCoolingGap": 0.4602,
+      "numericRelief": 0.0002,
+      "outerCoolingGap": 0.735520580466329,
+      "cellInner": 244,
+      "cellOuter": 310.5,
+      "axialCoolingLength": 375,
+      "coolingDirection": "front-to-rear",
+      "moduleGapAtInner": 1,
+      "moduleGapAtOuter": 1.3397478632478632,
+      "sideFrameMinimumThickness": 2.488568850793598
+    },
+    {
+      "stage": 3,
+      "modules": 4,
+      "physicalCellsPerModule": [
+        372,
+        372,
+        372,
+        372
+      ],
+      "totalPhysicalCells": 1488,
+      "plateThickness": 0.55,
+      "nominalInnerCoolingGap": 0.46,
+      "constructedInnerCoolingGap": 0.4602,
+      "numericRelief": 0.0002,
+      "outerCoolingGap": 0.7996930465900596,
+      "cellInner": 244,
+      "cellOuter": 326,
+      "axialCoolingLength": 375,
+      "coolingDirection": "front-to-rear",
+      "moduleGapAtInner": 1,
+      "moduleGapAtOuter": 1.4059871794871794,
+      "sideFrameMinimumThickness": 2.488568850793598
+    }
+  ],
+  "physicalCells": 3813,
   "layoutOverrides": {
-    "source": "latest red outer / yellow inner outline and open-inner-sleeve confirmation",
-    "intakeLength": 270,
-    "compressorLength": 210,
     "intakeInnerEnds": "both open",
     "mainInnerShellFront": 210,
+    "innerContractionStart": 1785,
     "outerWaistRadius": 410,
-    "mainInnerShellMaximumRadius": 330
+    "mainInnerShellMaximumRadius": 354
   },
   "shellGeometry": {
     "innerCurve": "cubic Hermite, zero slope at expansionStart, shoulder and rear",
@@ -275,28 +1296,28 @@
     },
     "innerConstantRadius": {
       "front": 210,
-      "rear": 900,
+      "rear": 620,
       "radius": 248
     },
     "innerWall": 5,
     "stackClearances": [
       {
         "stage": 1,
-        "minimumRadialClearance": 67.44217258041792,
-        "x": 900,
-        "rearRadialClearance": 69.19070765122157
+        "minimumRadialClearance": 14.666173855394078,
+        "x": 690,
+        "rearRadialClearance": 98.76177988022684
       },
       {
         "stage": 2,
-        "minimumRadialClearance": 28.74537334686667,
+        "minimumRadialClearance": 23.233709258390718,
         "x": 992,
-        "rearRadialClearance": 74.5962361499009
+        "rearRadialClearance": 28.833763942631606
       },
       {
         "stage": 3,
-        "minimumRadialClearance": 46.49169239992284,
+        "minimumRadialClearance": 13.79130991428417,
         "x": 1387,
-        "rearRadialClearance": 71.90837615800899
+        "rearRadialClearance": 19.884888280564496
       }
     ],
     "seamStations": [
@@ -313,8 +1334,8 @@
       "intersectionVolume": 0
     },
     "interShellClearance": {
-      "minimumRadialClearance": 59.67437834253013,
-      "x": 1940
+      "minimumRadialClearance": 45.2638865329879,
+      "x": 1800.5
     },
     "outerAccessCovers": 3,
     "outerFasteners": 38,
@@ -322,30 +1343,345 @@
     "detailRelief": 0.025,
     "detailsWithinOriginalEnvelope": true
   },
+  "waterManagement": {
+    "dimensionStatus": "schematic assembly detail; no separation efficiency claim",
+    "separatorCount": 2,
+    "independentDrainCount": 2,
+    "drainInnerDiameter": 4,
+    "drainOuterDiameter": 7,
+    "tailDrainPositions": [
+      [
+        1990,
+        -120,
+        -130
+      ],
+      [
+        1990,
+        -120,
+        130
+      ]
+    ],
+    "groups": [
+      "anodeSeparator",
+      "anodeDrain",
+      "cathodeSeparator",
+      "cathodeDrain"
+    ],
+    "baffleCountPerSeparator": 2,
+    "wiringIncluded": false
+  },
+  "wiring": {
+    "parts": 3,
+    "bundles": 1,
+    "shortBranches": 3,
+    "frameConnectors": 3,
+    "clamps": 3,
+    "angleDegrees": 330,
+    "sheathDiameter": 4.8,
+    "branchDiameter": 3.6,
+    "interfaceBoxCentre": [
+      620,
+      181.86533479473206,
+      -105.0000000000001
+    ],
+    "routeStart": 650,
+    "routeEnd": 1674.5,
+    "representation": "insulated multicore harness only; no conductor interconnection or power-electronics design"
+  },
+  "plumbing": {
+    "units": "mm",
+    "independentModules": 11,
+    "portCounts": {
+      "air": 11,
+      "cathode": 11,
+      "hydrogen": 11,
+      "return": 11
+    },
+    "moduleManifoldsAreIsolatedArcs": true,
+    "manifoldRootOffset": 5,
+    "modules": [
+      {
+        "stage": 1,
+        "module": 1,
+        "rootRadius": 133,
+        "airX": 780.24,
+        "wetX": 847.9200000000001,
+        "internalFeedX": 956,
+        "internalReturnX": 706,
+        "manifoldAngles": [
+          34.22381220790932,
+          145.77618779209067
+        ],
+        "cathodeRepresentativeLength": 67.68000000000006
+      },
+      {
+        "stage": 1,
+        "module": 2,
+        "rootRadius": 133,
+        "airX": 780.24,
+        "wetX": 847.9200000000001,
+        "internalFeedX": 956,
+        "internalReturnX": 706,
+        "manifoldAngles": [
+          154.22381220790933,
+          265.7761877920907
+        ],
+        "cathodeRepresentativeLength": 67.68000000000006
+      },
+      {
+        "stage": 1,
+        "module": 3,
+        "rootRadius": 133,
+        "airX": 780.24,
+        "wetX": 847.9200000000001,
+        "internalFeedX": 956,
+        "internalReturnX": 706,
+        "manifoldAngles": [
+          274.2238122079093,
+          385.77618779209064
+        ],
+        "cathodeRepresentativeLength": 67.68000000000006
+      },
+      {
+        "stage": 2,
+        "module": 1,
+        "rootRadius": 239,
+        "airX": 1112,
+        "wetX": 1202,
+        "internalFeedX": 1351,
+        "internalReturnX": 1008,
+        "manifoldAngles": [
+          49.12242697246258,
+          130.8775730275374
+        ],
+        "cathodeRepresentativeLength": 90
+      },
+      {
+        "stage": 2,
+        "module": 2,
+        "rootRadius": 239,
+        "airX": 1112,
+        "wetX": 1202,
+        "internalFeedX": 1351,
+        "internalReturnX": 1008,
+        "manifoldAngles": [
+          139.12242697246256,
+          220.87757302753744
+        ],
+        "cathodeRepresentativeLength": 90
+      },
+      {
+        "stage": 2,
+        "module": 3,
+        "rootRadius": 239,
+        "airX": 1112,
+        "wetX": 1202,
+        "internalFeedX": 1351,
+        "internalReturnX": 1008,
+        "manifoldAngles": [
+          229.1224269724626,
+          310.8775730275374
+        ],
+        "cathodeRepresentativeLength": 90
+      },
+      {
+        "stage": 2,
+        "module": 4,
+        "rootRadius": 239,
+        "airX": 1112,
+        "wetX": 1202,
+        "internalFeedX": 1351,
+        "internalReturnX": 1008,
+        "manifoldAngles": [
+          319.1224269724626,
+          400.8775730275374
+        ],
+        "cathodeRepresentativeLength": 90
+      },
+      {
+        "stage": 3,
+        "module": 1,
+        "rootRadius": 239,
+        "airX": 1507,
+        "wetX": 1597,
+        "internalFeedX": 1746,
+        "internalReturnX": 1403,
+        "manifoldAngles": [
+          49.12242697246258,
+          130.8775730275374
+        ],
+        "cathodeRepresentativeLength": 90
+      },
+      {
+        "stage": 3,
+        "module": 2,
+        "rootRadius": 239,
+        "airX": 1507,
+        "wetX": 1597,
+        "internalFeedX": 1746,
+        "internalReturnX": 1403,
+        "manifoldAngles": [
+          139.12242697246256,
+          220.87757302753744
+        ],
+        "cathodeRepresentativeLength": 90
+      },
+      {
+        "stage": 3,
+        "module": 3,
+        "rootRadius": 239,
+        "airX": 1507,
+        "wetX": 1597,
+        "internalFeedX": 1746,
+        "internalReturnX": 1403,
+        "manifoldAngles": [
+          229.1224269724626,
+          310.8775730275374
+        ],
+        "cathodeRepresentativeLength": 90
+      },
+      {
+        "stage": 3,
+        "module": 4,
+        "rootRadius": 239,
+        "airX": 1507,
+        "wetX": 1597,
+        "internalFeedX": 1746,
+        "internalReturnX": 1403,
+        "manifoldAngles": [
+          319.1224269724626,
+          400.8775730275374
+        ],
+        "cathodeRepresentativeLength": 90
+      }
+    ],
+    "internalChannelStatus": "representative module connectivity; axial cooling gaps remain open",
+    "feedHeader": {
+      "radius": 70,
+      "angle": 45
+    },
+    "returnHeader": {
+      "radius": 70,
+      "angle": 225
+    },
+    "wetHeader": {
+      "radius": 95,
+      "angle": 315
+    },
+    "wetSeparatorRouteRadius": 125
+  },
+  "errors": [],
   "compressorGeometry": {
     "status": "passed",
-    "scope": "Exported front machinery geometry only; no aerodynamic performance validation",
-    "modelModifiedAt": "2026-10-22T16:07:19.316Z",
+    "scope": "Front machinery geometry only; no aerodynamic performance or motor power validation",
+    "source": "exported GLB",
+    "modelModifiedAt": "2026-10-23T10:31:56.223Z",
     "units": "mm",
-    "frontParts": 15,
+    "frontParts": 21,
+    "componentCounts": {
+      "fan": 1,
+      "fan-spinner": 1,
+      "fan-stators": 18,
+      "main-motor": 1,
+      "motor-front-cap": 1,
+      "motor-rear-cap": 1,
+      "motor-shaft-collar": 1,
+      "motor-housing": 1,
+      "intake-fasteners": 16,
+      "intake-inner-shell": 1,
+      "compressor-rotor-1": 1,
+      "compressor-shroud-1": 1,
+      "compressor-rotor-2": 1,
+      "compressor-shroud-2": 1,
+      "compressor-return-channel": 1,
+      "compressor-motor-1": 1,
+      "compressor-motor-2": 1,
+      "compressor-front-flange": 1,
+      "compressor-rear-flange": 1,
+      "compressor-casing": 1,
+      "compressor-fasteners": 24
+    },
     "solidIntersections": {
       "toleranceMm3": 0.02,
-      "candidates": 26,
-      "maximumVolumeMm3": 0.00007312075314303002,
+      "candidates": 45,
+      "maximumVolumeMm3": 2.3376856006507296e-11,
       "collisions": []
+    },
+    "fanStators": {
+      "blades": 18,
+      "stationary": true,
+      "frontMm": 235,
+      "rearMm": 285,
+      "axialClearanceFromFanMm": 25,
+      "shellCheck": "actual exported shell solids",
+      "shellIntersections": [
+        {
+          "id": "outer-shell",
+          "volumeMm3": 0
+        },
+        {
+          "id": "inner-shell",
+          "volumeMm3": 0
+        }
+      ]
+    },
+    "independentDrives": {
+      "rotatingGroups": [
+        {
+          "id": "compressor-rotor-1",
+          "rotor": "compressor-1",
+          "frontMm": 487,
+          "rearMm": 549,
+          "connectedComponents": 1
+        },
+        {
+          "id": "compressor-rotor-2",
+          "rotor": "compressor-2",
+          "frontMm": 576,
+          "rearMm": 638,
+          "connectedComponents": 1
+        }
+      ],
+      "motorHousingsStationary": true,
+      "axialSeparationBetweenRotorsMm": 27,
+      "motorSizing": "geometric placeholders; no 16 kW packaging or operating performance claim"
+    },
+    "outletNeck": {
+      "frontMm": 675,
+      "rearMm": 690,
+      "specifiedInnerDiameterMm": 36,
+      "specifiedOuterDiameterMm": 48,
+      "measuredInnerVertexDiameterMm": 35.99999809761325,
+      "measuredOuterVertexDiameterMm": 48.000001765057846,
+      "fullBoreProbeRadiusMm": 17.9,
+      "obstructions": []
     },
     "inletToOutlet": {
       "probeRadiusMm": 0.5,
-      "segments": 44,
+      "segments": 120,
       "toleranceMm3": 0.001,
       "maximumObstructionVolumeMm3": 0,
       "obstructions": []
     },
-    "formerBypass": {
-      "radiusFromAxisMm": 155,
-      "probeRadiusMm": 1,
-      "shroudIntersectionMm3": 12.859116699052429,
-      "blocked": true
+    "formerBypass": [
+      {
+        "stage": 1,
+        "radiusFromAxisMm": 155,
+        "probeRadiusMm": 1,
+        "shroudIntersectionMm3": 12.594570780319936,
+        "blocked": true
+      },
+      {
+        "stage": 2,
+        "radiusFromAxisMm": 125,
+        "probeRadiusMm": 1,
+        "shroudIntersectionMm3": 18.42401272949734,
+        "blocked": true
+      }
+    ],
+    "returnDiaphragm": {
+      "centreBlocked": true,
+      "intersectionVolumeMm3": 5.267438694435463
     },
     "blueSleeve": {
       "specifiedBoreDiameterMm": 330,
@@ -373,5 +1709,102 @@
       "obstructions": []
     },
     "failures": []
+  },
+  "exportedCellGeometry": {
+    "modelBytes": 50544540,
+    "modules": [
+      {
+        "id": "stack-1-1",
+        "stage": 1,
+        "module": 1,
+        "physicalCells": 279,
+        "axialCoolingProbes": 280
+      },
+      {
+        "id": "stack-1-2",
+        "stage": 1,
+        "module": 2,
+        "physicalCells": 279,
+        "axialCoolingProbes": 280
+      },
+      {
+        "id": "stack-1-3",
+        "stage": 1,
+        "module": 3,
+        "physicalCells": 279,
+        "axialCoolingProbes": 280
+      },
+      {
+        "id": "stack-2-1",
+        "stage": 2,
+        "module": 1,
+        "physicalCells": 372,
+        "axialCoolingProbes": 373
+      },
+      {
+        "id": "stack-2-2",
+        "stage": 2,
+        "module": 2,
+        "physicalCells": 372,
+        "axialCoolingProbes": 373
+      },
+      {
+        "id": "stack-2-3",
+        "stage": 2,
+        "module": 3,
+        "physicalCells": 372,
+        "axialCoolingProbes": 373
+      },
+      {
+        "id": "stack-2-4",
+        "stage": 2,
+        "module": 4,
+        "physicalCells": 372,
+        "axialCoolingProbes": 373
+      },
+      {
+        "id": "stack-3-1",
+        "stage": 3,
+        "module": 1,
+        "physicalCells": 372,
+        "axialCoolingProbes": 373
+      },
+      {
+        "id": "stack-3-2",
+        "stage": 3,
+        "module": 2,
+        "physicalCells": 372,
+        "axialCoolingProbes": 373
+      },
+      {
+        "id": "stack-3-3",
+        "stage": 3,
+        "module": 3,
+        "physicalCells": 372,
+        "axialCoolingProbes": 373
+      },
+      {
+        "id": "stack-3-4",
+        "stage": 3,
+        "module": 4,
+        "physicalCells": 372,
+        "axialCoolingProbes": 373
+      }
+    ],
+    "physicalCells": 3813,
+    "minimumMeasuredThickness": 0.5499893489108842,
+    "maximumMeasuredThickness": 0.5500235144984345,
+    "minimumMeasuredInnerCoolingGap": 0.46018848262784867,
+    "maximumMeasuredInnerCoolingGap": 0.4602124767568812,
+    "axialCoolingProbes": 3824,
+    "maximumSolidObstruction": 0,
+    "obstructionChecks": 198,
+    "portCounts": {
+      "air": 11,
+      "hydrogen": 11,
+      "return": 11,
+      "cathode": 11
+    },
+    "passed": true
   }
 }

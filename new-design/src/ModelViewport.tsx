@@ -6,10 +6,11 @@ import { createEngineeringMaterials } from './materials';
 
 type Props = {
   viewMode: 'complete' | 'cutaway'; sectionDepth: number;
-  cameraView: 'perspective' | 'side' | 'front' | 'fan' | 'machinery' | 'stacks';
+  cameraView: 'perspective' | 'side' | 'front' | 'fan' | 'machinery' | 'stacks' | 'cells' | 'water';
   showOuterShell: boolean; showInnerShell: boolean; showStacks: boolean;
   showIntake: boolean; showIntakeInner: boolean; showCompressorCase: boolean;
-  showAir: boolean; showHydrogen: boolean; showReturn: boolean; resetKey: number;
+  showAir: boolean; showHydrogen: boolean; showReturn: boolean;
+  showCathodeWater: boolean; showAnodeSeparator: boolean; showWiring: boolean; resetKey: number;
 };
 
 export default function ModelViewport(props: Props) {
@@ -83,9 +84,18 @@ export default function ModelViewport(props: Props) {
     let priorReset=-1,priorCamera='',priorMode='',priorDepth=-1,priorVisibility='';
     function fit() {
       const view=latest.current.cameraView;
-      const direction=view==='side'?new THREE.Vector3(0,0,1):view==='front'?new THREE.Vector3(-1,0,0):view==='fan'?new THREE.Vector3(-1,.17,.5).normalize():view==='machinery'?new THREE.Vector3(.2,.18,1).normalize():new THREE.Vector3(-.52,.30,1).normalize();
-      const box=view==='fan'?[[40,220],[-505,505],[-505,505]]:view==='machinery'?[[205,705],[-180,180],[-180,180]]:view==='stacks'?[[680,1780],[-260,260],[-260,260]]:[[-12,2030],[-525,525],[-525,525]];
-      const target=new THREE.Vector3((box[0][0]+box[0][1])/2,0,0);controls.target.copy(target);
+      const direction=view==='side'?new THREE.Vector3(0,0,1):view==='front'?new THREE.Vector3(-1,0,0):view==='fan'?new THREE.Vector3(-1,.17,.5).normalize():view==='machinery'?new THREE.Vector3(.2,.18,1).normalize():view==='cells'?new THREE.Vector3(-1,.28,.9).normalize():view==='water'?new THREE.Vector3(.25,.2,1).normalize():new THREE.Vector3(-.52,.30,1).normalize();
+      let box=view==='fan'?[[40,220],[-505,505],[-505,505]]:view==='machinery'?[[205,705],[-180,180],[-180,180]]:view==='stacks'?[[680,1780],[-340,340],[-340,340]]:view==='cells'?[[680,910],[90,240],[-140,35]]:view==='water'?[[1480,1900],[-180,100],[-120,220]]:[[-12,2030],[-525,525],[-525,525]];
+      if(view==='water') {
+        const waterBounds=new THREE.Box3();
+        meshes.filter(mesh=>['cathodeSeparator','anodeSeparator'].includes(mesh.userData.group))
+          .forEach(mesh=>waterBounds.expandByObject(mesh));
+        if(!waterBounds.isEmpty()) {
+          waterBounds.expandByScalar(45);
+          box=['x','y','z'].map(axis=>[waterBounds.min[axis as 'x'|'y'|'z'],waterBounds.max[axis as 'x'|'y'|'z']]);
+        }
+      }
+      const target=new THREE.Vector3(...box.map(range=>(range[0]+range[1])/2) as [number,number,number]);controls.target.copy(target);
       const right=new THREE.Vector3().crossVectors(camera.up,direction).normalize(),up=new THREE.Vector3().crossVectors(direction,right);
       const tanV=Math.tan(THREE.MathUtils.degToRad(camera.fov)/2),tanH=tanV*camera.aspect;
       let distance=0;
@@ -116,18 +126,29 @@ export default function ModelViewport(props: Props) {
       cap.onAfterRender=()=>renderer.clearStencil();
       scene.add(stencil,cap);sections.push({source:mesh,stencil,cap});
     }
-    new GLTFLoader().load(new URL('model.glb?v=20261022-contoured-metal-2',document.baseURI).href,gltf=>{
+    const modelUrl=new URL('model.glb?v=20261023-radial-cells-twin-compressor-1',document.baseURI);
+    const modelRequest=new AbortController();
+    const loadFailed=()=>{if(!cancelled)setStatus('模型加载失败，请刷新页面重试。');};
+    // Read the binary directly. FileLoader's rewrapped progress stream can
+    // report ERR_ABORTED in Chromium even after delivering the complete GLB.
+    fetch(modelUrl,{signal:modelRequest.signal}).then(response=>{
+      if(!response.ok)throw new Error(`Model HTTP ${response.status}`);
+      return response.arrayBuffer();
+    }).then(data=>{
+      if(cancelled)return;
+      new GLTFLoader().parse(data,new URL('.',modelUrl).href,gltf=>{
       if(cancelled){disposeObject(gltf.scene);return;}
       root=gltf.scene;scene.add(root);
       root.traverse(item=>{
         if(!(item instanceof THREE.Mesh))return;
-        meshes.push(item);item.renderOrder=1000;item.castShadow=!String(item.userData.id).startsWith('stack-edges-');item.receiveShadow=true;
+        meshes.push(item);item.renderOrder=1000;item.castShadow=true;item.receiveShadow=true;
         const source=item.material as THREE.MeshStandardMaterial;
         item.material=finishes.create(source,item.userData);
-        if(item.userData.clip||item.userData.laminated)addSection(item,sections.length);
+        if(item.userData.clip)addSection(item,sections.length);
       });
       setStatus('');priorMode='';priorDepth=-1;priorVisibility='';fit();
-    },undefined,()=>{if(!cancelled)setStatus('模型加载失败，请刷新页面重试。');});
+      },loadFailed);
+    }).catch(loadFailed);
     const resize=()=>{
       const width=element.clientWidth,height=element.clientHeight;if(width<1||height<1)return;
       renderer.setSize(width,height,false);camera.aspect=width/height;camera.updateProjectionMatrix();fit();
@@ -145,9 +166,9 @@ export default function ModelViewport(props: Props) {
         }
         priorMode=p.viewMode;priorDepth=p.sectionDepth;dirty=true;
       }
-      const visibility=[p.showOuterShell,p.showInnerShell,p.showStacks,p.showAir,p.showHydrogen,p.showReturn,p.showIntake,p.showIntakeInner,p.showCompressorCase].join();
+      const visibility=[p.showOuterShell,p.showInnerShell,p.showStacks,p.showAir,p.showHydrogen,p.showReturn,p.showIntake,p.showIntakeInner,p.showCompressorCase,p.showCathodeWater,p.showAnodeSeparator,p.showWiring].join();
       if(priorVisibility!==visibility){
-        const visible:Record<string,boolean>={outerShell:p.showOuterShell,innerShell:p.showInnerShell,intakeOuter:p.showIntake,intakeInner:p.showIntakeInner,compressorCase:p.showCompressorCase,stacks:p.showStacks,air:p.showAir,hydrogen:p.showHydrogen,return:p.showReturn,anodeInternal:p.showHydrogen||p.showReturn};
+        const visible:Record<string,boolean>={outerShell:p.showOuterShell,innerShell:p.showInnerShell,intakeOuter:p.showIntake,intakeInner:p.showIntakeInner,compressorCase:p.showCompressorCase,stacks:p.showStacks,air:p.showAir,hydrogen:p.showHydrogen,return:p.showReturn,anodeInternal:p.showHydrogen||p.showReturn,cathodeExhaust:p.showCathodeWater,cathodeSeparator:p.showCathodeWater,cathodeDrain:p.showCathodeWater,anodeSeparator:p.showAnodeSeparator,anodeDrain:p.showAnodeSeparator,wiring:p.showWiring};
         meshes.forEach(mesh=>{mesh.visible=visible[mesh.userData.group]??true;});priorVisibility=visibility;dirty=true;
       }
       for(const {source,stencil,cap} of sections){
@@ -159,7 +180,7 @@ export default function ModelViewport(props: Props) {
       if(dirty){renderer.render(scene,camera);dirty=false;}
     };render();
     return()=>{
-      cancelled=true;cancelAnimationFrame(frame);observer.disconnect();controls.dispose();
+      cancelled=true;modelRequest.abort();cancelAnimationFrame(frame);observer.disconnect();controls.dispose();
       if(root)disposeObject(root);
       sections.forEach(({stencil,cap})=>{stencil.children.forEach(o=>((o as THREE.Mesh).material as THREE.Material).dispose());(cap.material as THREE.Material).dispose();});
       capGeometry.dispose();disposeObject(grid);disposeObject(floor);finishes.dispose();environment.dispose();pmrem.dispose();renderer.dispose();renderer.domElement.remove();

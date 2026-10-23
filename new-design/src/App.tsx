@@ -3,9 +3,9 @@ import { Box, Layers, MousePointer2, RotateCcw, SlidersHorizontal } from 'lucide
 import ModelViewport from './ModelViewport';
 import './styles.css';
 
-type VisibilityKey = 'outerShell' | 'innerShell' | 'intake' | 'intakeInner' | 'compressorCase' | 'stacks' | 'air' | 'hydrogen' | 'return';
+type VisibilityKey = 'outerShell' | 'innerShell' | 'intake' | 'intakeInner' | 'compressorCase' | 'stacks' | 'air' | 'hydrogen' | 'return' | 'cathodeWater' | 'anodeSeparator' | 'wiring';
 type Visibility = Record<VisibilityKey, boolean>;
-type CameraView = 'perspective' | 'side' | 'front' | 'fan' | 'machinery' | 'stacks';
+type CameraView = 'perspective' | 'side' | 'front' | 'fan' | 'machinery' | 'stacks' | 'cells' | 'water';
 
 const initialVisibility: Visibility = {
   outerShell: true,
@@ -17,6 +17,9 @@ const initialVisibility: Visibility = {
   air: true,
   hydrogen: true,
   return: true,
+  cathodeWater: true,
+  anodeSeparator: true,
+  wiring: true,
 };
 
 function LayerToggle({ label, detail, color, checked, onChange }: {
@@ -63,6 +66,12 @@ export default function App() {
 
   const selectCamera = (view: CameraView) => {
     setCameraView(view);
+    // An off-centre cut exposes axial slots between the radial cell sheets;
+    // the water view retains both separators on opposite sides of the core.
+    if (view === 'cells' || view === 'water') {
+      setViewMode('cutaway');
+      setSectionDepth(view === 'cells' ? 45 : 37);
+    }
     // Reapply a preset even after the user has manually orbited away from it.
     setResetKey(current => current + 1);
   };
@@ -101,6 +110,9 @@ export default function App() {
               showAir={visibility.air}
               showHydrogen={visibility.hydrogen}
               showReturn={visibility.return}
+              showCathodeWater={visibility.cathodeWater}
+              showAnodeSeparator={visibility.anodeSeparator}
+              showWiring={visibility.wiring}
               resetKey={resetKey}
             />
           </div>
@@ -127,6 +139,10 @@ export default function App() {
                   aria-pressed={cameraView === 'machinery'} onClick={() => selectCamera('machinery')}>电机 / 增压机</button>
                 <button type="button" className={cameraView === 'stacks' ? 'is-active' : ''}
                   aria-pressed={cameraView === 'stacks'} onClick={() => selectCamera('stacks')}>电堆</button>
+                <button type="button" className={cameraView === 'cells' ? 'is-active' : ''}
+                  aria-pressed={cameraView === 'cells'} onClick={() => selectCamera('cells')}>片组 / 冷却缝</button>
+                <button type="button" className={cameraView === 'water' ? 'is-active' : ''}
+                  aria-pressed={cameraView === 'water'} onClick={() => selectCamera('water')}>水管理</button>
               </div>
             </div>
             <div className="viewer-hint"><MousePointer2 size={13} />拖动旋转 · 缩放查看</div>
@@ -181,7 +197,7 @@ export default function App() {
                     </button>
                   ))}
                 </div>
-                <p className="depth-scope" id="section-depth-scope">沿轴向平面剖切壳体与电堆</p>
+                <p className="depth-scope" id="section-depth-scope">剖切壳体、电堆与管路；完整模式查看全部连接</p>
               </div>
             )}
           </section>
@@ -193,8 +209,8 @@ export default function App() {
               <LayerToggle label="整机内壳" detail="水平延伸 · 连续渐扩与收缩" color="swatch-inner" checked={visibility.innerShell} onChange={() => toggleLayer('innerShell')} />
               <LayerToggle label="引气外筒" detail="内外筒之间形成环形引气道" color="swatch-intake" checked={visibility.intake} onChange={() => toggleLayer('intake')} />
               <LayerToggle label="引气内筒" detail="包围电机 · 前后均开口" color="swatch-intake-inner" checked={visibility.intakeInner} onChange={() => toggleLayer('intakeInner')} />
-              <LayerToggle label="黄色压气机外壳" detail="隐藏后查看叶轮与内部导流罩" color="swatch-compressor" checked={visibility.compressorCase} onChange={() => toggleLayer('compressorCase')} />
-              <LayerToggle label="电堆模块" detail="隐藏后可查看内部管路" color="swatch-stack" checked={visibility.stacks} onChange={() => toggleLayer('stacks')} />
+              <LayerToggle label="黄色压气机外壳" detail="双级独立电驱 · 级间回流静叶" color="swatch-compressor" checked={visibility.compressorCase} onChange={() => toggleLayer('compressorCase')} />
+              <LayerToggle label="电堆模块" detail="环向片组 · 冷却通道前进后出" color="swatch-stack" checked={visibility.stacks} onChange={() => toggleLayer('stacks')} />
             </div>
           </section>
 
@@ -204,6 +220,9 @@ export default function App() {
               <LayerToggle label="空气管路" color="swatch-air" checked={visibility.air} onChange={() => toggleLayer('air')} />
               <LayerToggle label="供氢管路" color="swatch-hydrogen" checked={visibility.hydrogen} onChange={() => toggleLayer('hydrogen')} />
               <LayerToggle label="回氢管路" color="swatch-return" checked={visibility.return} onChange={() => toggleLayer('return')} />
+              <LayerToggle label="阴极尾气与排水" detail="尾气汇集 · 气水分离与排水" color="swatch-inner" checked={visibility.cathodeWater} onChange={() => toggleLayer('cathodeWater')} />
+              <LayerToggle label="阳极气水分离器" detail="回氢泵前除水" color="swatch-return" checked={visibility.anodeSeparator} onChange={() => toggleLayer('anodeSeparator')} />
+              <LayerToggle label="电气线束" color="swatch-stack" checked={visibility.wiring} onChange={() => toggleLayer('wiring')} />
             </div>
           </section>
 
@@ -218,20 +237,25 @@ export default function App() {
               ))}
             </div>
             <details className="dimension-report">
-              <summary>报告尺寸 <span>/ mm</span></summary>
+              <summary>当前几何尺寸 <span>/ mm</span></summary>
               <table>
-                <caption>电堆：内径 / 外径 × 轴向长</caption>
+                <caption>电堆装配环：内径 / 外径 × 轴向长</caption>
                 <tbody>
                   <tr><th scope="row">整机长</th><td>2012</td></tr>
                   <tr><th scope="row">风扇段内径</th><td>Φ1000</td></tr>
                   <tr><th scope="row">主电机</th><td>Φ300 × 193</td></tr>
-                  <tr><th scope="row">第一级</th><td>Φ160 / Φ351 × 282</td></tr>
-                  <tr><th scope="row">第二级</th><td>Φ301 / Φ434 × 375</td></tr>
-                  <tr><th scope="row">第三级</th><td>Φ384 / Φ496 × 375</td></tr>
+                  <tr><th scope="row">第一级</th><td>Φ256 / Φ473.402 × 282</td></tr>
+                  <tr><th scope="row">第二级</th><td>Φ468 / Φ627.002 × 375</td></tr>
+                  <tr><th scope="row">第三级</th><td>Φ468 / Φ658.002 × 375</td></tr>
+                  <tr><th scope="row">一级片组</th><td>Φ276 / Φ467.4</td></tr>
+                  <tr><th scope="row">二级片组</th><td>Φ488 / Φ621</td></tr>
+                  <tr><th scope="row">三级片组</th><td>Φ488 / Φ652</td></tr>
+                  <tr><th scope="row">每模块片数</th><td>279 / 372 / 372</td></tr>
+                  <tr><th scope="row">实体片总数</th><td>3813</td></tr>
                 </tbody>
               </table>
             </details>
-            <p className="scale-note">主机与电堆尺寸按构型报告<br />引气与机匣按新示意调整，装配细节为示意</p>
+            <p className="scale-note">电池片沿圆周排列，片间冷却通道贯通轴向<br />本页展示几何与管路布局，机电装配细节为示意</p>
           </section>
         </aside>
       </main>

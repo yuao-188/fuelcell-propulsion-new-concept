@@ -10,7 +10,7 @@
     "preview": "vite preview --host 127.0.0.1 --port 4174",
     "dev:new-design": "vite --config vite.new-design.config.ts --host 127.0.0.1 --port 5175",
     "model:new-design": "node scripts/build-new-design-model.mjs",
-    "build:new-design": "npm run model:new-design && node scripts/verify-new-design-compressor.mjs && tsc -p new-design/tsconfig.json && vite build --config vite.new-design.config.ts",
+    "build:new-design": "npm run model:new-design && node scripts/verify-new-design-compressor.mjs && node scripts/verify-new-design-cells.mjs && tsc -p new-design/tsconfig.json && vite build --config vite.new-design.config.ts",
     "prepare:new-design": "node scripts/prepare-new-design.mjs"
   },
   "dependencies": {

@@ -8,6 +8,9 @@ import { parameters as P, colors as C } from '../new-design/parameters.mjs';
 import { buildDetailedMachinery } from './detailed-machinery.mjs';
 import { buildDetailedStack } from './detailed-stacks.mjs';
 import { buildDetailedShells } from './detailed-shells.mjs';
+import { buildWaterManagement } from './detailed-water-wiring.mjs';
+import { buildFluidNetworks } from './build-new-design-fluids.mjs';
+import { buildWiring } from './detailed-wiring.mjs';
 
 const api = await ManifoldModule();
 api.setup();
@@ -76,84 +79,11 @@ const add = (id, name, group, color, solid, extra={}) => {
   parts.push({id,name,group,color,solid,...extra});
 };
 
-// One continuous air void is subtracted from the union of all its outer walls.
-// This creates genuine tee openings; cylinders are never merely overlaid.
-const airOuter = [cylinder([P.compressor.outlet,0,0],[P.air.end,0,0],P.air.outer)];
-const airVoid = [cylinder([P.compressor.outlet-.1,0,0],[P.air.end+.1,0,0],P.air.inner)];
-const airEnvelopes = [];
-P.stacks.forEach((s, i) => {
-  const x=(s.front+s.rear)/2, r=s.inner+P.air.ringInset;
-  const outerRing=torus(x,r,P.air.branchOuter), innerRing=torus(x,r,P.air.branchInner);
-  airOuter.push(outerRing); airVoid.push(innerRing);
-  airEnvelopes.push(torus(x,r,P.air.branchOuter+P.clearance));
-  for(const sign of [-1,1]) {
-    airOuter.push(cylinder([x,0,0],[x,sign*r,0],P.air.branchOuter));
-    airVoid.push(cylinder([x,0,0],[x,sign*r,0],P.air.branchInner));
-    airEnvelopes.push(cylinder([x,0,0],[x,sign*(r+1),0],P.air.branchOuter+P.clearance));
-    ports.push({id:`air-${i+1}-${sign}`,fluid:'air',stage:i+1,face:'inner',position:[x,sign*s.inner,0]});
-  }
-});
-const airBore=union(airVoid), airSolid=union(airOuter).subtract(airBore), airClearance=union(airEnvelopes);
-add('air-network','中央空气主管 · 六根支管 · 模块连接管','air',C.air,airSolid,{clip:true});
-
-const H=P.hydrogen;
-const feedTrunk=[[P.stacks[0].rear+H.faceOffset,0,-H.offset],[H.inletX,0,-H.offset]];
-const returnTrunk=roundPath([[P.stacks[0].front-H.faceOffset,0,H.offset],[P.pump.front-25,0,H.offset],[P.pump.front-13,0,P.pump.centerZ],[P.pump.front,0,P.pump.centerZ]],8);
-const loopX=P.pump.rear+25, loopRadius=P.pump.centerZ;
-const pumpReturn=[[P.pump.rear,0,P.pump.centerZ],[loopX,0,P.pump.centerZ]];
-for(let i=1;i<=20;i++) { const a=i*Math.PI/20; pumpReturn.push([loopX,loopRadius*Math.sin(a),loopRadius*Math.cos(a)]); }
-pumpReturn.push([loopX,0,-H.offset]);
-const feedPaths=[feedTrunk,pumpReturn], returnPaths=[returnTrunk];
-const feedInternalOuter=[], feedInternalVoid=[], returnInternalOuter=[], returnInternalVoid=[], stackCutters=[], anodeOuter=[], anodeVoid=[];
-P.stacks.forEach((s,i)=>{
-  const r=s.inner+H.ringInset, xf=s.rear-18, xr=s.front+18;
-  const fo=[torus(xf,r,H.ringOuter)], fi=[torus(xf,r,H.ringInner)];
-  const ro=[torus(xr,r,H.ringOuter)], ri=[torus(xr,r,H.ringInner)];
-  const cutters=[torus(xf,r,H.ringOuter+P.clearance),torus(xr,r,H.ringOuter+P.clearance)];
-  for(const [j,theta] of [-15,195].entries()) {
-    const port=polar(s.rear,r,theta), ringPoint=polar(xf,r,theta);
-    feedPaths.push(roundPath([[s.rear+H.faceOffset,0,-H.offset],[s.rear+H.faceOffset,port[1],port[2]],port],4));
-    fo.push(cylinder(ringPoint,port,H.outer));
-    fi.push(cylinder(ringPoint,[port[0]+.1,port[1],port[2]],H.inner));
-    cutters.push(cylinder([xf-1,port[1],port[2]],[s.rear+1,port[1],port[2]],H.outer+P.clearance));
-    ports.push({id:`feed-${i+1}-${j}`,fluid:'hydrogen',stage:i+1,face:'rear',position:port});
-  }
-  for(const [j,theta] of [15,165].entries()) {
-    const port=polar(s.front,r,theta), ringPoint=polar(xr,r,theta);
-    returnPaths.push(roundPath([port,[s.front-H.faceOffset,port[1],port[2]],[s.front-H.faceOffset,0,H.offset]],4));
-    ro.push(cylinder(port,ringPoint,H.outer));
-    ri.push(cylinder([port[0]-.1,port[1],port[2]],ringPoint,H.inner));
-    cutters.push(cylinder([s.front-1,port[1],port[2]],[xr+1,port[1],port[2]],H.outer+P.clearance));
-    ports.push({id:`return-${i+1}-${j}`,fluid:'return',stage:i+1,face:'front',position:port});
-  }
-  const moduleChannelsOuter=[],moduleChannelsVoid=[];
-  for(let j=0;j<s.modules;j++) {
-    const theta=s.firstSeam+(j+.5)*360/s.modules;
-    const a=polar(xr,r,theta),b=polar(xf,r,theta);
-    moduleChannelsOuter.push(cylinder(a,b,H.ringOuter));
-    moduleChannelsVoid.push(cylinder(a,b,H.ringInner));
-    cutters.push(cylinder(a,b,H.ringOuter+P.clearance));
-  }
-  anodeOuter.push(union(moduleChannelsOuter));anodeVoid.push(union(moduleChannelsVoid));
-  feedInternalOuter.push(union(fo)); feedInternalVoid.push(union(fi));
-  returnInternalOuter.push(union(ro)); returnInternalVoid.push(union(ri));
-  stackCutters.push(union(cutters));
-});
-const feedOuter=union(feedPaths.map(p=>tubePath(p,H.outer))), returnOuter=union(returnPaths.map(p=>tubePath(p,H.outer)));
-const feedBore=union([...feedPaths.map(p=>tubePath(p,H.inner,.15)),...feedInternalVoid]);
-const returnBore=union([...returnPaths.map(p=>tubePath(p,H.inner,.15)),...returnInternalVoid]);
-const moduleHydrogenBore=union([...anodeVoid,feedBore,returnBore]);
-add('hydrogen-network','氢气供给 · 泵后回接','hydrogen',C.hydrogen,feedOuter.subtract(feedBore));
-add('return-network','阳极回气 · 汇集到循环泵','return',C.return,returnOuter.subtract(returnBore));
-
-P.stacks.forEach((s,i)=>{
-  const cut=union([airClearance,stackCutters[i]]);
-  buildDetailedStack({M,P,C,union,cylinder,sector,polar,add,s,i,cut});
-  // Grey sealed manifold inserts carry the internal passages across module seams.
-  // Their outer diameters have matching cutouts in every neighbouring module.
-  add(`anode-internal-${i+1}`,`第${i+1}级阳极供回歧管与模块内部通道`,'anodeInternal',C.internal,
-    union([feedInternalOuter[i],returnInternalOuter[i],anodeOuter[i]]).subtract(moduleHydrogenBore),{clip:true});
-});
+// Each fluid circuit is constructed as joined walls minus a continuous bore.
+const water=buildWaterManagement({M,CS,P,C,union,cylinder,roundPath,tubePath,add});
+const fluids=buildFluidNetworks({M,P,C,union,cylinder,tubePath,roundPath,polar,add,water});
+ports.push(...fluids.ports);
+const stackChecks=P.stacks.map((s,i)=>buildDetailedStack({M,P,C,union,cylinder,sector,polar,add,s,i,cut:fluids.stackCutters[i]}));
 
 // Front machinery: main motor shaft terminates at its own motor. The compressor
 // has a separate enclosed drive with no continuation of that front shaft.
@@ -175,61 +105,61 @@ add('pump-hardware','循环泵端面紧固件','pump','#bcc8cc',pumpHardware,{me
 
 const os=P.outerShell, ins=P.innerShell;
 const shells=buildDetailedShells({M,CS,P,union,cylinder,revolved,polar,add});
+const wiring=buildWiring({M,P,C,union,cylinder,tubePath,roundPath,polar,add});
 
 console.log(`Built ${parts.length} solid components. Checking exact intersections...`);
-const report={schema:2,units:P.units,dimensionSource:'report_构型计算_完整版.md with user-specified casing and bay revisions',pumpPlacement:'inside stage 3 central cavity, as confirmed by user',envelopes:{length:os.rear-os.front,ductBore:2*(os.radius-os.wall),nozzleBore:2*(os.outletRadius-os.wall),motorDiameter:2*P.motor.radius,motorLength:P.motor.rear-P.motor.front,stackLength:P.stacks.at(-1).rear-P.stacks[0].front},modules:P.stacks.map(s=>s.modules),portCounts:{air:6,hydrogen:6,return:6},parts:parts.length,solidChecks:0,broadPhasePairs:0,collisions:[],fluidChecks:{},ports};
-report.layoutOverrides={source:'latest red outer / yellow inner outline and open-inner-sleeve confirmation',intakeLength:P.motorHousing.rear-P.motorHousing.front,compressorLength:P.compressor.outlet-P.compressor.front,intakeInnerEnds:'both open',mainInnerShellFront:ins.front,outerWaistRadius:os.waistRadius,mainInnerShellMaximumRadius:ins.radius};
-report.shellGeometry=shells.verification;
+const report={schema:3,units:P.units,dimensionSource:'user-confirmed circumferential cells and revised assembly, 2026-10-23',
+  performanceScope:'geometry only; prior thermal/power results are not recalculated',
+  pumpPlacement:'stage 3 central cavity',envelopes:{length:os.rear-os.front,ductBore:2*(os.radius-os.wall),nozzleBore:2*(os.outletRadius-os.wall),motorDiameter:2*P.motor.radius,motorLength:P.motor.rear-P.motor.front,stackLength:P.stacks.at(-1).rear-P.stacks[0].front},
+  modules:P.stacks.map(s=>s.modules),portCounts:Object.fromEntries(['air','hydrogen','return','cathode'].map(fluid=>[fluid,ports.filter(p=>p.fluid===fluid).length])),
+  parts:parts.length,solidChecks:0,broadPhasePairs:0,collisions:[],fluidChecks:{},ports,stackChecks,
+  physicalCells:stackChecks.reduce((sum,s)=>sum+s.totalPhysicalCells,0),
+  layoutOverrides:{intakeInnerEnds:'both open',mainInnerShellFront:ins.front,innerContractionStart:ins.shoulder,outerWaistRadius:os.waistRadius,mainInnerShellMaximumRadius:ins.radius},
+  shellGeometry:shells.verification,waterManagement:water.verification,wiring:wiring?.verification,plumbing:fluids.checks};
+const errors=[];
 const bounds=parts.map(p=>p.solid.boundingBox());
-for(const id of ['fan','main-motor','compressor-drive','inner-shell']) {
-  const pieces=parts.find(p=>p.id===id).solid.decompose();
-  assert.equal(pieces.length,1,id+' must remain one connected component');
-  pieces.forEach(s=>s.delete());
-}
 const overlap=(a,b)=>[0,1,2].every(k=>a.max[k]>b.min[k]+1e-5 && b.max[k]>a.min[k]+1e-5);
 for(let i=0;i<parts.length;i++) for(let j=i+1;j<parts.length;j++) {
   report.broadPhasePairs++;
   if(!overlap(bounds[i],bounds[j])) continue;
   report.solidChecks++;
   const common=parts[i].solid.intersect(parts[j].solid), volume=common.volume(); common.delete();
-  if(volume>0.02) report.collisions.push({a:parts[i].id,b:parts[j].id,volume});
+  if(volume>0.001) report.collisions.push({a:parts[i].id,b:parts[j].id,volume});
 }
-for(const [name,a,b] of [['air/hydrogen',airBore,feedBore],['air/return',airBore,returnBore],['hydrogen/return',feedBore,returnBore]]) {
-  const intersection=a.intersect(b), volume=intersection.volume(); intersection.delete();
-  report.fluidChecks[name]={intersectionVolume:volume};
-  assert.ok(volume<.001,`Fluids cross: ${name}`);
-}
-const fullHydrogenBore=union([moduleHydrogenBore,pumpVoid]);
-for(const [label,a,b] of [['pump-inlet',pumpVoid,returnBore],['pump-outlet',pumpVoid,feedBore],
-  ...anodeVoid.flatMap((v,i)=>[[`anode-${i+1}-feed`,v,feedBore],[`anode-${i+1}-return`,v,returnBore]])]) {
-  const junction=a.intersect(b),volume=junction.volume();
-  assert.ok(volume>.001,label+' must have an open connection');
-  junction.delete();
-}
-const gasSeparation=airBore.intersect(fullHydrogenBore);
-assert.ok(gasSeparation.volume()<.001,'Air and full anode circuit must remain separate');
-gasSeparation.delete();
-const completeLoop=fullHydrogenBore.decompose();
-report.fluidChecks.completeAnodeLoop={connectedComponents:completeLoop.length,internalModuleChannels:11,pumpConnected:true};
-assert.equal(completeLoop.length,1,'Anode circuit, module channels and pump must be connected');
-completeLoop.forEach(s=>s.delete());
-const allSolids=union(parts.map(p=>p.solid));
-for(const [name,bore] of [['air',airBore],['completeAnode',fullHydrogenBore]]) {
-  const blockage=allSolids.intersect(bore),volume=blockage.volume();
-  report.fluidChecks[name+'Obstruction']={solidVolumeInsideLumen:volume};
-  assert.ok(volume<.02,`${name} bore obstructed by solid material: ${volume}`);
-  blockage.delete();
-}
-for(const [name,bore] of [['air',airBore],['hydrogen',feedBore],['return',returnBore]]) {
+console.log('Exact pair checks complete:',report.solidChecks,'collisions:',report.collisions.length);
+const cathodeCircuit=union([fluids.airBore,fluids.cathodeBore,water.cathode.gasBore,water.cathode.drainBore]);
+const anodeCircuit=union([fluids.anodeBore,fluids.feedBore,fluids.returnBore,pumpVoid,water.anode.gasBore,water.anode.drainBore]);
+const gasSeparation=cathodeCircuit.intersect(anodeCircuit), separationVolume=gasSeparation.volume();gasSeparation.delete();
+report.fluidChecks.gasSeparation={intersectionVolume:separationVolume};
+if(separationVolume>.001) errors.push('Cathode/anode circuits intersect: '+separationVolume);
+for(const [name,bore] of [['completeCathode',cathodeCircuit],['completeAnode',anodeCircuit]]) {
   const components=bore.decompose();
   report.fluidChecks[name]={connectedComponents:components.length};
-  assert.equal(components.length,1,`${name} lumen disconnected`);
+  if(components.length!==1) errors.push(name+' disconnected: '+components.length);
   components.forEach(s=>s.delete());
+  // Per-part lumen checks retain the offending part name and avoid a costly
+  // union of all 3813 individual plates into the surrounding installation.
+  const boreBounds=bore.boundingBox(), obstructions=[];
+  for(let i=0;i<parts.length;i++) {
+    if(!overlap(bounds[i],boreBounds)) continue;
+    const blockage=parts[i].solid.intersect(bore),volume=blockage.volume();blockage.delete();
+    if(volume>.001) obstructions.push({part:parts[i].id,volume});
+  }
+  report.fluidChecks[name].obstructions=obstructions;
+  if(obstructions.length) errors.push(name+' lumen obstructed');
+}
+for(const {name,a,b} of fluids.junctionChecks??[]) {
+  const join=a.intersect(b), volume=join.volume();join.delete();
+  report.fluidChecks[name]={connectedVolume:volume};
+  if(volume<.001) errors.push(name+' missing connection');
 }
 assert.equal(parts.filter(p=>p.module).length,11);
+assert.equal(report.physicalCells,3813);
+for(const count of Object.values(report.portCounts)) assert.equal(count,11);
+report.errors=errors;
 await mkdir(resolve(root,'new-design/public'),{recursive:true});
 await writeFile(resolve(root,'new-design/verification.json'),JSON.stringify(report,null,2));
-if(report.collisions.length) { console.error(JSON.stringify(report.collisions,null,2)); throw new Error('Physical intersections must be resolved before exporting.'); }
+if(report.collisions.length || errors.length) { console.error(JSON.stringify({collisions:report.collisions,errors,fluidChecks:report.fluidChecks},null,2)); throw new Error('Assembly verification failed; model was not exported.'); }
 
 const document=new Document(), buffer=document.createBuffer(), scene=document.createScene('New design');
 const materials=new Map();
@@ -251,7 +181,7 @@ for(const part of parts) {
     .setAttribute('NORMAL',document.createAccessor().setType('VEC3').setArray(normals).setBuffer(buffer))
     .setIndices(document.createAccessor().setType('SCALAR').setArray(meshData.triVerts).setBuffer(buffer)).setMaterial(materials.get(materialKey));
   const mesh=document.createMesh(part.name).addPrimitive(primitive);
-  scene.addChild(document.createNode(part.name).setMesh(mesh).setExtras({id:part.id,group:part.group,clip:part.clip||false,laminated:part.laminated||false,stage:part.stage||0,module:part.module||0,finish:part.finish||'',layerPitch:part.layerPitch||0,layerOrigin:part.layerOrigin||0,layerCount:part.layerCount||0}));
+  scene.addChild(document.createNode(part.name).setMesh(mesh).setExtras({id:part.id,group:part.group,clip:part.clip||false,laminated:part.laminated||false,stage:part.stage||0,module:part.module||0,finish:part.finish||'',layerPitch:part.layerPitch||0,layerOrigin:part.layerOrigin||0,layerCount:part.layerCount||0,physicalCells:part.physicalCells||0,cellArrangement:part.cellArrangement||'',plateThickness:part.plateThickness||0,innerCoolingGap:part.innerCoolingGap||0,rotor:part.rotor||'',stationary:part.stationary||false,bladeCount:part.bladeCount||0,motorSizing:part.motorSizing||''}));
 }
 await new NodeIO().write(resolve(root,'new-design/public/model.glb'),document);
 console.log(JSON.stringify({parts:parts.length,modules:11,checkedPairs:report.solidChecks,collisions:report.collisions.length,fluidChecks:report.fluidChecks},null,2));

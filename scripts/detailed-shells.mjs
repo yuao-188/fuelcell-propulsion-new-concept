@@ -38,9 +38,13 @@ export function buildDetailedShells({ M, CS, P, union, cylinder, revolved, polar
 
   // Cubic Hermite transitions have exactly zero slope at every join. Unlike a
   // linear loft, this retains a level forward section and no expansion shoulder.
+  const midStation = ins.midStation ?? ins.shoulder;
+  const midRadius = ins.midRadius ?? ins.radius;
   const innerRadius = x => x <= expansionStart ? ins.inletRadius
-    : x <= ins.shoulder ? ins.inletRadius + (ins.radius - ins.inletRadius)
-      * smooth((x - expansionStart) / (ins.shoulder - expansionStart))
+    : x <= midStation ? ins.inletRadius + (midRadius - ins.inletRadius)
+      * smooth((x - expansionStart) / (midStation - expansionStart))
+    : x <= ins.shoulder ? midRadius + (ins.radius - midRadius)
+      * smooth((x - midStation) / (ins.shoulder - midStation))
       : ins.radius + (ins.outletRadius - ins.radius)
       * smooth((x - ins.shoulder) / (ins.rear - ins.shoulder));
   const innerProfile = [[ins.front, ins.inletRadius], [expansionStart, ins.inletRadius]];
