@@ -80,11 +80,11 @@ for (let stage=1; stage<=P.stacks.length; stage++) {
     }).sort((a,b)=>a.angle-b.angle);
     for(let k=1;k<measured.length;k++) {
       const gap = Math.min(...measured[k-1].frontInner.flatMap(a=>measured[k].frontInner.map(b=>Math.hypot(...a.map((v,j)=>v-b[j])))));
-      assert.ok(gap>=.46-1e-6 && gap<.4604,`${id}: exported inner cooling gap ${gap}`);
+      assert.ok(gap>=layout.coolingGap-1e-6 && gap<layout.coolingGap+.0004,`${id}: exported inner cooling gap ${gap}`);
       result.minimumMeasuredInnerCoolingGap=Math.min(result.minimumMeasuredInnerCoolingGap,gap);
       result.maximumMeasuredInnerCoolingGap=Math.max(result.maximumMeasuredInnerCoolingGap,gap);
     }
-    // A 0.4 mm diameter test cylinder traverses every cooling channel. The
+    // A test cylinder smaller than the stage's nominal gap traverses each channel. The
     // first/last probes also check the gaps beside circumferential end plates.
     const firstCorner=measured[0].angle-Math.atan(.275/s.cellInner);
     const lastCorner=measured.at(-1).angle+Math.atan(.275/s.cellInner);
@@ -92,7 +92,8 @@ for (let stage=1; stage<=P.stacks.length; stage++) {
       ...measured.slice(1).map((plate,k)=>(plate.angle+measured[k].angle)/2),
       (lastCorner+degrees(module.activeEnd))/2];
     // Continue beyond the rear face to check the new external H2 supply spokes.
-    const probes=angles.map(theta=>cylinder(polar(s.front-.15,s.cellInner+.3,theta),polar(s.rear+9,s.cellInner+.3,theta),.2));
+    const probeRadius=Math.min(.2,layout.coolingGap*.4);
+    const probes=angles.map(theta=>cylinder(polar(s.front-.15,s.cellInner+.3,theta),polar(s.rear+9,s.cellInner+.3,theta),probeRadius));
     const probeSolid=M.union(probes), bounds=probeSolid.boundingBox();
     for(const obstacle of solids) {
       if(!overlap(bounds,obstacle.bounds))continue;
@@ -103,7 +104,7 @@ for (let stage=1; stage<=P.stacks.length; stage++) {
     }
     components.forEach(component=>component.delete()); probes.forEach(probe=>probe.delete());probeSolid.delete();
     result.physicalCells+=measured.length;result.axialCoolingProbes+=angles.length;
-    result.modules.push({id,stage,module:module.index+1,physicalCells:measured.length,axialCoolingProbes:angles.length});
+    result.modules.push({id,stage,module:module.index+1,physicalCells:measured.length,nominalInnerCoolingGap:layout.coolingGap,probeDiameter:2*probeRadius,axialCoolingProbes:angles.length});
     console.log(`${id}: ${measured.length} radial cells, ${angles.length} open axial cooling channels`);
   }
 }

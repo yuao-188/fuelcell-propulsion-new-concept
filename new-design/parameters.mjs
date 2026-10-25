@@ -2,18 +2,20 @@
 // Pipe diameters, small compressor drives, blade profiles and fasteners are schematic.
 export const parameters = {
   units: 'mm',
-  fan: { x: 130, front: 50, rear: 210, radius: 498, hubRadius: 100, blades: 12, stators: 18 },
+  fan: { x: 130, front: 50, rear: 210, radius: 498, hubRadius: 100, blades: 16, stators: 18, tipAngleToAxisDeg: 66 },
   motor: { front: 245, rear: 438, radius: 150 },
   // Latest user sketch reallocates this shared bay: shorter intake, longer compressor.
   motorHousing: { front: 210, rear: 480, outer: 172, inner: 165 },
   intakeLiner: { front: 210, rear: 480, inner: 152, outer: 156, contractionStart: 440, radialContraction: 16 },
   compressor: { front: 480, rear: 660, outlet: 690, outer: 172, inner: 165,
     bladesPerStage: 18, backplateSegments: 512,
-    inletGuide: { count: 6, motorFront: 490, motorRear: 511, innerCentreX: 506.5, outerCentreX: 498,
-      innerChord: 8, outerChord: 14, thickness: 1.8, sweepDeg: 10, phaseDeg: 30, inwardTurn: 5, camber: 1.5 } },
+    stages: [
+      { bladeOuter: 162.8, backplateRadius: 143.8, diffuserFront: 552, diffuserRear: 567, diffuserInner: 148.2 },
+      { bladeOuter: 114.8, backplateRadius: 114.8, diffuserFront: 619, diffuserRear: 629, diffuserInner: 119.2 },
+    ] },
   stacks: [
     { front: 690, rear: 972, inner: 128, outer: 236.701, cellInner: 138, cellOuter: 233.7, modules: 3, firstSeam: 30, cells: 279 },
-    { front: 992, rear: 1367, inner: 234, outer: 313.501, cellInner: 244, cellOuter: 310.5, modules: 4, firstSeam: 45, cells: 372 },
+    { front: 992, rear: 1367, inner: 210, outer: 289.501, cellInner: 220, cellOuter: 286.5, modules: 4, firstSeam: 45, cells: 372, innerCoolingGap: .36 },
     { front: 1387, rear: 1762, inner: 234, outer: 350, cellInner: 244, cellOuter: 346.999, modules: 4, firstSeam: 45, cells: 372 },
   ],
   cells: { plateThickness: .55, innerCoolingGap: .46, moduleGap: 1 },

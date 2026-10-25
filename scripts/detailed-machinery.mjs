@@ -9,7 +9,7 @@ export function fanBladeSections(F) {
     const chord = s <= .45
       ? lerp(F.hubRadius * .60, F.radius * .273, smooth(s / .45))
       : lerp(F.radius * .273, F.radius * .285, smooth((s - .45) / .55));
-    const angleToAxisDeg = lerp(25, 76, smooth(s));
+    const angleToAxisDeg = lerp(25, F.tipAngleToAxisDeg, smooth(s));
     // Move the root slightly aft so its longer axial projection remains behind
     // the conical spinner. No airfoil coordinate is flattened by an axial clamp.
     const centreX = F.x + F.hubRadius * .1 * (1 - s) ** 2;
@@ -74,7 +74,7 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
     const vertices = [], triangles = [], ringSize = perimeter.length;
     for (const section of fanBladeSections(F)) {
       // The visible midspan and tip have similar chord. Only the buried/root
-      // region narrows enough to keep twelve neighbouring blades separate.
+      // region narrows enough to keep neighbouring blades separate.
       const { chord, centreX, radius: radial, sweep } = section;
       const beta = (90 - section.angleToAxisDeg) * Math.PI / 180;
       // Tangential section coordinates increase the swept radius. The centre
@@ -108,21 +108,21 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
     return closedMesh(vertices, triangles);
   }
 
-  // Main fan: twelve broad swept airfoils with a real root buried in the hub.
+  // Main fan: swept airfoils with a real root buried in the hub.
   const F = P.fan, fanFront = F.front ?? F.x - (P.motorHousing.front - F.x);
   const fanRear = F.rear ?? P.motorHousing.front, fanLength = fanRear - fanFront;
   const hubFront = F.x - fanLength * .125, hubRear = fanRear - fanLength * .075;
   const blade = fanBlade();
   const fanPieces = [axisCylinder(hubFront, hubRear, F.hubRadius),
     solidLathe([[hubRear, F.hubRadius], [fanRear, F.hubRadius * .46]])];
-  const fanBladeCount = 12;
+  const fanBladeCount = F.blades;
   for (let i = 0; i < fanBladeCount; i++) fanPieces.push(blade.rotate([i * 360 / fanBladeCount, 0, 0]));
   const grooveFront = hubRear - fanLength * .045, grooveRear = hubRear - fanLength * .025;
   const hubGroove = axisCylinder(grooveFront, grooveRear, F.hubRadius + .2)
     .subtract(axisCylinder(grooveFront - .1, grooveRear + .1, F.hubRadius * .978));
   const fanSolid = union(fanPieces).subtract(hubGroove);
-  add('fan', '十二叶后掠扭转风扇 · 叶根25°至叶尖76°', 'front', steel, fanSolid,
-    { ...metal, rotor: 'main', bladeCount: fanBladeCount, rootChordAngleToAxis: 25, tipChordAngleToAxis: 76 });
+  add('fan', `${fanBladeCount}叶后掠扭转风扇 · 叶根25°至叶尖${F.tipAngleToAxisDeg}°`, 'front', steel, fanSolid,
+    { ...metal, rotor: 'main', bladeCount: fanBladeCount, rootChordAngleToAxis: 25, tipChordAngleToAxis: F.tipAngleToAxisDeg });
 
   const nose = [];
   for (let i = 0; i <= 28; i++) {

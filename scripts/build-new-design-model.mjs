@@ -28,7 +28,14 @@ const cylinder = (a, b, r, r2 = r, n = 32) => {
   const auxiliary = Math.abs(z.z) < .8 ? new Vector3(0, 0, 1) : new Vector3(0, 1, 0);
   const x = auxiliary.cross(z).normalize(), y = z.clone().cross(x);
   const matrix = new Matrix4().makeBasis(x, y, z).setPosition(vec(a));
-  return M.cylinder(length, r, r2, n).transform(matrix.elements);
+  const primitive = M.cylinder(length, r, r2, n);
+  let result;
+  try {
+    result = primitive.transform(matrix.elements);
+    return result;
+  } finally {
+    if (primitive !== result) primitive.delete();
+  }
 };
 const tubePath = (points, r, endExtension = 0) => {
   const pp = points.map(v => [...v]);
@@ -37,10 +44,27 @@ const tubePath = (points, r, endExtension = 0) => {
     const last = pp.length - 1;
     pp[last] = vec(pp[last]).add(vec(pp[last]).sub(vec(pp[last - 1])).normalize().multiplyScalar(endExtension)).toArray();
   }
-  return union([
-    ...pp.slice(1).map((p, i) => cylinder(pp[i], p, r)),
-    ...pp.slice(1, -1).map(p => M.sphere(r, 24).translate(p)),
-  ]);
+  // Only these locally created pieces are owned by this helper. The general
+  // union helper also receives caller-owned bores and must never delete inputs.
+  const pieces = [];
+  let result;
+  try {
+    for (let i = 1; i < pp.length; i++) pieces.push(cylinder(pp[i - 1], pp[i], r));
+    for (const point of pp.slice(1, -1)) {
+      const primitive = M.sphere(r, 24);
+      let placed;
+      try {
+        placed = primitive.translate(point);
+        pieces.push(placed);
+      } finally {
+        if (primitive !== placed) primitive.delete();
+      }
+    }
+    result = union(pieces);
+    return result;
+  } finally {
+    for (const piece of new Set(pieces)) if (piece !== result) piece.delete();
+  }
 };
 const roundPath = (points, bend = 14) => {
   if (points.length < 3) return points;
@@ -63,16 +87,39 @@ const torus = (x, radius, tubeRadius) => {
   const circle = Array.from({ length: 20 }, (_, i) => [radius + tubeRadius * Math.cos(i * 2 * Math.PI / 20), x + tubeRadius * Math.sin(i * 2 * Math.PI / 20)]);
   return new CS([circle]).revolve(128).rotate([0, 90, 0]);
 };
-const revolved = (profile, wall) => new CS([[
-  ...profile.map(([x,r]) => [r,x]),
-  ...profile.toReversed().map(([x,r]) => [r-(typeof wall==='function'?wall(x):wall),x]),
-]]).revolve(144).rotate([0, 90, 0]);
+const revolved = (profile, wall) => {
+  const section = new CS([[
+    ...profile.map(([x,r]) => [r,x]),
+    ...profile.toReversed().map(([x,r]) => [r-(typeof wall==='function'?wall(x):wall),x]),
+  ]]);
+  let spun, result;
+  try {
+    spun = section.revolve(144);
+    result = spun.rotate([0, 90, 0]);
+    return result;
+  } finally {
+    if (spun && spun !== result) spun.delete();
+    section.delete();
+  }
+};
 function sector(front, rear, inner, outer, start, end) {
   const points = [];
   const count = Math.ceil((end-start) / 2);
   for(let i=0; i<=count; i++) { const t=(start+(end-start)*i/count)*Math.PI/180; points.push([-outer*Math.sin(t),outer*Math.cos(t)]); }
   for(let i=count; i>=0; i--) { const t=(start+(end-start)*i/count)*Math.PI/180; points.push([-inner*Math.sin(t),inner*Math.cos(t)]); }
-  return new CS([points]).extrude(rear-front).rotate([0,90,0]).translate([front,0,0]);
+  const section = new CS([points]);
+  let extruded, rotated, result;
+  try {
+    extruded = section.extrude(rear-front);
+    rotated = extruded.rotate([0,90,0]);
+    result = rotated.translate([front,0,0]);
+    return result;
+  } finally {
+    for (const temporary of new Set([rotated, extruded])) {
+      if (temporary && temporary !== result) temporary.delete();
+    }
+    section.delete();
+  }
 }
 const add = (id, name, group, color, solid, extra={}) => {
   assert.equal(solid.status(), 'NoError', name);
@@ -109,7 +156,7 @@ const shells=buildDetailedShells({M,CS,P,union,cylinder,revolved,polar,add});
 const wiring=buildWiring({M,P,C,union,cylinder,tubePath,roundPath,polar,add});
 
 console.log(`Built ${parts.length} solid components. Checking exact intersections...`);
-const report={schema:4,units:P.units,dimensionSource:'user-confirmed aft-shifted first-stage fixed drive and curved inward inlet guides; two supported 18-blade rotors retained, 2026-10-25',
+const report={schema:4,units:P.units,dimensionSource:'user-confirmed 16-blade fan with 66-degree tip, aft diffusers, larger first-stage rotor with unchanged disk, stage-2 ID420/OD579.002 and 372 cells with 0.36 cooling gap, 2026-10-25',
   performanceScope:'geometry only; prior thermal/power results are not recalculated',
   pumpPlacement:'stage 3 central cavity',envelopes:{length:os.rear-os.front,ductBore:2*(os.radius-os.wall),nozzleBore:2*(os.outletRadius-os.wall),motorDiameter:2*P.motor.radius,motorLength:P.motor.rear-P.motor.front,stackLength:P.stacks.at(-1).rear-P.stacks[0].front},
   modules:P.stacks.map(s=>s.modules),portCounts:Object.fromEntries(['air','hydrogen','return','cathode'].map(fluid=>[fluid,ports.filter(p=>p.fluid===fluid).length])),
@@ -137,19 +184,32 @@ console.log('Checking separation of cathode and anode cavities...');
 const gasSeparation=cathodeCircuit.intersect(anodeCircuit), separationVolume=gasSeparation.volume();gasSeparation.delete();
 report.fluidChecks.gasSeparation={intersectionVolume:separationVolume};
 if(separationVolume>.001) errors.push('Cathode/anode circuits intersect: '+separationVolume);
-for(const [name,bore] of [['completeCathode',cathodeCircuit],['completeAnode',anodeCircuit]]) {
+for(const [name,bore,segments] of [
+  ['completeCathode',cathodeCircuit,[fluids.airBore,fluids.cathodeBore,water.cathode.gasBore,water.cathode.drainBore]],
+  ['completeAnode',anodeCircuit,[fluids.anodeBore,pumpVoid,water.anode.gasBore,water.anode.drainBore]],
+]) {
   console.log('Checking connected cavity and solid obstructions:',name);
+  console.log('Starting cavity decompose:',name);
   const components=bore.decompose();
+  console.log('Completed cavity decompose:',name,'components:',components.length);
   report.fluidChecks[name]={connectedComponents:components.length};
   if(components.length!==1) errors.push(name+' disconnected: '+components.length);
   components.forEach(s=>s.delete());
-  // Per-part lumen checks retain the offending part name and avoid a costly
-  // union of all 3813 individual plates into the surrounding installation.
-  const boreBounds=bore.boundingBox(), obstructions=[];
+  // Intersection distributes over union. Checking every original cavity
+  // segment is equivalent to checking the complete bore for obstruction, but
+  // avoids repeatedly Booleaning the large coincident union against its walls.
+  const segmentBounds=segments.map(segment=>segment.boundingBox()), obstructions=[];
   for(let i=0;i<parts.length;i++) {
-    if(!overlap(bounds[i],boreBounds)) continue;
-    const blockage=parts[i].solid.intersect(bore),volume=blockage.volume();blockage.delete();
-    if(volume>.001) obstructions.push({part:parts[i].id,volume});
+    for(let j=0;j<segments.length;j++) {
+      if(!overlap(bounds[i],segmentBounds[j])) continue;
+      if(name==='completeAnode') console.log('Starting anode obstruction:',parts[i].id,'segment:',j);
+      const blockage=parts[i].solid.intersect(segments[j]);
+      if(name==='completeAnode') console.log('Evaluating anode obstruction volume:',parts[i].id,'segment:',j);
+      let volume;
+      try { volume=blockage.volume(); } finally { blockage.delete(); }
+      if(name==='completeAnode') console.log('Completed anode obstruction:',parts[i].id,'segment:',j,'volume:',volume);
+      if(volume>.001) obstructions.push({part:parts[i].id,segment:j,volume});
+    }
   }
   report.fluidChecks[name].obstructions=obstructions;
   if(obstructions.length) errors.push(name+' lumen obstructed');

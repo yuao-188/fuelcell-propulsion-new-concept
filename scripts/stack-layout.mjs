@@ -3,7 +3,7 @@ import { parameters as P } from '../new-design/parameters.mjs';
 /** Layout for constant-thickness radial plates; all lengths are in mm. */
 export function getStackLayout(s, options = {}) {
   const plateThickness = options.plateThickness ?? P.cells.plateThickness;
-  const coolingGap = options.coolingGap ?? P.cells.innerCoolingGap;
+  const coolingGap = options.coolingGap ?? s.innerCoolingGap ?? P.cells.innerCoolingGap;
   // Submicron relief preserves the nominal minimum after Float32 GLB export.
   const numericRelief = options.numericRelief ?? .0002;
   const constructedGap = coolingGap + numericRelief;

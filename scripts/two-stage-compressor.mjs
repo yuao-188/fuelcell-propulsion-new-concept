@@ -1,5 +1,3 @@
-import { getCompressorInletGuideLayout } from './compressor-inlet-guide-layout.mjs';
-
 /** Two independently driven centrifugal stages. All drive sizes are schematic. */
 export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCylinder, solidLathe, hollowLathe, add }) {
   const tau = Math.PI * 2, lerp = (a, b, t) => a + (b - a) * t;
@@ -54,93 +52,58 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
     else solid = solid.scale([end - start, 1, 1]).translate([start, 0, 0]);
     return solid;
   }
+  const [firstStage, secondStage] = K.stages;
   const stages = [
-    { number: 1, plate: ax(544), back: ax(549), radius: rr(143.8), eye: rr(41),
-      bladeInner: rr(39), bladeOuter: rr(143.8), heightIn: 22 * axialScale, heightOut: 9.5 * axialScale,
+    { number: 1, plate: ax(544), back: ax(549), radius: rr(firstStage.backplateRadius), eye: rr(41),
+      bladeInner: rr(39), bladeOuter: rr(firstStage.bladeOuter), heightIn: 22 * axialScale, heightOut: 9.5 * axialScale,
       hubStart: ax(514), hubShoulder: ax(522), shaftFront: ax(487), shaftRear: ax(549),
-      diffuserStart: ax(534.5), diffuserEnd: ax(549.5), diffuserInner: rr(148.2) },
-    { number: 2, plate: ax(611), back: ax(616), radius: rr(114.8), eye: rr(35.6),
-      bladeInner: rr(33.5), bladeOuter: rr(114.8), heightIn: 27 * axialScale, heightOut: 11 * axialScale,
+      diffuserStart: ax(firstStage.diffuserFront), diffuserEnd: ax(firstStage.diffuserRear), diffuserInner: rr(firstStage.diffuserInner) },
+    { number: 2, plate: ax(611), back: ax(616), radius: rr(secondStage.backplateRadius), eye: rr(35.6),
+      bladeInner: rr(33.5), bladeOuter: rr(secondStage.bladeOuter), heightIn: 27 * axialScale, heightOut: 11 * axialScale,
       hubStart: ax(576), hubShoulder: ax(584), shaftFront: ax(611), shaftRear: ax(638),
-      diffuserStart: ax(600), diffuserEnd: ax(616.5), diffuserInner: rr(119.2) },
+      diffuserStart: ax(secondStage.diffuserFront), diffuserEnd: ax(secondStage.diffuserRear), diffuserInner: rr(secondStage.diffuserInner) },
   ];
   const shaftRadius = rr(12.375), bladeCount = K.bladesPerStage;
   const backplateSegments = K.backplateSegments;
   for (const S of stages) {
-    // Only each rotating impeller's own backplate returns. Its nominal radius
-    // equals the blade tip, with 512 segments limiting the polygonal inset.
-    // Every blade embeds 0.15 mm into it along the entire blade bottom edge.
+    // The first stage's working blades now extend beyond its unchanged rear
+    // disk; the second stage retains equal blade-tip and backplate radii.
+    // The supported blade bottoms embed 0.15 mm into the corresponding disk.
     const rootFront = S.plate - S.heightIn, rootInner = S.eye * .69 - rr(.8);
     const rotor = [axisCylinder(S.shaftFront, S.shaftRear, shaftRadius, 64),
-      axisCylinder(S.plate, S.back, S.bladeOuter, backplateSegments),
+      axisCylinder(S.plate, S.back, S.radius, backplateSegments),
       solidLathe([[S.hubStart, shaftRadius * 1.15], [S.hubShoulder, S.eye * .69], [S.plate, S.eye]])];
     // The extended inner strips lie inside the original cone at their root,
     // then emerge exactly on its surface. They join along the full axial root
     // span rather than touching only the cone's downstream end.
     for (let i = 0; i < bladeCount; i++) rotor.push(radialVane(S.bladeInner, S.bladeOuter, i * tau / bladeCount,
       -.52, rr(2.6), 0, S.plate, t => lerp(S.heightIn, S.heightOut, t), rootInner));
-    add(`compressor-rotor-${S.number}`, `第${S.number}级十八叶离心叶轮 · 等径背盘与连续叶根`, 'front', steel,
+    add(`compressor-rotor-${S.number}`, `第${S.number}级十八叶离心叶轮与后背盘`, 'front', steel,
       union(rotor), { ...metal, roughness: .21, clip: true, rotor: `compressor-${S.number}`, bladeCount,
-        stage: S.number, backplate: true, shroud: false, backplateRadiusMm: S.bladeOuter,
+        stage: S.number, backplate: true, shroud: false, backplateRadiusMm: S.radius, bladeTipRadiusMm: S.bladeOuter,
+        bladeTipOverhangMm: S.bladeOuter - S.radius,
         backplateSegments, bladeRootAxialFrontMm: rootFront, bladeRootAxialRearMm: S.plate,
         bladeRootEmbeddingMm: rr(.8), bladeRootMount: 'continuous-conical-hub-and-backplate' });
 
     // Both static cover disks are also removed from the physical model.
-    // Separate mesh identity permits removing the external casing in an
-    // inspection view while retaining the real diffuser vanes and passage.
-    // Cut against the exact wall so each vane meets its support at a face.
+    // Both diffuser rows sit aft of their respective rotor disks. Clip each
+    // curved vane to the narrowing casing while keeping the inner passage open.
     const diffuser = [];
     for (let i = 0; i < 18; i++) diffuser.push(radialVane(S.diffuserInner, K.inner + .5,
       (i + .35) * tau / 18, .10, rr(2.1), S.diffuserStart, S.diffuserEnd).intersect(caseLumen));
     add(`compressor-diffuser-${S.number}`, `第${S.number}级十八扩压静叶`, 'front', vaneSteel,
-      union(diffuser), { ...metal, roughness: .34, clip: true, stationary: true, bladeCount: 18, stage: S.number });
+      union(diffuser), { ...metal, roughness: .34, clip: true, stationary: true, bladeCount: 18, stage: S.number,
+        axialFrontMm: S.diffuserStart, axialRearMm: S.diffuserEnd,
+        axialGapBehindBackplateMm: S.diffuserStart - S.back });
   }
 
   // The complete eighteen-vane intermediate return assembly stays absent,
   // along with its former central diaphragm and the two stationary covers.
 
-  const inletGuide = getCompressorInletGuideLayout(P);
-  const { point: guidePoint, ...inletGuideInfo } = inletGuide;
-  function inletGuideBlade(index) {
-    const vertices = [], triangles = [], perimeter = [], ns = inletGuide.spanSegments, nc = inletGuide.chordSegments;
-    for (let j = 0; j <= nc; j++) perimeter.push([j / nc, 1]);
-    for (let j = nc; j >= 0; j--) perimeter.push([j / nc, -1]);
-    const ringSize = perimeter.length;
-    for (let s = 0; s <= ns; s++) for (const [chord, side] of perimeter) {
-      vertices.push(...guidePoint(s / ns, chord, side, index));
-    }
-    for (let s = 0; s < ns; s++) for (let j = 0; j < ringSize; j++) {
-      const a = s * ringSize + j, b = s * ringSize + (j + 1) % ringSize;
-      const c = a + ringSize, d = b + ringSize;
-      triangles.push(a, c, b, b, c, d);
-    }
-    for (const s of [0, ns]) {
-      const centre = guidePoint(s / ns, .5, 0, index), ci = vertices.length / 3;
-      vertices.push(...centre);
-      for (let j = 0; j < ringSize; j++) {
-        const a = s * ringSize + j, b = s * ringSize + (j + 1) % ringSize;
-        triangles.push(...(s === 0 ? [ci, a, b] : [ci, b, a]));
-      }
-    }
-    let sixVolume = 0;
-    for (let i = 0; i < triangles.length; i += 3) {
-      const a = triangles[i] * 3, b = triangles[i + 1] * 3, c = triangles[i + 2] * 3;
-      sixVolume += vertices[a] * (vertices[b + 1] * vertices[c + 2] - vertices[b + 2] * vertices[c + 1])
-        + vertices[a + 1] * (vertices[b + 2] * vertices[c] - vertices[b] * vertices[c + 2])
-        + vertices[a + 2] * (vertices[b] * vertices[c + 1] - vertices[b + 1] * vertices[c]);
-    }
-    if (sixVolume < 0) for (let i = 0; i < triangles.length; i += 3) {
-      [triangles[i + 1], triangles[i + 2]] = [triangles[i + 2], triangles[i + 1]];
-    }
-    return M.ofMesh({ numProp: 3, vertProperties: new Float32Array(vertices),
-      triVerts: new Uint32Array(triangles) }).intersect(caseLumen);
-  }
-
-  // The first motor moves aft and its old three rods become six curved fixed
-  // guide vanes. Their roots join the motor casing; their tips meet the exact
-  // compressor casing wall. The downstream motor retains its three supports.
+  // Restore the original first motor position and its three fine radial rods.
+  // There are no inlet guide blades or interstage return guide blades.
   // These are packaging placeholders, not validated power-rated motor models.
-  const motors = [{ number: 1, front: inletGuide.motorFront, rear: inletGuide.motorRear },
+  const motors = [{ number: 1, front: ax(484), rear: ax(510), support: ax(492) },
     { number: 2, front: ax(624), rear: ax(649), support: ax(634) }];
   for (const D of motors) {
     const motorRadius = rr(33), bore = shaftRadius + .9;
@@ -148,17 +111,14 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
       D.front - .1, D.number === 1 ? D.rear + .1 : ax(639.5), bore, 64));
     const pieces = [body];
     if (D.number === 2) pieces.push(solidLathe([[D.rear, motorRadius], [ax(662), .25]]));
-    if (D.number === 1) {
-      for (let i = 0; i < inletGuide.count; i++) pieces.push(inletGuideBlade(i));
-    } else for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 3; i++) {
         const angle = i * tau / 3;
         const p = r => [D.support, r * Math.cos(angle), r * Math.sin(angle)];
         pieces.push(cylinder(p(motorRadius - .5), p(K.inner + 1), rr(2.4), rr(2.4), 32).intersect(caseFree));
       }
-    add(`compressor-motor-${D.number}`, D.number === 1 ? '第一级独立电机固定壳与六片曲面入口导叶'
-      : '第二级独立电机固定壳与支座', 'front', darkSteel,
+    add(`compressor-motor-${D.number}`, `第${D.number}级独立电机固定壳与支座`, 'front', darkSteel,
       union(pieces), { ...metal, clip: true, stationary: true, stage: D.number, motorSizing: 'schematic-only',
-        ...(D.number === 1 ? { inletGuide: inletGuideInfo, inletGuideVaneCount: inletGuide.count } : {}) });
+        supportCount: 3, supportAxialCentreMm: D.support, inletGuideVaneCount: 0 });
   }
 
   const flangeDepth = 3 * axialScale, flangeGap = .04;
@@ -198,6 +158,6 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
     driveArchitecture: 'independent-front-and-rear-motors', motorSizing: 'schematic-only', casingInside, stages,
     removedDiscSurfaces: ['compressor-shroud-1', 'compressor-return-diaphragm', 'compressor-shroud-2'],
     restoredBackplates: stages.map(S => ({ stage: S.number, front: S.plate, rear: S.back,
-      radius: S.bladeOuter, segments: backplateSegments })),
-    returnVaneCount: 0, returnDiaphragmSupportCount: 0, inletGuide: inletGuideInfo };
+      radius: S.radius, segments: backplateSegments })),
+    returnVaneCount: 0, returnDiaphragmSupportCount: 0, inletGuideVaneCount: 0 };
 }

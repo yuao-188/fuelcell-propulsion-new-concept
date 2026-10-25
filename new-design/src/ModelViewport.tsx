@@ -40,11 +40,11 @@ export default function ModelViewport(props: Props) {
     callouts.setAttribute('class','compressor-callouts');callouts.setAttribute('aria-hidden','true');
     element.appendChild(callouts);
     const anchors:[string,number[],number,boolean][]=[
-      ['一级离心叶轮',[536.638,98.452,-17.526],.38,false],
-      ['一级扩压静叶',[541,151.548,-32.53],.52,false],
+      ['一级离心叶轮',[536.638,99.8717715,-14.3679942],.38,false],
+      ['一级扩压静叶',[559.5,151.548,-32.53],.52,false],
       ['一级背盘',[546.5,100,-18],.66,false],
       ['二级离心叶轮',[601.584,74.313,-10.131],.38,true],
-      ['二级扩压静叶',[608,122.831,-28.079],.52,true],
+      ['二级扩压静叶',[624,122.831,-28.079],.52,true],
       ['二级背盘',[613.5,80,-15],.66,true],
     ];
     const calloutItems=anchors.map(([label,point,row,rightSide])=>{
@@ -148,7 +148,7 @@ export default function ModelViewport(props: Props) {
       cap.onAfterRender=()=>renderer.clearStencil();
       scene.add(stencil,cap);sections.push({source:mesh,stencil,cap});
     }
-    const modelUrl=new URL('model.glb?v=20261025-inward-inlet-guides',document.baseURI);
+    const modelUrl=new URL('model.glb?v=20261025-aft-diffusers-16blade',document.baseURI);
     const modelRequest=new AbortController();
     const loadFailed=()=>{if(!cancelled)setStatus('模型加载失败，请刷新页面重试。');};
     // Read the binary directly. FileLoader's rewrapped progress stream can
