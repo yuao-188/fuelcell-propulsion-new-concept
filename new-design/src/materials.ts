@@ -52,14 +52,18 @@ function surfaceFinish(source: THREE.MeshStandardMaterial, data: SurfaceData): F
     color: '#253138', metalness: .03, roughness: .76, grain: 'blasted', variation: .05, relief: .006, reflection: .5 };
   if (id.includes('fastener') || id.includes('washer')) return { ...base, color: '#77858e',
     metalness: .94, roughness: .27, scale: 100, variation: .1, relief: .012 };
-  if (id.includes('flange') || id.includes('cap') || id.startsWith('stack-frames-') || id.startsWith('compressor-shroud-') || id === 'compressor-return-channel') {
+  if (id.startsWith('compressor-diffuser-') || id === 'compressor-return-channel') return { ...base,
+    color: '#526b7c', metalness: .86, roughness: .34, variation: .12, relief: .018, reflection: 1.05 };
+  if (id.startsWith('compressor-rotor-')) return { ...base,
+    color: '#d6e1e8', metalness: .94, roughness: .24, variation: .1, relief: .012, reflection: 1.2 };
+  if (id.includes('flange') || id.includes('cap') || id.startsWith('stack-frames-') || id.startsWith('compressor-shroud-') || id === 'compressor-return-diaphragm') {
     return { ...base, color: '#a9b5bd', metalness: .93, roughness: .28, variation: .14, relief: .024, reflection: 1.15 };
   }
   if (id === 'fan' || id === 'fan-spinner' || id === 'fan-stators' || id.startsWith('compressor-rotor-')) return { ...base,
     color: '#aebbc5', metalness: .96, roughness: .235, variation: .12, relief: .014, reflection: 1.2 };
   if (id === 'main-motor') return { ...base, color: '#ad8a46', metalness: .84, roughness: .33,
     grain: 'blasted', scale: 145, variation: .15, relief: .025, reflection: 1.05 };
-  if (id.startsWith('compressor-motor-')) return { ...base, color: '#566975', metalness: .78, roughness: .32,
+  if (id.startsWith('compressor-motor-')) return { ...base, color: '#b29350', metalness: .78, roughness: .32,
     grain: 'blasted', scale: 100, variation: .12, relief: .015 };
   if (group === 'compressorCase') return { ...base, color: '#b49a62', metalness: .82, roughness: .31,
     grain: 'blasted', scale: 145, variation: .16, relief: .025, reflection: 1.1 };

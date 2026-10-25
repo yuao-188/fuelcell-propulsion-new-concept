@@ -1,39 +1,24 @@
+import { getInnerShellLayout } from './inner-shell-layout.mjs';
+
 /** A small insulated multicore harness, not a circuit diagram or a common bus. */
 export function buildWiring({ M, P, C, union, cylinder, tubePath, roundPath, polar, add }) {
   const angle = 330, sheathRadius = 2.4, branchRadius = 1.8;
-  const shell = P.innerShell, smooth = t => t * t * (3 - 2 * t);
-  const lerp = (a, b, t) => a + (b - a) * t;
-  const midStation = shell.midStation ?? shell.shoulder, midRadius = shell.midRadius ?? shell.radius;
-  const shellRadius = x => x <= shell.expansionStart ? shell.inletRadius
-    : x <= midStation ? lerp(shell.inletRadius, midRadius, smooth((x - shell.expansionStart) / (midStation - shell.expansionStart)))
-    : x <= shell.shoulder ? lerp(midRadius, shell.radius, smooth((x - midStation) / (shell.shoulder - midStation)))
-    : lerp(shell.radius, shell.outletRadius, smooth((x - shell.shoulder) / (shell.rear - shell.shoulder)));
-  // Match the actual sampled grey shell, including its piecewise-linear seats.
-  const shellProfile = [[shell.front, shell.inletRadius], [shell.expansionStart, shell.inletRadius]];
-  for (let i = 1; i <= 96; i++) {
-    const x = lerp(shell.expansionStart, shell.shoulder, i / 96); shellProfile.push([x, shellRadius(x)]);
-  }
-  for (let i = 1; i <= 40; i++) {
-    const x = lerp(shell.shoulder, shell.rear, i / 40); shellProfile.push([x, shellRadius(x)]);
-  }
-  const routeRadius = x => {
-    if (x <= shellProfile[0][0]) return shellProfile[0][1] - shell.wall - 7;
-    if (x >= shellProfile.at(-1)[0]) return shellProfile.at(-1)[1] - shell.wall - 7;
-    const index = shellProfile.findIndex(point => point[0] >= x);
-    const a = shellProfile[index - 1], b = shellProfile[index];
-    return lerp(a[1], b[1], (x - a[0]) / (b[0] - a[0])) - shell.wall - 7;
-  };
+  const shellLayout = getInnerShellLayout(P), eg = shellLayout.egress;
+  const shellProfile = shellLayout.profile, exposedRadius = P.stacks.at(-1).outer + 14;
+  const routeRadius = x => x > eg.x ? exposedRadius : shellLayout.radiusAt(x) - shellLayout.wallAt(x) - 7;
   const at = (x, radius) => polar(x, radius, angle);
   const centre = point => at(point, routeRadius(point));
   const stageMid = P.stacks.map(s => (s.front + s.rear) / 2);
   const routeStart = P.compressor.front + 170, routeEnd = stageMid.at(-1) + 100;
   const boxX = P.compressor.front + 140, boxRadius = 210;
-  const stations = [...new Set([routeStart, routeEnd, ...stageMid,
+  const stations = [...new Set([routeStart, eg.x - 18, ...stageMid,
     ...stageMid.map(x => x - 45), ...shellProfile.map(point => point[0])])]
-    .filter(x => x >= routeStart && x <= routeEnd).sort((a, b) => a - b);
+    .filter(x => x >= routeStart && x <= eg.x - 18).sort((a, b) => a - b);
   // Keep the first bend beyond the gland's rear face. The former +22 mm
   // station started its fillet inside the gland and clipped its metal rim.
-  const mainPath = roundPath([at(boxX + 10, boxRadius), at(boxX + 30, boxRadius), ...stations.map(centre)], 6);
+  const mainPath = roundPath([at(boxX + 10, boxRadius), at(boxX + 30, boxRadius), ...stations.map(centre),
+    at(eg.x, routeRadius(eg.x)), at(eg.x, exposedRadius), at(eg.x + 24, exposedRadius),
+    at(routeEnd, exposedRadius)], 6);
   const harness = [tubePath(mainPath, sheathRadius)];
   const connectors = [], clampPieces = [], branchPaths = [];
 
@@ -44,6 +29,10 @@ export function buildWiring({ M, P, C, union, cylinder, tubePath, roundPath, pol
   const gland = cylinder(at(boxX + 14, boxRadius), at(boxX + 20, boxRadius), 4.2, 4.2, 40);
   const glandBore = cylinder(at(boxX + 9, boxRadius), at(boxX + 21, boxRadius), 2.8, 2.8, 40);
   connectors.push(union([boxOuter, gland]).subtract(union([boxInner, glandBore])));
+  // A visible hollow sleeve occupies the matching casing bore. The harness
+  // crosses radially through it before continuing over the exposed third stack.
+  connectors.push(cylinder(at(eg.x, eg.innerRadius), at(eg.x, eg.outerRadius), eg.sleeveRadius, eg.sleeveRadius, 40)
+    .subtract(cylinder(at(eg.x, eg.innerRadius - .1), at(eg.x, eg.outerRadius + .1), eg.boreRadius, eg.boreRadius, 40)));
 
   P.stacks.forEach((s, i) => {
     const x = stageMid[i], terminalX = x + 18;
@@ -81,9 +70,11 @@ export function buildWiring({ M, P, C, union, cylinder, tubePath, roundPath, pol
   }
   void C;
   return { parts, verification: { parts: parts.length, bundles: 1, shortBranches: branchPaths.length,
-    frameConnectors: connectors.length - 1, clamps: clampPieces.length, angleDegrees: angle,
+    frameConnectors: P.stacks.length, clamps: clampPieces.length, angleDegrees: angle,
     sheathDiameter: 2 * sheathRadius, branchDiameter: 2 * branchRadius,
     interfaceBoxCentre: at(boxX, boxRadius), routeStart, routeEnd,
+    casingFeedthrough: { x: eg.x, angle: eg.angle, innerRadius: eg.innerRadius, outerRadius: eg.outerRadius,
+      sleeveOuterRadius: eg.sleeveRadius, sleeveBoreRadius: eg.boreRadius }, exposedThirdStageRouteRadius: exposedRadius,
     representation: 'insulated multicore harness only; no conductor interconnection or power-electronics design' },
     mainPath, branchPaths };
 }

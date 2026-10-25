@@ -11,6 +11,7 @@ import { buildDetailedShells } from './detailed-shells.mjs';
 import { buildWaterManagement } from './detailed-water-wiring.mjs';
 import { buildFluidNetworks } from './build-new-design-fluids.mjs';
 import { buildWiring } from './detailed-wiring.mjs';
+import { renderMeshWithCreasedNormals } from './render-mesh.mjs';
 
 const api = await ManifoldModule();
 api.setup();
@@ -87,7 +88,7 @@ const stackChecks=P.stacks.map((s,i)=>buildDetailedStack({M,P,C,union,cylinder,s
 
 // Front machinery: main motor shaft terminates at its own motor. The compressor
 // has a separate enclosed drive with no continuation of that front shaft.
-buildDetailedMachinery({M,CS,P,C,union,cylinder,revolved,sector,add});
+const machinery=buildDetailedMachinery({M,CS,P,C,union,cylinder,revolved,sector,add});
 const pumpOuter=union([
   cylinder([P.pump.front,0,P.pump.centerZ],[P.pump.front+6,0,P.pump.centerZ],P.pump.radius,P.pump.radius,64),
   cylinder([P.pump.front+6,0,P.pump.centerZ],[P.pump.rear-6,0,P.pump.centerZ],P.pump.radius-2,P.pump.radius-2,64),
@@ -108,14 +109,14 @@ const shells=buildDetailedShells({M,CS,P,union,cylinder,revolved,polar,add});
 const wiring=buildWiring({M,P,C,union,cylinder,tubePath,roundPath,polar,add});
 
 console.log(`Built ${parts.length} solid components. Checking exact intersections...`);
-const report={schema:3,units:P.units,dimensionSource:'user-confirmed circumferential cells and revised assembly, 2026-10-23',
+const report={schema:4,units:P.units,dimensionSource:'user-confirmed 700 mm third stage, open aft inner casing and outer-rim hydrogen inlets, 2026-10-25',
   performanceScope:'geometry only; prior thermal/power results are not recalculated',
   pumpPlacement:'stage 3 central cavity',envelopes:{length:os.rear-os.front,ductBore:2*(os.radius-os.wall),nozzleBore:2*(os.outletRadius-os.wall),motorDiameter:2*P.motor.radius,motorLength:P.motor.rear-P.motor.front,stackLength:P.stacks.at(-1).rear-P.stacks[0].front},
   modules:P.stacks.map(s=>s.modules),portCounts:Object.fromEntries(['air','hydrogen','return','cathode'].map(fluid=>[fluid,ports.filter(p=>p.fluid===fluid).length])),
   parts:parts.length,solidChecks:0,broadPhasePairs:0,collisions:[],fluidChecks:{},ports,stackChecks,
   physicalCells:stackChecks.reduce((sum,s)=>sum+s.totalPhysicalCells,0),
-  layoutOverrides:{intakeInnerEnds:'both open',mainInnerShellFront:ins.front,innerContractionStart:ins.shoulder,outerWaistRadius:os.waistRadius,mainInnerShellMaximumRadius:ins.radius},
-  shellGeometry:shells.verification,waterManagement:water.verification,wiring:wiring?.verification,plumbing:fluids.checks};
+  layoutOverrides:{intakeInnerEnds:'both open',mainInnerShellFront:ins.front,mainInnerShellRear:P.stacks[2].front,innerShellStopsAtThirdStageFront:true,innerAftCone:false,outerWaistRadius:os.waistRadius,thirdStageOuterDiameter:2*P.stacks[2].outer,hydrogenInlet:'each module outer cylindrical surface'},
+  machinery,shellGeometry:shells.verification,waterManagement:water.verification,wiring:wiring?.verification,plumbing:fluids.checks};
 const errors=[];
 const bounds=parts.map(p=>p.solid.boundingBox());
 const overlap=(a,b)=>[0,1,2].every(k=>a.max[k]>b.min[k]+1e-5 && b.max[k]>a.min[k]+1e-5);
@@ -127,12 +128,17 @@ for(let i=0;i<parts.length;i++) for(let j=i+1;j<parts.length;j++) {
   if(volume>0.001) report.collisions.push({a:parts[i].id,b:parts[j].id,volume});
 }
 console.log('Exact pair checks complete:',report.solidChecks,'collisions:',report.collisions.length);
+console.log('Joining complete gas and drain cavities...');
 const cathodeCircuit=union([fluids.airBore,fluids.cathodeBore,water.cathode.gasBore,water.cathode.drainBore]);
-const anodeCircuit=union([fluids.anodeBore,fluids.feedBore,fluids.returnBore,pumpVoid,water.anode.gasBore,water.anode.drainBore]);
+// anodeBore already includes both feed and return; duplicate coincident inputs
+// unnecessarily multiply the Boolean work and its WASM memory requirement.
+const anodeCircuit=union([fluids.anodeBore,pumpVoid,water.anode.gasBore,water.anode.drainBore]);
+console.log('Checking separation of cathode and anode cavities...');
 const gasSeparation=cathodeCircuit.intersect(anodeCircuit), separationVolume=gasSeparation.volume();gasSeparation.delete();
 report.fluidChecks.gasSeparation={intersectionVolume:separationVolume};
 if(separationVolume>.001) errors.push('Cathode/anode circuits intersect: '+separationVolume);
 for(const [name,bore] of [['completeCathode',cathodeCircuit],['completeAnode',anodeCircuit]]) {
+  console.log('Checking connected cavity and solid obstructions:',name);
   const components=bore.decompose();
   report.fluidChecks[name]={connectedComponents:components.length};
   if(components.length!==1) errors.push(name+' disconnected: '+components.length);
@@ -161,14 +167,31 @@ await mkdir(resolve(root,'new-design/public'),{recursive:true});
 await writeFile(resolve(root,'new-design/verification.json'),JSON.stringify(report,null,2));
 if(report.collisions.length || errors.length) { console.error(JSON.stringify({collisions:report.collisions,errors,fluidChecks:report.fluidChecks},null,2)); throw new Error('Assembly verification failed; model was not exported.'); }
 
+// Validation cavities are no longer needed. Embind objects own WASM allocations
+// which JavaScript's collector cannot release; keep only the finished solids.
+const retainedSolids=new Set(parts.map(part=>part.solid));
+const validationSolids=new Set([cathodeCircuit,anodeCircuit,pumpVoid,...fluids.stackCutters,
+  fluids.airBore,fluids.cathodeBore,fluids.anodeBore,fluids.feedBore,fluids.returnBore,
+  ...fluids.junctionChecks.flatMap(join=>[join.a,join.b]),water.clearance,
+  ...[water.anode,water.cathode].flatMap(side=>[side.clearance,side.gasBore,side.drainBore])]);
+for(const solid of validationSolids) if(!retainedSolids.has(solid)) solid.delete();
+
 const document=new Document(), buffer=document.createBuffer(), scene=document.createScene('New design');
 const materials=new Map();
 for(const part of parts) {
-  const meshData=part.solid.calculateNormals(0,35).getMesh();
-  const positions=new Float32Array(meshData.numVert*3), normals=new Float32Array(meshData.numVert*3);
-  for(let i=0;i<meshData.numVert;i++) {
-    positions.set(meshData.vertProperties.slice(i*meshData.numProp,i*meshData.numProp+3),i*3);
-    normals.set(meshData.vertProperties.slice(i*meshData.numProp+3,i*meshData.numProp+6),i*3);
+  console.log('Exporting solid:',part.id);
+  let positions, normals, indices;
+  if(part.id==='hydrogen-network' || part.id==='wiring-harness') {
+    ({positions,normals,indices}=renderMeshWithCreasedNormals(part.solid));
+  } else {
+    const normalSolid=part.solid.calculateNormals(0,35),meshData=normalSolid.getMesh();
+    positions=new Float32Array(meshData.numVert*3);normals=new Float32Array(meshData.numVert*3);
+    for(let i=0;i<meshData.numVert;i++) {
+      const source=i*meshData.numProp,target=i*3;
+      for(let axis=0;axis<3;axis++) {positions[target+axis]=meshData.vertProperties[source+axis];normals[target+axis]=meshData.vertProperties[source+axis+3];}
+    }
+    indices=new Uint32Array(meshData.triVerts);
+    normalSolid.delete();
   }
   const metal=part.metallic??(['air','hydrogen','return'].includes(part.group)?.32:part.group==='stacks'?.22:.68);
   const rough=part.roughness??.34;
@@ -179,7 +202,7 @@ for(const part of parts) {
   }
   const primitive=document.createPrimitive().setAttribute('POSITION',document.createAccessor().setType('VEC3').setArray(positions).setBuffer(buffer))
     .setAttribute('NORMAL',document.createAccessor().setType('VEC3').setArray(normals).setBuffer(buffer))
-    .setIndices(document.createAccessor().setType('SCALAR').setArray(meshData.triVerts).setBuffer(buffer)).setMaterial(materials.get(materialKey));
+    .setIndices(document.createAccessor().setType('SCALAR').setArray(indices).setBuffer(buffer)).setMaterial(materials.get(materialKey));
   const mesh=document.createMesh(part.name).addPrimitive(primitive);
   scene.addChild(document.createNode(part.name).setMesh(mesh).setExtras({id:part.id,group:part.group,clip:part.clip||false,laminated:part.laminated||false,stage:part.stage||0,module:part.module||0,finish:part.finish||'',layerPitch:part.layerPitch||0,layerOrigin:part.layerOrigin||0,layerCount:part.layerCount||0,physicalCells:part.physicalCells||0,cellArrangement:part.cellArrangement||'',plateThickness:part.plateThickness||0,innerCoolingGap:part.innerCoolingGap||0,rotor:part.rotor||'',stationary:part.stationary||false,bladeCount:part.bladeCount||0,motorSizing:part.motorSizing||''}));
 }

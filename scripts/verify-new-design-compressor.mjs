@@ -8,7 +8,8 @@ import { NodeIO } from '@gltf-transform/core';
 import ManifoldModule from 'manifold-3d';
 import { Matrix4, Vector3 } from 'three';
 import { parameters as P, colors as C } from '../new-design/parameters.mjs';
-import { buildDetailedMachinery } from './detailed-machinery.mjs';
+import { buildDetailedMachinery, fanBladeSections } from './detailed-machinery.mjs';
+import { getInnerShellLayout } from './inner-shell-layout.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 const modelPath = resolve(root, 'new-design/public/model.glb');
@@ -20,9 +21,11 @@ const machineIds = [
   'motor-shaft-collar', 'motor-housing', 'compressor-motor-1', 'compressor-motor-2',
   'compressor-rotor-1', 'compressor-rotor-2', 'compressor-casing',
   'compressor-shroud-1', 'compressor-shroud-2', 'compressor-return-channel',
+  'compressor-diffuser-1', 'compressor-diffuser-2', 'compressor-return-diaphragm',
   'intake-inner-shell', 'intake-fasteners', 'compressor-front-flange', 'compressor-rear-flange', 'compressor-fasteners',
 ];
-const expectedComponents = { 'fan-stators': 18, 'intake-fasteners': 16, 'compressor-fasteners': 24 };
+const expectedComponents = { 'fan-stators': 18, 'intake-fasteners': 16, 'compressor-fasteners': 24,
+  'compressor-diffuser-1': 18, 'compressor-diffuser-2': 18, 'compressor-return-channel': 18 };
 const shellIds = ['outer-shell', 'inner-shell'];
 const retiredMachineIds = ['compressor-drive', 'compressor-shroud'];
 
@@ -81,13 +84,9 @@ try {
     outerProfile.push([os.shoulder, os.waistRadius]);
     for (let i = 1; i <= 40; i++) outerProfile.push([os.shoulder + (os.rear - os.shoulder) * i / 40,
       os.waistRadius + (os.outletRadius - os.waistRadius) * smooth(i / 40)]);
-    const innerProfile = [[ins.front, ins.inletRadius], [ins.expansionStart, ins.inletRadius]];
-    for (let i = 1; i <= 96; i++) innerProfile.push([ins.expansionStart + (ins.shoulder - ins.expansionStart) * i / 96,
-      ins.inletRadius + (ins.radius - ins.inletRadius) * smooth(i / 96)]);
-    for (let i = 1; i <= 40; i++) innerProfile.push([ins.shoulder + (ins.rear - ins.shoulder) * i / 40,
-      ins.radius + (ins.outletRadius - ins.radius) * smooth(i / 40)]);
+    const innerLayout = getInnerShellLayout(P);
     register('outer-shell', revolved(outerProfile, os.wall));
-    register('inner-shell', revolved(innerProfile, ins.wall));
+    register('inner-shell', revolved(innerLayout.profile, innerLayout.wallAt));
   } else {
     const document = await new NodeIO().read(modelPath);
     for (const node of document.getRoot().listNodes()) {
@@ -157,6 +156,78 @@ try {
   if (!result.fanStators.stationary) failures.push('Fan stators must not be marked as a rotor');
   if (result.fanStators.axialClearanceFromFanMm <= .001) failures.push('Fan stators must have axial clearance behind the fan');
   if (shellIntersections.some(item => item.volumeMm3 > .02)) failures.push('Fan stators intersect a grey shell');
+
+  const fanMesh = fan.solid.getMesh(), fanVertices = [];
+  for (let i = 0; i < fanMesh.vertProperties.length; i += fanMesh.numProp) {
+    fanVertices.push(Array.from(fanMesh.vertProperties.slice(i, i + 3)));
+  }
+  const nearestVertex = point => {
+    let nearest = null, errorMm = Infinity;
+    for (const vertex of fanVertices) {
+      const error = Math.hypot(...vertex.map((value, i) => value - point[i]));
+      if (error < errorMm) { nearest = vertex; errorMm = error; }
+    }
+    return { position: nearest, errorMm };
+  };
+  const sections = fanBladeSections(P.fan);
+  const measuredSections = sections.filter(section => section.radius > P.fan.hubRadius + 5).map(section => {
+    const angle = section.angleToAxisDeg * Math.PI / 180;
+    const endpoints = [0, 1].map(u => {
+      const q = section.chord * (u - .48), tangential = q * Math.sin(angle);
+      return nearestVertex([section.centreX + q * Math.cos(angle),
+        section.radius * Math.cos(section.sweep) - tangential * Math.sin(section.sweep),
+        section.radius * Math.sin(section.sweep) + tangential * Math.cos(section.sweep)]);
+    });
+    const chord = endpoints[1].position.map((value, i) => value - endpoints[0].position[i]);
+    return { radiusMm: section.radius, spanFraction: section.span,
+      specifiedAngleToAxisDeg: section.angleToAxisDeg,
+      measuredAngleToAxisDeg: Math.acos(Math.abs(chord[0]) / Math.hypot(...chord)) * 180 / Math.PI,
+      maximumEndpointErrorMm: Math.max(...endpoints.map(endpoint => endpoint.errorMm)) };
+  });
+  result.fanTwist = { buriedRootAngleToAxisDeg: sections[0].angleToAxisDeg,
+    exposedRoot: measuredSections[0], tip: measuredSections.at(-1), measuredSections };
+  if (measuredSections.some(section => section.maximumEndpointErrorMm > .004
+    || Math.abs(section.measuredAngleToAxisDeg - section.specifiedAngleToAxisDeg) > .004)
+    || measuredSections.some((section, i) => i && section.measuredAngleToAxisDeg <= measuredSections[i - 1].measuredAngleToAxisDeg)) {
+    failures.push('Fan chord angles are not the requested continuous root-to-tip twist');
+  }
+  result.fanRadialSections = [125, 300, 470].map(radius => {
+    const ring = probeCylinder([fan.bounds.min[0] - 1, 0, 0], [fan.bounds.max[0] + 1, 0, 0], radius + .15, 192)
+      .subtract(probeCylinder([fan.bounds.min[0] - 2, 0, 0], [fan.bounds.max[0] + 2, 0, 0], radius - .15, 192));
+    const intersections = fan.solid.intersect(ring), components = intersections.decompose();
+    const bladeCount = components.length;
+    components.forEach(component => component.delete()); intersections.delete(); ring.delete();
+    return { radiusMm: radius, separatedBlades: bladeCount };
+  });
+  if (result.fanRadialSections.some(section => section.separatedBlades !== 12)) failures.push('Fan blades merge or are missing outside the hub');
+
+  // Rotating a blade sweeps every azimuth. A convex hull in (x,r), revolved
+  // with circumscribed facets, encloses that whole motion rather than sampling
+  // a few angular positions. The extra radial 0.8 mm verifies the running gap.
+  const motionGap = .8, revolutionSegments = 192;
+  const hullPoints = fanVertices.map(([x, y, z]) => [x,
+    (Math.hypot(y, z) + motionGap) / Math.cos(Math.PI / revolutionSegments)]);
+  hullPoints.push([fan.bounds.min[0], 0], [fan.bounds.max[0], 0]);
+  hullPoints.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const halfHull = points => {
+    const hull = [];
+    for (const point of points) {
+      while (hull.length > 1 && cross(hull.at(-2), hull.at(-1), point) <= 0) hull.pop();
+      hull.push(point);
+    }
+    return hull;
+  };
+  const lowerHull = halfHull(hullPoints), upperHull = halfHull(hullPoints.toReversed());
+  const motionHull = [...lowerHull.slice(0, -1), ...upperHull.slice(0, -1)].map(([x, r]) => [r, x]).reverse();
+  const sweptEnvelope = new CS([motionHull]).revolve(revolutionSegments).rotate([0, 90, 0]);
+  const sweptBounds = sweptEnvelope.boundingBox();
+  const motionIntersections = [...parts, ...shells].filter(part => part.id !== 'fan' && part.id !== 'fan-spinner'
+    && overlaps(sweptBounds, part.bounds)).map(part => ({ id: part.id, volumeMm3: intersectionVolume(sweptEnvelope, part.solid) }));
+  result.fanMotionEnvelope = { radialRunningGapMm: motionGap, method: 'conservative continuous rotational envelope',
+    maximumIntersectionMm3: Math.max(0, ...motionIntersections.map(item => item.volumeMm3)), intersections: motionIntersections };
+  if (motionIntersections.some(item => item.volumeMm3 > .02)) failures.push('Fan rotational envelope with 0.8 mm running gap intersects a fixed part');
+  sweptEnvelope.delete();
 
   const compressorRotors = [getPart('compressor-rotor-1'), getPart('compressor-rotor-2')];
   const compressorMotors = [getPart('compressor-motor-1'), getPart('compressor-motor-2')];
@@ -268,7 +339,7 @@ try {
   });
   if (result.formerBypass.some(probe => !probe.blocked)) failures.push('A compressor stage has an open outer bypass');
   const centreBypass = probeCylinder([ax(550), 0, 0], [ax(575), 0, 0], .75);
-  const diaphragmBlockage = intersectionVolume(centreBypass, getPart('compressor-return-channel').solid);
+  const diaphragmBlockage = intersectionVolume(centreBypass, getPart('compressor-return-diaphragm').solid);
   result.returnDiaphragm = { centreBlocked: diaphragmBlockage > 1, intersectionVolumeMm3: diaphragmBlockage };
   if (!result.returnDiaphragm.centreBlocked) failures.push('Return diaphragm centre is open despite the separate short shafts');
   centreBypass.delete();

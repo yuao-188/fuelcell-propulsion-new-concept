@@ -1,7 +1,7 @@
 {
-  "schema": 3,
+  "schema": 4,
   "units": "mm",
-  "dimensionSource": "user-confirmed circumferential cells and revised assembly, 2026-10-23",
+  "dimensionSource": "user-confirmed 700 mm third stage, open aft inner casing and outer-rim hydrogen inlets, 2026-10-25",
   "performanceScope": "geometry only; prior thermal/power results are not recalculated",
   "pumpPlacement": "stage 3 central cavity",
   "envelopes": {
@@ -23,9 +23,9 @@
     "return": 11,
     "cathode": 11
   },
-  "parts": 99,
-  "solidChecks": 1099,
-  "broadPhasePairs": 4851,
+  "parts": 102,
+  "solidChecks": 1097,
+  "broadPhasePairs": 5151,
   "collisions": [],
   "fluidChecks": {
     "gasSeparation": {
@@ -55,10 +55,10 @@
       "connectedVolume": 57.35693558935399
     },
     "1-1-feed-port": {
-      "connectedVolume": 9.244941907093946
+      "connectedVolume": 2.0559866255468773
     },
     "1-1-feed-channel": {
-      "connectedVolume": 22.608109344987003
+      "connectedVolume": 22.46257020104281
     },
     "1-1-anode-midpoint": {
       "connectedVolume": 4.532338361078069
@@ -85,10 +85,10 @@
       "connectedVolume": 57.35690801458012
     },
     "1-2-feed-port": {
-      "connectedVolume": 9.24506289360185
+      "connectedVolume": 2.055980152948323
     },
     "1-2-feed-channel": {
-      "connectedVolume": 22.608108601333715
+      "connectedVolume": 22.462568058799697
     },
     "1-2-anode-midpoint": {
       "connectedVolume": 4.532338361078062
@@ -115,10 +115,10 @@
       "connectedVolume": 57.35693217950571
     },
     "1-3-feed-port": {
-      "connectedVolume": 9.245063746424071
+      "connectedVolume": 2.0559776858975383
     },
     "1-3-feed-channel": {
-      "connectedVolume": 22.60809691497709
+      "connectedVolume": 22.462579623902233
     },
     "1-3-anode-midpoint": {
       "connectedVolume": 4.532338361078033
@@ -145,10 +145,10 @@
       "connectedVolume": 57.70095521242624
     },
     "2-1-feed-port": {
-      "connectedVolume": 9.247711682414902
+      "connectedVolume": 2.055950854682157
     },
     "2-1-feed-channel": {
-      "connectedVolume": 22.569620527404663
+      "connectedVolume": 22.83625483009926
     },
     "2-1-anode-midpoint": {
       "connectedVolume": 4.532338361081433
@@ -175,10 +175,10 @@
       "connectedVolume": 57.70095521242531
     },
     "2-2-feed-port": {
-      "connectedVolume": 9.24771168241549
+      "connectedVolume": 2.055950854682094
     },
     "2-2-feed-channel": {
-      "connectedVolume": 22.569620527404968
+      "connectedVolume": 22.836254830098422
     },
     "2-2-anode-midpoint": {
       "connectedVolume": 4.532338361081264
@@ -205,10 +205,10 @@
       "connectedVolume": 57.70095521242627
     },
     "2-3-feed-port": {
-      "connectedVolume": 9.24771168241525
+      "connectedVolume": 2.0559508546821554
     },
     "2-3-feed-channel": {
-      "connectedVolume": 22.56962052740423
+      "connectedVolume": 22.836254830098454
     },
     "2-3-anode-midpoint": {
       "connectedVolume": 4.53233836108142
@@ -235,10 +235,10 @@
       "connectedVolume": 57.700955212426884
     },
     "2-4-feed-port": {
-      "connectedVolume": 9.247711682415453
+      "connectedVolume": 2.0559508546820955
     },
     "2-4-feed-channel": {
-      "connectedVolume": 22.569620527404126
+      "connectedVolume": 22.83625483009867
     },
     "2-4-anode-midpoint": {
       "connectedVolume": 4.532338361081348
@@ -265,10 +265,10 @@
       "connectedVolume": 57.70095521242618
     },
     "3-1-feed-port": {
-      "connectedVolume": 9.247711682415124
+      "connectedVolume": 2.055950777314944
     },
     "3-1-feed-channel": {
-      "connectedVolume": 22.56962052740459
+      "connectedVolume": 22.83625483093044
     },
     "3-1-anode-midpoint": {
       "connectedVolume": 4.532338361081688
@@ -295,10 +295,10 @@
       "connectedVolume": 57.7009552124256
     },
     "3-2-feed-port": {
-      "connectedVolume": 9.247711682415451
+      "connectedVolume": 2.055950777314852
     },
     "3-2-feed-channel": {
-      "connectedVolume": 22.569620527405345
+      "connectedVolume": 22.836254830929366
     },
     "3-2-anode-midpoint": {
       "connectedVolume": 4.532338361081301
@@ -325,10 +325,10 @@
       "connectedVolume": 57.700955212426145
     },
     "3-3-feed-port": {
-      "connectedVolume": 9.247711682415591
+      "connectedVolume": 2.055950777314951
     },
     "3-3-feed-channel": {
-      "connectedVolume": 22.56962052740433
+      "connectedVolume": 22.83625483092968
     },
     "3-3-anode-midpoint": {
       "connectedVolume": 4.532338361081671
@@ -355,10 +355,10 @@
       "connectedVolume": 57.700955212427836
     },
     "3-4-feed-port": {
-      "connectedVolume": 9.247711682415563
+      "connectedVolume": 2.0559507773148447
     },
     "3-4-feed-channel": {
-      "connectedVolume": 22.56962052740425
+      "connectedVolume": 22.836254830929484
     },
     "3-4-anode-midpoint": {
       "connectedVolume": 4.532338361081165
@@ -416,14 +416,14 @@
       "stage": 1,
       "module": 1,
       "position": [
-        972,
-        8.143901214329898e-15,
-        133
+        956,
+        196.9112628160971,
+        131.3518860815098
       ],
       "direction": [
-        -1,
         0,
-        0
+        -0.831898736448503,
+        -0.5549274657965526
       ],
       "inner": 2.2,
       "outer": 3.8
@@ -492,14 +492,14 @@
       "stage": 1,
       "module": 2,
       "position": [
-        972,
-        -115.1813787033304,
-        -66.49999999999991
+        956,
+        -212.20970158963564,
+        104.85421284925938
       ],
       "direction": [
-        -1,
         0,
-        0
+        0.8965306508617862,
+        -0.4429817062423031
       ],
       "inner": 2.2,
       "outer": 3.8
@@ -568,14 +568,14 @@
       "stage": 1,
       "module": 3,
       "position": [
-        972,
-        115.18137870333031,
-        -66.50000000000006
+        956,
+        15.298438773538322,
+        -236.20609893076914
       ],
       "direction": [
-        -1,
         0,
-        0
+        -0.06463191441328225,
+        0.9979091720388555
       ],
       "inner": 2.2,
       "outer": 3.8
@@ -644,14 +644,14 @@
       "stage": 2,
       "module": 1,
       "position": [
-        1367,
-        1.4634529249810872e-14,
-        239
+        1351,
+        208.0817524419597,
+        234.48850995663514
       ],
       "direction": [
-        -1,
         0,
-        0
+        -0.6637355301640495,
+        -0.747967342868556
       ],
       "inner": 2.2,
       "outer": 3.8
@@ -720,14 +720,14 @@
       "stage": 2,
       "module": 2,
       "position": [
-        1367,
-        -239,
-        2.9269058499621745e-14
+        1351,
+        -234.48850995663517,
+        208.0817524419597
       ],
       "direction": [
-        -1,
         0,
-        0
+        0.747967342868556,
+        -0.6637355301640496
       ],
       "inner": 2.2,
       "outer": 3.8
@@ -796,14 +796,14 @@
       "stage": 2,
       "module": 3,
       "position": [
-        1367,
-        -4.390358774943261e-14,
-        -239
+        1351,
+        -208.08175244195982,
+        -234.48850995663503
       ],
       "direction": [
-        -1,
         0,
-        0
+        0.6637355301640496,
+        0.7479673428685559
       ],
       "inner": 2.2,
       "outer": 3.8
@@ -872,14 +872,14 @@
       "stage": 2,
       "module": 4,
       "position": [
-        1367,
-        239,
-        -5.853811699924349e-14
+        1351,
+        234.48850995663523,
+        -208.0817524419596
       ],
       "direction": [
-        -1,
         0,
-        0
+        -0.7479673428685563,
+        0.6637355301640493
       ],
       "inner": 2.2,
       "outer": 3.8
@@ -948,14 +948,14 @@
       "stage": 3,
       "module": 1,
       "position": [
-        1762,
-        1.4634529249810872e-14,
-        239
+        1746,
+        232.30743555741736,
+        261.78857000399455
       ],
       "direction": [
-        -1,
         0,
-        0
+        -0.6637355301640495,
+        -0.747967342868556
       ],
       "inner": 2.2,
       "outer": 3.8
@@ -1024,14 +1024,14 @@
       "stage": 3,
       "module": 2,
       "position": [
-        1762,
-        -239,
-        2.9269058499621745e-14
+        1746,
+        -261.7885700039946,
+        232.30743555741736
       ],
       "direction": [
-        -1,
         0,
-        0
+        0.747967342868556,
+        -0.6637355301640496
       ],
       "inner": 2.2,
       "outer": 3.8
@@ -1100,14 +1100,14 @@
       "stage": 3,
       "module": 3,
       "position": [
-        1762,
-        -4.390358774943261e-14,
-        -239
+        1746,
+        -232.30743555741748,
+        -261.78857000399444
       ],
       "direction": [
-        -1,
         0,
-        0
+        0.6637355301640496,
+        0.7479673428685559
       ],
       "inner": 2.2,
       "outer": 3.8
@@ -1176,14 +1176,14 @@
       "stage": 3,
       "module": 4,
       "position": [
-        1762,
-        239,
-        -5.853811699924349e-14
+        1746,
+        261.78857000399466,
+        -232.30743555741725
       ],
       "direction": [
-        -1,
         0,
-        0
+        -0.7479673428685563,
+        0.6637355301640493
       ],
       "inner": 2.2,
       "outer": 3.8
@@ -1268,13 +1268,13 @@
       "nominalInnerCoolingGap": 0.46,
       "constructedInnerCoolingGap": 0.4602,
       "numericRelief": 0.0002,
-      "outerCoolingGap": 0.7996930465900596,
+      "outerCoolingGap": 0.8866322476308484,
       "cellInner": 244,
-      "cellOuter": 326,
+      "cellOuter": 346.999,
       "axialCoolingLength": 375,
       "coolingDirection": "front-to-rear",
       "moduleGapAtInner": 1,
-      "moduleGapAtOuter": 1.4059871794871794,
+      "moduleGapAtOuter": 1.495726495726496,
       "sideFrameMinimumThickness": 2.488568850793598
     }
   ],
@@ -1282,12 +1282,553 @@
   "layoutOverrides": {
     "intakeInnerEnds": "both open",
     "mainInnerShellFront": 210,
-    "innerContractionStart": 1785,
+    "mainInnerShellRear": 1387,
+    "innerShellStopsAtThirdStageFront": true,
+    "innerAftCone": false,
     "outerWaistRadius": 410,
-    "mainInnerShellMaximumRadius": 354
+    "thirdStageOuterDiameter": 700,
+    "hydrogenInlet": "each module outer cylindrical surface"
+  },
+  "machinery": {
+    "fanFront": 50,
+    "fanRear": 210,
+    "mainFanRadius": 498,
+    "fanBladeCount": 12,
+    "fanStatorCount": 18,
+    "statorFront": 235,
+    "statorRear": 285,
+    "compressorStages": 2,
+    "compressorBladeCount": 12,
+    "neckStart": 675,
+    "driveArchitecture": "independent-front-and-rear-motors",
+    "motorSizing": "schematic-only",
+    "casingInside": [
+      [
+        480,
+        165
+      ],
+      [
+        483.75,
+        165
+      ],
+      [
+        487.5,
+        165
+      ],
+      [
+        491.25,
+        165
+      ],
+      [
+        495,
+        165
+      ],
+      [
+        498.75,
+        165
+      ],
+      [
+        502.5,
+        165
+      ],
+      [
+        506.25,
+        165
+      ],
+      [
+        510,
+        165
+      ],
+      [
+        513.75,
+        165
+      ],
+      [
+        517.5,
+        165
+      ],
+      [
+        521.25,
+        165
+      ],
+      [
+        525,
+        165
+      ],
+      [
+        528.75,
+        165
+      ],
+      [
+        532.5,
+        165
+      ],
+      [
+        536.25,
+        165
+      ],
+      [
+        540,
+        165
+      ],
+      [
+        543.75,
+        165
+      ],
+      [
+        547.5,
+        165
+      ],
+      [
+        551.25,
+        165
+      ],
+      [
+        555,
+        165
+      ],
+      [
+        556.75,
+        164.855
+      ],
+      [
+        558.5,
+        164.44
+      ],
+      [
+        560.25,
+        163.785
+      ],
+      [
+        562,
+        162.92
+      ],
+      [
+        563.75,
+        161.875
+      ],
+      [
+        565.5,
+        160.68
+      ],
+      [
+        567.25,
+        159.365
+      ],
+      [
+        569,
+        157.96
+      ],
+      [
+        570.75,
+        156.495
+      ],
+      [
+        572.5,
+        155
+      ],
+      [
+        574.25,
+        153.505
+      ],
+      [
+        576,
+        152.04
+      ],
+      [
+        577.75,
+        150.635
+      ],
+      [
+        579.5,
+        149.32
+      ],
+      [
+        581.25,
+        148.125
+      ],
+      [
+        583,
+        147.07999999999998
+      ],
+      [
+        584.75,
+        146.215
+      ],
+      [
+        586.5,
+        145.56
+      ],
+      [
+        588.25,
+        145.145
+      ],
+      [
+        590,
+        145
+      ],
+      [
+        591.6,
+        144.9275
+      ],
+      [
+        593.2,
+        144.72
+      ],
+      [
+        594.8,
+        144.3925
+      ],
+      [
+        596.4,
+        143.96
+      ],
+      [
+        598,
+        143.4375
+      ],
+      [
+        599.6,
+        142.84
+      ],
+      [
+        601.2,
+        142.18249999999998
+      ],
+      [
+        602.8,
+        141.48000000000002
+      ],
+      [
+        604.4,
+        140.7475
+      ],
+      [
+        606,
+        140
+      ],
+      [
+        607.6,
+        139.2525
+      ],
+      [
+        609.2,
+        138.51999999999998
+      ],
+      [
+        610.8,
+        137.81750000000002
+      ],
+      [
+        612.4,
+        137.16
+      ],
+      [
+        614,
+        136.5625
+      ],
+      [
+        615.6,
+        136.04
+      ],
+      [
+        617.2,
+        135.6075
+      ],
+      [
+        618.8,
+        135.28
+      ],
+      [
+        620.4,
+        135.0725
+      ],
+      [
+        622,
+        135
+      ],
+      [
+        623.4,
+        134.4925
+      ],
+      [
+        624.8,
+        133.04000000000005
+      ],
+      [
+        626.2,
+        130.74749999999992
+      ],
+      [
+        627.6,
+        127.71999999999994
+      ],
+      [
+        629,
+        124.0625
+      ],
+      [
+        630.4,
+        119.88000000000007
+      ],
+      [
+        631.8,
+        115.27750000000016
+      ],
+      [
+        633.2,
+        110.35999999999984
+      ],
+      [
+        634.6,
+        105.23249999999992
+      ],
+      [
+        636,
+        100
+      ],
+      [
+        637.4,
+        94.7675000000001
+      ],
+      [
+        638.8,
+        89.64000000000016
+      ],
+      [
+        640.2,
+        84.72249999999985
+      ],
+      [
+        641.6,
+        80.11999999999992
+      ],
+      [
+        643,
+        75.9375
+      ],
+      [
+        644.4,
+        72.28000000000006
+      ],
+      [
+        645.8,
+        69.25250000000008
+      ],
+      [
+        647.2,
+        66.95999999999994
+      ],
+      [
+        648.6,
+        65.50749999999998
+      ],
+      [
+        650,
+        65
+      ],
+      [
+        651.25,
+        64.65925
+      ],
+      [
+        652.5,
+        63.684
+      ],
+      [
+        653.75,
+        62.14475
+      ],
+      [
+        655,
+        60.112
+      ],
+      [
+        656.25,
+        57.65625
+      ],
+      [
+        657.5,
+        54.848
+      ],
+      [
+        658.75,
+        51.75775
+      ],
+      [
+        660,
+        48.455999999999996
+      ],
+      [
+        661.25,
+        45.01325
+      ],
+      [
+        662.5,
+        41.5
+      ],
+      [
+        663.75,
+        37.98675
+      ],
+      [
+        665,
+        34.544
+      ],
+      [
+        666.25,
+        31.24225
+      ],
+      [
+        667.5,
+        28.152
+      ],
+      [
+        668.75,
+        25.34375
+      ],
+      [
+        670,
+        22.88799999999999
+      ],
+      [
+        671.25,
+        20.855250000000005
+      ],
+      [
+        672.5,
+        19.316000000000003
+      ],
+      [
+        673.75,
+        18.34075
+      ],
+      [
+        675,
+        18
+      ],
+      [
+        675.75,
+        18
+      ],
+      [
+        676.5,
+        18
+      ],
+      [
+        677.25,
+        18
+      ],
+      [
+        678,
+        18
+      ],
+      [
+        678.75,
+        18
+      ],
+      [
+        679.5,
+        18
+      ],
+      [
+        680.25,
+        18
+      ],
+      [
+        681,
+        18
+      ],
+      [
+        681.75,
+        18
+      ],
+      [
+        682.5,
+        18
+      ],
+      [
+        683.25,
+        18
+      ],
+      [
+        684,
+        18
+      ],
+      [
+        684.75,
+        18
+      ],
+      [
+        685.5,
+        18
+      ],
+      [
+        686.25,
+        18
+      ],
+      [
+        687,
+        18
+      ],
+      [
+        687.75,
+        18
+      ],
+      [
+        688.5,
+        18
+      ],
+      [
+        689.25,
+        18
+      ],
+      [
+        690,
+        18
+      ]
+    ],
+    "stages": [
+      {
+        "number": 1,
+        "plate": 544,
+        "back": 549,
+        "radius": 145,
+        "eye": 41,
+        "bladeInner": 39,
+        "bladeOuter": 143.8,
+        "heightIn": 22,
+        "heightOut": 9.5,
+        "hubStart": 514,
+        "hubShoulder": 522,
+        "shaftFront": 487,
+        "shaftRear": 549,
+        "diffuserStart": 534.5,
+        "diffuserEnd": 549.5,
+        "diffuserInner": 148.2
+      },
+      {
+        "number": 2,
+        "plate": 611,
+        "back": 616,
+        "radius": 116,
+        "eye": 35.6,
+        "bladeInner": 33.5,
+        "bladeOuter": 114.8,
+        "heightIn": 27,
+        "heightOut": 11,
+        "hubStart": 576,
+        "hubShoulder": 584,
+        "shaftFront": 611,
+        "shaftRear": 638,
+        "diffuserStart": 600,
+        "diffuserEnd": 616.5,
+        "diffuserInner": 119.2
+      }
+    ]
   },
   "shellGeometry": {
-    "innerCurve": "cubic Hermite, zero slope at expansionStart, shoulder and rear",
+    "innerCurve": "monotone cubic Hermite; level stator support, early expansion, third-stage front-rim endface contact",
     "outerCurve": "preserved fan inlet; cubic Hermite contraction, constant waist, cubic Hermite tail contraction",
     "outerWaist": {
       "front": 850,
@@ -1296,28 +1837,30 @@
     },
     "innerConstantRadius": {
       "front": 210,
-      "rear": 620,
+      "rear": 285,
       "radius": 248
     },
     "innerWall": 5,
     "stackClearances": [
       {
         "stage": 1,
-        "minimumRadialClearance": 14.666173855394078,
+        "enclosed": true,
+        "minimumRadialClearance": 83.22284866557092,
         "x": 690,
-        "rearRadialClearance": 98.76177988022684
+        "rearRadialClearance": 102.71602298408445
       },
       {
         "stage": 2,
-        "minimumRadialClearance": 23.233709258390718,
+        "enclosed": true,
+        "minimumRadialClearance": 26.418089207169146,
         "x": 992,
-        "rearRadialClearance": 28.833763942631606
+        "rearRadialClearance": 33.4093865619887
       },
       {
         "stage": 3,
-        "minimumRadialClearance": 13.79130991428417,
-        "x": 1387,
-        "rearRadialClearance": 19.884888280564496
+        "enclosed": false,
+        "frontRimContact": true,
+        "casingAfterFront": false
       }
     ],
     "seamStations": [
@@ -1325,6 +1868,20 @@
       1110,
       1750
     ],
+    "innerTerminal": {
+      "x": 1387,
+      "outerRadius": 350,
+      "wall": 2,
+      "coolingRadialClearance": 0.9180764537708228,
+      "contact": "stage 3 outer frame endface only",
+      "casingAroundStage3": false,
+      "aftCasing": false
+    },
+    "wiringFeedthrough": {
+      "x": 1345,
+      "angle": 330,
+      "boreRadius": 4.35
+    },
     "fanSweptClearance": {
       "front": 50,
       "rear": 210,
@@ -1334,8 +1891,8 @@
       "intersectionVolume": 0
     },
     "interShellClearance": {
-      "minimumRadialClearance": 45.2638865329879,
-      "x": 1800.5
+      "minimumRadialClearance": 53.90385894028327,
+      "x": 1387
     },
     "outerAccessCovers": 3,
     "outerFasteners": 38,
@@ -1386,6 +1943,15 @@
     ],
     "routeStart": 650,
     "routeEnd": 1674.5,
+    "casingFeedthrough": {
+      "x": 1345,
+      "angle": 330,
+      "innerRadius": 344.21740153298487,
+      "outerRadius": 350.9272331215147,
+      "sleeveOuterRadius": 4.15,
+      "sleeveBoreRadius": 2.9
+    },
+    "exposedThirdStageRouteRadius": 364,
     "representation": "insulated multicore harness only; no conductor interconnection or power-electronics design"
   },
   "plumbing": {
@@ -1412,7 +1978,19 @@
           34.22381220790932,
           145.77618779209067
         ],
-        "cathodeRepresentativeLength": 67.68000000000006
+        "cathodeRepresentativeLength": 67.68000000000006,
+        "hydrogenInlet": {
+          "face": "outer cylindrical face",
+          "radius": 236.701,
+          "angle": 33.70571895150628,
+          "endPlateAngle": 30.705718951506277,
+          "x": 956,
+          "direction": "radially inward",
+          "rearSpokeTangentialWidth": 1.4,
+          "endPlateBoreTangentialWidth": 0.8,
+          "endPlateBoreAxialWidth": 4.4,
+          "maximumExternalRadius": 247.501
+        }
       },
       {
         "stage": 1,
@@ -1426,7 +2004,19 @@
           154.22381220790933,
           265.7761877920907
         ],
-        "cathodeRepresentativeLength": 67.68000000000006
+        "cathodeRepresentativeLength": 67.68000000000006,
+        "hydrogenInlet": {
+          "face": "outer cylindrical face",
+          "radius": 236.701,
+          "angle": 153.70571895150627,
+          "endPlateAngle": 150.70571895150627,
+          "x": 956,
+          "direction": "radially inward",
+          "rearSpokeTangentialWidth": 1.4,
+          "endPlateBoreTangentialWidth": 0.8,
+          "endPlateBoreAxialWidth": 4.4,
+          "maximumExternalRadius": 247.501
+        }
       },
       {
         "stage": 1,
@@ -1440,7 +2030,19 @@
           274.2238122079093,
           385.77618779209064
         ],
-        "cathodeRepresentativeLength": 67.68000000000006
+        "cathodeRepresentativeLength": 67.68000000000006,
+        "hydrogenInlet": {
+          "face": "outer cylindrical face",
+          "radius": 236.701,
+          "angle": 273.70571895150624,
+          "endPlateAngle": 270.70571895150624,
+          "x": 956,
+          "direction": "radially inward",
+          "rearSpokeTangentialWidth": 1.4,
+          "endPlateBoreTangentialWidth": 0.8,
+          "endPlateBoreAxialWidth": 4.4,
+          "maximumExternalRadius": 247.501
+        }
       },
       {
         "stage": 2,
@@ -1454,7 +2056,19 @@
           49.12242697246258,
           130.8775730275374
         ],
-        "cathodeRepresentativeLength": 90
+        "cathodeRepresentativeLength": 90,
+        "hydrogenInlet": {
+          "face": "outer cylindrical face",
+          "radius": 313.501,
+          "angle": 48.4146083088933,
+          "endPlateAngle": 45.4146083088933,
+          "x": 1351,
+          "direction": "radially inward",
+          "rearSpokeTangentialWidth": 1.4,
+          "endPlateBoreTangentialWidth": 0.8,
+          "endPlateBoreAxialWidth": 4.4,
+          "maximumExternalRadius": 324.301
+        }
       },
       {
         "stage": 2,
@@ -1468,7 +2082,19 @@
           139.12242697246256,
           220.87757302753744
         ],
-        "cathodeRepresentativeLength": 90
+        "cathodeRepresentativeLength": 90,
+        "hydrogenInlet": {
+          "face": "outer cylindrical face",
+          "radius": 313.501,
+          "angle": 138.4146083088933,
+          "endPlateAngle": 135.4146083088933,
+          "x": 1351,
+          "direction": "radially inward",
+          "rearSpokeTangentialWidth": 1.4,
+          "endPlateBoreTangentialWidth": 0.8,
+          "endPlateBoreAxialWidth": 4.4,
+          "maximumExternalRadius": 324.301
+        }
       },
       {
         "stage": 2,
@@ -1482,7 +2108,19 @@
           229.1224269724626,
           310.8775730275374
         ],
-        "cathodeRepresentativeLength": 90
+        "cathodeRepresentativeLength": 90,
+        "hydrogenInlet": {
+          "face": "outer cylindrical face",
+          "radius": 313.501,
+          "angle": 228.4146083088933,
+          "endPlateAngle": 225.4146083088933,
+          "x": 1351,
+          "direction": "radially inward",
+          "rearSpokeTangentialWidth": 1.4,
+          "endPlateBoreTangentialWidth": 0.8,
+          "endPlateBoreAxialWidth": 4.4,
+          "maximumExternalRadius": 324.301
+        }
       },
       {
         "stage": 2,
@@ -1496,7 +2134,19 @@
           319.1224269724626,
           400.8775730275374
         ],
-        "cathodeRepresentativeLength": 90
+        "cathodeRepresentativeLength": 90,
+        "hydrogenInlet": {
+          "face": "outer cylindrical face",
+          "radius": 313.501,
+          "angle": 318.4146083088933,
+          "endPlateAngle": 315.4146083088933,
+          "x": 1351,
+          "direction": "radially inward",
+          "rearSpokeTangentialWidth": 1.4,
+          "endPlateBoreTangentialWidth": 0.8,
+          "endPlateBoreAxialWidth": 4.4,
+          "maximumExternalRadius": 324.301
+        }
       },
       {
         "stage": 3,
@@ -1510,7 +2160,19 @@
           49.12242697246258,
           130.8775730275374
         ],
-        "cathodeRepresentativeLength": 90
+        "cathodeRepresentativeLength": 90,
+        "hydrogenInlet": {
+          "face": "outer cylindrical face",
+          "radius": 350,
+          "angle": 48.4146083088933,
+          "endPlateAngle": 45.4146083088933,
+          "x": 1746,
+          "direction": "radially inward",
+          "rearSpokeTangentialWidth": 1.4,
+          "endPlateBoreTangentialWidth": 0.8,
+          "endPlateBoreAxialWidth": 4.4,
+          "maximumExternalRadius": 360.8
+        }
       },
       {
         "stage": 3,
@@ -1524,7 +2186,19 @@
           139.12242697246256,
           220.87757302753744
         ],
-        "cathodeRepresentativeLength": 90
+        "cathodeRepresentativeLength": 90,
+        "hydrogenInlet": {
+          "face": "outer cylindrical face",
+          "radius": 350,
+          "angle": 138.4146083088933,
+          "endPlateAngle": 135.4146083088933,
+          "x": 1746,
+          "direction": "radially inward",
+          "rearSpokeTangentialWidth": 1.4,
+          "endPlateBoreTangentialWidth": 0.8,
+          "endPlateBoreAxialWidth": 4.4,
+          "maximumExternalRadius": 360.8
+        }
       },
       {
         "stage": 3,
@@ -1538,7 +2212,19 @@
           229.1224269724626,
           310.8775730275374
         ],
-        "cathodeRepresentativeLength": 90
+        "cathodeRepresentativeLength": 90,
+        "hydrogenInlet": {
+          "face": "outer cylindrical face",
+          "radius": 350,
+          "angle": 228.4146083088933,
+          "endPlateAngle": 225.4146083088933,
+          "x": 1746,
+          "direction": "radially inward",
+          "rearSpokeTangentialWidth": 1.4,
+          "endPlateBoreTangentialWidth": 0.8,
+          "endPlateBoreAxialWidth": 4.4,
+          "maximumExternalRadius": 360.8
+        }
       },
       {
         "stage": 3,
@@ -1552,7 +2238,80 @@
           319.1224269724626,
           400.8775730275374
         ],
-        "cathodeRepresentativeLength": 90
+        "cathodeRepresentativeLength": 90,
+        "hydrogenInlet": {
+          "face": "outer cylindrical face",
+          "radius": 350,
+          "angle": 318.4146083088933,
+          "endPlateAngle": 315.4146083088933,
+          "x": 1746,
+          "direction": "radially inward",
+          "rearSpokeTangentialWidth": 1.4,
+          "endPlateBoreTangentialWidth": 0.8,
+          "endPlateBoreAxialWidth": 4.4,
+          "maximumExternalRadius": 360.8
+        }
+      }
+    ],
+    "hydrogenInletFace": "outer cylindrical face, radial inward",
+    "hydrogenReturnFace": "front face unchanged",
+    "hydrogenEndPlatePassages": 11,
+    "activeCoolingFacesCrossedByHydrogenSpokes": false,
+    "hydrogenSeamChecks": [
+      {
+        "stage": 1,
+        "module": 1,
+        "feedBoreIntersectionVolume": 0
+      },
+      {
+        "stage": 1,
+        "module": 2,
+        "feedBoreIntersectionVolume": 0
+      },
+      {
+        "stage": 1,
+        "module": 3,
+        "feedBoreIntersectionVolume": 0
+      },
+      {
+        "stage": 2,
+        "module": 1,
+        "feedBoreIntersectionVolume": 0
+      },
+      {
+        "stage": 2,
+        "module": 2,
+        "feedBoreIntersectionVolume": 0
+      },
+      {
+        "stage": 2,
+        "module": 3,
+        "feedBoreIntersectionVolume": 0
+      },
+      {
+        "stage": 2,
+        "module": 4,
+        "feedBoreIntersectionVolume": 0
+      },
+      {
+        "stage": 3,
+        "module": 1,
+        "feedBoreIntersectionVolume": 0
+      },
+      {
+        "stage": 3,
+        "module": 2,
+        "feedBoreIntersectionVolume": 0
+      },
+      {
+        "stage": 3,
+        "module": 3,
+        "feedBoreIntersectionVolume": 0
+      },
+      {
+        "stage": 3,
+        "module": 4,
+        "feedBoreIntersectionVolume": 0
       }
     ],
     "internalChannelStatus": "representative module connectivity; axial cooling gaps remain open",
@@ -1575,9 +2334,9 @@
     "status": "passed",
     "scope": "Front machinery geometry only; no aerodynamic performance or motor power validation",
     "source": "exported GLB",
-    "modelModifiedAt": "2026-10-23T10:31:56.223Z",
+    "modelModifiedAt": "2026-10-25T11:12:59.586Z",
     "units": "mm",
-    "frontParts": 21,
+    "frontParts": 24,
     "componentCounts": {
       "fan": 1,
       "fan-spinner": 1,
@@ -1591,9 +2350,12 @@
       "intake-inner-shell": 1,
       "compressor-rotor-1": 1,
       "compressor-shroud-1": 1,
+      "compressor-diffuser-1": 18,
       "compressor-rotor-2": 1,
       "compressor-shroud-2": 1,
-      "compressor-return-channel": 1,
+      "compressor-diffuser-2": 18,
+      "compressor-return-diaphragm": 1,
+      "compressor-return-channel": 18,
       "compressor-motor-1": 1,
       "compressor-motor-2": 1,
       "compressor-front-flange": 1,
@@ -1603,8 +2365,8 @@
     },
     "solidIntersections": {
       "toleranceMm3": 0.02,
-      "candidates": 45,
-      "maximumVolumeMm3": 2.3376856006507296e-11,
+      "candidates": 53,
+      "maximumVolumeMm3": 0.000425773725712275,
       "collisions": []
     },
     "fanStators": {
@@ -1621,6 +2383,239 @@
         },
         {
           "id": "inner-shell",
+          "volumeMm3": 0
+        }
+      ]
+    },
+    "fanTwist": {
+      "buriedRootAngleToAxisDeg": 25,
+      "exposedRoot": {
+        "radiusMm": 108,
+        "spanFraction": 0.07142857142857142,
+        "specifiedAngleToAxisDeg": 25.74344023323615,
+        "measuredAngleToAxisDeg": 25.743437177753446,
+        "maximumEndpointErrorMm": 0.000007787011157256309
+      },
+      "tip": {
+        "radiusMm": 491.3632718583675,
+        "spanFraction": 1,
+        "specifiedAngleToAxisDeg": 76,
+        "measuredAngleToAxisDeg": 75.9999987460681,
+        "maximumEndpointErrorMm": 0.000011990300305799097
+      },
+      "measuredSections": [
+        {
+          "radiusMm": 108,
+          "spanFraction": 0.07142857142857142,
+          "specifiedAngleToAxisDeg": 25.74344023323615,
+          "measuredAngleToAxisDeg": 25.743437177753446,
+          "maximumEndpointErrorMm": 0.000007787011157256309
+        },
+        {
+          "radiusMm": 123,
+          "spanFraction": 0.10714285714285714,
+          "specifiedAngleToAxisDeg": 26.63092201166181,
+          "measuredAngleToAxisDeg": 26.630925721950025,
+          "maximumEndpointErrorMm": 0.00000739732381419937
+        },
+        {
+          "radiusMm": 138,
+          "spanFraction": 0.14285714285714285,
+          "specifiedAngleToAxisDeg": 27.825072886297377,
+          "measuredAngleToAxisDeg": 27.82507233350872,
+          "maximumEndpointErrorMm": 0.000007054739541711483
+        },
+        {
+          "radiusMm": 153,
+          "spanFraction": 0.17857142857142858,
+          "specifiedAngleToAxisDeg": 29.2980138483965,
+          "measuredAngleToAxisDeg": 29.29801558379989,
+          "maximumEndpointErrorMm": 0.000006791011178148937
+        },
+        {
+          "radiusMm": 168,
+          "spanFraction": 0.21428571428571427,
+          "specifiedAngleToAxisDeg": 31.021865889212826,
+          "measuredAngleToAxisDeg": 31.02186639042298,
+          "maximumEndpointErrorMm": 0.000007321115001301402
+        },
+        {
+          "radiusMm": 183,
+          "spanFraction": 0.25,
+          "specifiedAngleToAxisDeg": 32.96875,
+          "measuredAngleToAxisDeg": 32.96875064087398,
+          "maximumEndpointErrorMm": 0.000006621727012741714
+        },
+        {
+          "radiusMm": 198,
+          "spanFraction": 0.2857142857142857,
+          "specifiedAngleToAxisDeg": 35.11078717201166,
+          "measuredAngleToAxisDeg": 35.11078588961554,
+          "maximumEndpointErrorMm": 0.000005323727298030201
+        },
+        {
+          "radiusMm": 213,
+          "spanFraction": 0.32142857142857145,
+          "specifiedAngleToAxisDeg": 37.42009839650146,
+          "measuredAngleToAxisDeg": 37.42010025342704,
+          "maximumEndpointErrorMm": 0.000008826728386832439
+        },
+        {
+          "radiusMm": 228,
+          "spanFraction": 0.35714285714285715,
+          "specifiedAngleToAxisDeg": 39.86880466472303,
+          "measuredAngleToAxisDeg": 39.86880478671708,
+          "maximumEndpointErrorMm": 0.0000027973338043140126
+        },
+        {
+          "radiusMm": 243,
+          "spanFraction": 0.39285714285714285,
+          "specifiedAngleToAxisDeg": 42.42902696793003,
+          "measuredAngleToAxisDeg": 42.42902646340386,
+          "maximumEndpointErrorMm": 0.000008200447436198628
+        },
+        {
+          "radiusMm": 258,
+          "spanFraction": 0.42857142857142855,
+          "specifiedAngleToAxisDeg": 45.07288629737609,
+          "measuredAngleToAxisDeg": 45.072886456893286,
+          "maximumEndpointErrorMm": 0.000014164557125463956
+        },
+        {
+          "radiusMm": 273,
+          "spanFraction": 0.4642857142857143,
+          "specifiedAngleToAxisDeg": 47.77250364431487,
+          "measuredAngleToAxisDeg": 47.77250567754956,
+          "maximumEndpointErrorMm": 0.000008924568580270429
+        },
+        {
+          "radiusMm": 288,
+          "spanFraction": 0.5,
+          "specifiedAngleToAxisDeg": 50.5,
+          "measuredAngleToAxisDeg": 50.50000263951135,
+          "maximumEndpointErrorMm": 0.000010753112239408087
+        },
+        {
+          "radiusMm": 303,
+          "spanFraction": 0.5357142857142857,
+          "specifiedAngleToAxisDeg": 53.22749635568513,
+          "measuredAngleToAxisDeg": 53.22749508217209,
+          "maximumEndpointErrorMm": 0.000007218614598419075
+        },
+        {
+          "radiusMm": 318,
+          "spanFraction": 0.5714285714285714,
+          "specifiedAngleToAxisDeg": 55.9271137026239,
+          "measuredAngleToAxisDeg": 55.92711685317487,
+          "maximumEndpointErrorMm": 0.000011213159980632751
+        },
+        {
+          "radiusMm": 333,
+          "spanFraction": 0.6071428571428571,
+          "specifiedAngleToAxisDeg": 58.57097303206997,
+          "measuredAngleToAxisDeg": 58.57097125933724,
+          "maximumEndpointErrorMm": 0.000003685952395332442
+        },
+        {
+          "radiusMm": 348,
+          "spanFraction": 0.6428571428571429,
+          "specifiedAngleToAxisDeg": 61.13119533527697,
+          "measuredAngleToAxisDeg": 61.13119386070269,
+          "maximumEndpointErrorMm": 0.000009971067120467499
+        },
+        {
+          "radiusMm": 363,
+          "spanFraction": 0.6785714285714286,
+          "specifiedAngleToAxisDeg": 63.57990160349854,
+          "measuredAngleToAxisDeg": 63.57990278621794,
+          "maximumEndpointErrorMm": 0.000011593156561090653
+        },
+        {
+          "radiusMm": 378,
+          "spanFraction": 0.7142857142857143,
+          "specifiedAngleToAxisDeg": 65.88921282798833,
+          "measuredAngleToAxisDeg": 65.88921630773925,
+          "maximumEndpointErrorMm": 0.000006632236196606936
+        },
+        {
+          "radiusMm": 393,
+          "spanFraction": 0.75,
+          "specifiedAngleToAxisDeg": 68.03125,
+          "measuredAngleToAxisDeg": 68.03124918621268,
+          "maximumEndpointErrorMm": 0.000014804276022455832
+        },
+        {
+          "radiusMm": 408,
+          "spanFraction": 0.7857142857142857,
+          "specifiedAngleToAxisDeg": 69.97813411078718,
+          "measuredAngleToAxisDeg": 69.97813058890604,
+          "maximumEndpointErrorMm": 0.000009403650188851782
+        },
+        {
+          "radiusMm": 423,
+          "spanFraction": 0.8214285714285714,
+          "specifiedAngleToAxisDeg": 71.70198615160349,
+          "measuredAngleToAxisDeg": 71.70198215731598,
+          "maximumEndpointErrorMm": 0.000007494963987512836
+        },
+        {
+          "radiusMm": 438,
+          "spanFraction": 0.8571428571428571,
+          "specifiedAngleToAxisDeg": 73.17492711370262,
+          "measuredAngleToAxisDeg": 73.17492776411075,
+          "maximumEndpointErrorMm": 0.000013916108055733822
+        },
+        {
+          "radiusMm": 453,
+          "spanFraction": 0.8928571428571429,
+          "specifiedAngleToAxisDeg": 74.36907798833819,
+          "measuredAngleToAxisDeg": 74.3690779413732,
+          "maximumEndpointErrorMm": 0.00000802390694050686
+        },
+        {
+          "radiusMm": 468,
+          "spanFraction": 0.9285714285714286,
+          "specifiedAngleToAxisDeg": 75.25655976676384,
+          "measuredAngleToAxisDeg": 75.25655538575883,
+          "maximumEndpointErrorMm": 0.000009837156717248927
+        },
+        {
+          "radiusMm": 483,
+          "spanFraction": 0.9642857142857143,
+          "specifiedAngleToAxisDeg": 75.80949344023324,
+          "measuredAngleToAxisDeg": 75.80949141164719,
+          "maximumEndpointErrorMm": 0.000012419494932871692
+        },
+        {
+          "radiusMm": 491.3632718583675,
+          "spanFraction": 1,
+          "specifiedAngleToAxisDeg": 76,
+          "measuredAngleToAxisDeg": 75.9999987460681,
+          "maximumEndpointErrorMm": 0.000011990300305799097
+        }
+      ]
+    },
+    "fanRadialSections": [
+      {
+        "radiusMm": 125,
+        "separatedBlades": 12
+      },
+      {
+        "radiusMm": 300,
+        "separatedBlades": 12
+      },
+      {
+        "radiusMm": 470,
+        "separatedBlades": 12
+      }
+    ],
+    "fanMotionEnvelope": {
+      "radialRunningGapMm": 0.8,
+      "method": "conservative continuous rotational envelope",
+      "maximumIntersectionMm3": 0,
+      "intersections": [
+        {
+          "id": "outer-shell",
           "volumeMm3": 0
         }
       ]
@@ -1681,7 +2676,7 @@
     ],
     "returnDiaphragm": {
       "centreBlocked": true,
-      "intersectionVolumeMm3": 5.267438694435463
+      "intersectionVolumeMm3": 5.267438694435441
     },
     "blueSleeve": {
       "specifiedBoreDiameterMm": 330,
@@ -1711,7 +2706,7 @@
     "failures": []
   },
   "exportedCellGeometry": {
-    "modelBytes": 50544540,
+    "modelBytes": 77408524,
     "modules": [
       {
         "id": "stack-1-1",
@@ -1798,13 +2793,31 @@
     "maximumMeasuredInnerCoolingGap": 0.4602124767568812,
     "axialCoolingProbes": 3824,
     "maximumSolidObstruction": 0,
-    "obstructionChecks": 198,
+    "obstructionChecks": 200,
     "portCounts": {
       "air": 11,
       "hydrogen": 11,
       "return": 11,
       "cathode": 11
     },
+    "assemblyEnvelopes": [
+      {
+        "stage": 1,
+        "measuredOuterDiameter": 473.4020180501664,
+        "specifiedOuterDiameter": 473.402
+      },
+      {
+        "stage": 2,
+        "measuredOuterDiameter": 627.0020297979484,
+        "specifiedOuterDiameter": 627.002
+      },
+      {
+        "stage": 3,
+        "measuredOuterDiameter": 700.0000281521953,
+        "specifiedOuterDiameter": 700
+      }
+    ],
+    "innerCasingRear": 1387,
     "passed": true
   }
 }

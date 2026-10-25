@@ -11,7 +11,7 @@ export const parameters = {
   stacks: [
     { front: 690, rear: 972, inner: 128, outer: 236.701, cellInner: 138, cellOuter: 233.7, modules: 3, firstSeam: 30, cells: 279 },
     { front: 992, rear: 1367, inner: 234, outer: 313.501, cellInner: 244, cellOuter: 310.5, modules: 4, firstSeam: 45, cells: 372 },
-    { front: 1387, rear: 1762, inner: 234, outer: 329.001, cellInner: 244, cellOuter: 326, modules: 4, firstSeam: 45, cells: 372 },
+    { front: 1387, rear: 1762, inner: 234, outer: 350, cellInner: 244, cellOuter: 346.999, modules: 4, firstSeam: 45, cells: 372 },
   ],
   cells: { plateThickness: .55, innerCoolingGap: .46, moduleGap: 1 },
   air: { outer: 24, inner: 18, end: 1840, branchOuter: 9, branchInner: 6.5 },
@@ -19,8 +19,9 @@ export const parameters = {
   pump: { front: 1630, rear: 1680, centerZ: 70, radius: 25, bore: 4.5 },
   // Red outline: retain the fan inlet, contract to a waist, then contract again aft.
   outerShell: { front: 0, taperStart: 210, waistStart: 850, waistRadius: 410, shoulder: 1762, rear: 2012, radius: 506, outletRadius: 292, wall: 6 },
-  // Yellow outline: larger level forebody and a higher aft expansion peak.
-  innerShell: { front: 210, expansionStart: 620, midStation: 1000, midRadius: 342, shoulder: 1785, rear: 1940, inletRadius: 248, radius: 354, outletRadius: 250, wall: 5 },
+  // End on stage 3's outer front rim; its circumference and aft end stay exposed.
+  innerShell: { front: 210, expansionStart: 285, inletRadius: 248, firstStageRadius: 325,
+    secondStageRadius: 345, wall: 5, terminalWall: 2, terminalTaperLength: 52 },
   clearance: 0.8,
 };
 export const colors = {

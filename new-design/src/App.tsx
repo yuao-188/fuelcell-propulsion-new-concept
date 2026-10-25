@@ -5,7 +5,7 @@ import './styles.css';
 
 type VisibilityKey = 'outerShell' | 'innerShell' | 'intake' | 'intakeInner' | 'compressorCase' | 'stacks' | 'air' | 'hydrogen' | 'return' | 'cathodeWater' | 'anodeSeparator' | 'wiring';
 type Visibility = Record<VisibilityKey, boolean>;
-type CameraView = 'perspective' | 'side' | 'front' | 'fan' | 'machinery' | 'stacks' | 'cells' | 'water';
+type CameraView = 'perspective' | 'side' | 'front' | 'fan' | 'machinery' | 'compressor' | 'stacks' | 'cells' | 'water';
 
 const initialVisibility: Visibility = {
   outerShell: true,
@@ -52,6 +52,7 @@ export default function App() {
   const [viewMode, setViewMode] = useState<'complete' | 'cutaway'>('cutaway');
   const [sectionDepth, setSectionDepth] = useState(50);
   const [cameraView, setCameraView] = useState<CameraView>('perspective');
+  const [compressorView, setCompressorView] = useState<'passage' | 'rotors'>('passage');
   const [visibility, setVisibility] = useState<Visibility>(initialVisibility);
   const [resetKey, setResetKey] = useState(0);
 
@@ -71,6 +72,11 @@ export default function App() {
     if (view === 'cells' || view === 'water') {
       setViewMode('cutaway');
       setSectionDepth(view === 'cells' ? 45 : 37);
+    }
+    if (view === 'compressor') {
+      setViewMode('cutaway');
+      setSectionDepth(50);
+      setCompressorView('passage');
     }
     // Reapply a preset even after the user has manually orbited away from it.
     setResetKey(current => current + 1);
@@ -92,8 +98,8 @@ export default function App() {
       <main className="design-workspace">
         <section className="viewer-card" aria-label="推进构型三维模型">
           <div className="viewer-heading">
-            <div className="viewer-caption"><span className="caption-dot" />整体构型</div>
-            <div className="viewer-mode">{viewMode === 'cutaway' ? '剖切视图' : '完整视图'}</div>
+            <div className="viewer-caption"><span className="caption-dot" />{cameraView === 'compressor' ? '两级独立电驱离心压气机' : '整体构型'}</div>
+            <div className="viewer-mode">{cameraView === 'compressor' && compressorView === 'rotors' ? '叶轮与静叶' : viewMode === 'cutaway' ? '剖切视图' : '完整视图'}</div>
           </div>
 
           <div className="viewer-scene">
@@ -101,6 +107,7 @@ export default function App() {
               viewMode={viewMode}
               sectionDepth={sectionDepth}
               cameraView={cameraView}
+              compressorView={compressorView}
               showOuterShell={visibility.outerShell}
               showInnerShell={visibility.innerShell}
               showIntake={visibility.intake}
@@ -115,6 +122,16 @@ export default function App() {
               showWiring={visibility.wiring}
               resetKey={resetKey}
             />
+            {cameraView === 'compressor' && <div className="compressor-inspector">
+              <div className="compressor-modes" role="group" aria-label="压气机细节">
+                <button type="button" className={compressorView === 'passage' ? 'is-active' : ''}
+                  aria-pressed={compressorView === 'passage'} onClick={() => { setCompressorView('passage'); setViewMode('cutaway'); setSectionDepth(50); }}>流道剖面</button>
+                <button type="button" className={compressorView === 'rotors' ? 'is-active' : ''}
+                  aria-pressed={compressorView === 'rotors'} onClick={() => setCompressorView('rotors')}>叶轮与静叶</button>
+              </div>
+              <p>{compressorView === 'passage' ? '入口眼 → 一级离心叶轮 → 扩压器 → 级间回流 → 二级离心叶轮 → 出口收集段' : '银色：转子与短轴　深银色：扩压静叶、回流静叶　金色：独立电机'}</p>
+              <span>{compressorView === 'passage' ? '拖动剖切滑块查看通道内壁' : '罩壳与隔盘已隐藏，转子保持完整，可拖动旋转'}</span>
+            </div>}
           </div>
 
           <div className="viewer-bottom">
@@ -136,7 +153,9 @@ export default function App() {
                 <button type="button" className={cameraView === 'fan' ? 'is-active' : ''}
                   aria-pressed={cameraView === 'fan'} onClick={() => selectCamera('fan')}>风扇</button>
                 <button type="button" className={cameraView === 'machinery' ? 'is-active' : ''}
-                  aria-pressed={cameraView === 'machinery'} onClick={() => selectCamera('machinery')}>电机 / 增压机</button>
+                  aria-pressed={cameraView === 'machinery'} onClick={() => selectCamera('machinery')}>前端总成</button>
+                <button type="button" className={cameraView === 'compressor' ? 'is-active' : ''}
+                  aria-pressed={cameraView === 'compressor'} onClick={() => selectCamera('compressor')}>压气机通道</button>
                 <button type="button" className={cameraView === 'stacks' ? 'is-active' : ''}
                   aria-pressed={cameraView === 'stacks'} onClick={() => selectCamera('stacks')}>电堆</button>
                 <button type="button" className={cameraView === 'cells' ? 'is-active' : ''}
@@ -167,7 +186,7 @@ export default function App() {
                 <Layers size={16} strokeWidth={1.6} />剖切
               </button>
             </div>
-            {viewMode === 'cutaway' && (
+            {viewMode === 'cutaway' && !(cameraView === 'compressor' && compressorView === 'rotors') && (
               <div className="depth-control">
                 <div className="depth-heading">
                   <label htmlFor="section-depth">剖切深度</label>
@@ -197,7 +216,7 @@ export default function App() {
                     </button>
                   ))}
                 </div>
-                <p className="depth-scope" id="section-depth-scope">剖切壳体、电堆与管路；完整模式查看全部连接</p>
+                <p className="depth-scope" id="section-depth-scope">{cameraView === 'compressor' ? '沿压气机径向剖切，查看各级叶间通道与回流结构' : '剖切壳体、电堆与管路；完整模式查看全部连接'}</p>
               </div>
             )}
           </section>
@@ -206,7 +225,7 @@ export default function App() {
             <h3 id="structure-label">结构部件</h3>
             <div className="layer-list">
               <LayerToggle label="外壳" color="swatch-outer" checked={visibility.outerShell} onChange={() => toggleLayer('outerShell')} />
-              <LayerToggle label="整机内壳" detail="水平延伸 · 连续渐扩与收缩" color="swatch-inner" checked={visibility.innerShell} onChange={() => toggleLayer('innerShell')} />
+              <LayerToggle label="整机内壳" detail="提前渐扩 · 止于三级前端外缘" color="swatch-inner" checked={visibility.innerShell} onChange={() => toggleLayer('innerShell')} />
               <LayerToggle label="引气外筒" detail="内外筒之间形成环形引气道" color="swatch-intake" checked={visibility.intake} onChange={() => toggleLayer('intake')} />
               <LayerToggle label="引气内筒" detail="包围电机 · 前后均开口" color="swatch-intake-inner" checked={visibility.intakeInner} onChange={() => toggleLayer('intakeInner')} />
               <LayerToggle label="黄色压气机外壳" detail="双级独立电驱 · 级间回流静叶" color="swatch-compressor" checked={visibility.compressorCase} onChange={() => toggleLayer('compressorCase')} />
@@ -246,10 +265,10 @@ export default function App() {
                   <tr><th scope="row">主电机</th><td>Φ300 × 193</td></tr>
                   <tr><th scope="row">第一级</th><td>Φ256 / Φ473.402 × 282</td></tr>
                   <tr><th scope="row">第二级</th><td>Φ468 / Φ627.002 × 375</td></tr>
-                  <tr><th scope="row">第三级</th><td>Φ468 / Φ658.002 × 375</td></tr>
+                  <tr><th scope="row">第三级</th><td>Φ468 / Φ700 × 375</td></tr>
                   <tr><th scope="row">一级片组</th><td>Φ276 / Φ467.4</td></tr>
                   <tr><th scope="row">二级片组</th><td>Φ488 / Φ621</td></tr>
-                  <tr><th scope="row">三级片组</th><td>Φ488 / Φ652</td></tr>
+                  <tr><th scope="row">三级片组</th><td>Φ488 / Φ693.998</td></tr>
                   <tr><th scope="row">每模块片数</th><td>279 / 372 / 372</td></tr>
                   <tr><th scope="row">实体片总数</th><td>3813</td></tr>
                 </tbody>

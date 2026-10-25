@@ -23,13 +23,13 @@ export function buildFluidNetworks({ M, P, C, union, cylinder, tubePath, roundPa
 
   // A directly meshed circular sweep keeps the numerous curved manifolds
   // inexpensive. Closed rings share their seam vertices; module arcs have caps.
-  function arc(x, radius, start, end, tube, closed = false) {
+  function arc(x, radius, start, end, tube, closed = false, radialTube = tube) {
     const steps = Math.ceil(Math.abs(end - start) / 3), sides = 20;
     const rows = closed ? steps : steps + 1, vertices = [], faces = [];
     for (let i = 0; i < rows; i++) {
       const t = (start + (end - start) * i / steps) * rad;
       for (let j = 0; j < sides; j++) {
-        const p = j * 2 * Math.PI / sides, r = radius + tube * Math.sin(p);
+        const p = j * 2 * Math.PI / sides, r = radius + radialTube * Math.sin(p);
         vertices.push(x + tube * Math.cos(p), r * Math.cos(t), r * Math.sin(t));
       }
     }
@@ -48,6 +48,33 @@ export function buildFluidNetworks({ M, P, C, union, cylinder, tubePath, roundPa
     }
     const solid = M.ofMesh({ numProp: 3, vertProperties: new Float32Array(vertices), triVerts: new Uint32Array(faces) });
     if (solid.status() !== 'NoError' || solid.volume() <= 0) throw new Error('Invalid fluid arc');
+    return solid;
+  }
+
+  // A radial loft changes from a round hose to a narrow oval rear spoke. The
+  // narrow section stays behind a circumferential end plate, leaving all of the
+  // active axial cooling outlets unobstructed. The same loft also makes the
+  // round-to-flat inlet inside the 3 mm outer frame.
+  function radialLoft(x, angle, stations) {
+    const theta = angle * rad, c = Math.cos(theta), q = Math.sin(theta);
+    const sides = 32, vertices = [], faces = [];
+    for (const [radius, axial, tangent] of stations) for (let j = 0; j < sides; j++) {
+      const p = j * 2 * Math.PI / sides, t = tangent * Math.sin(p);
+      vertices.push(x + axial * Math.cos(p), radius * c + t * q, radius * q - t * c);
+    }
+    for (let i = 0; i < stations.length - 1; i++) for (let j = 0; j < sides; j++) {
+      const a = i * sides + j, b = i * sides + (j + 1) % sides;
+      const d = (i + 1) * sides + j, e = (i + 1) * sides + (j + 1) % sides;
+      faces.push(a, b, e, a, e, d);
+    }
+    const first = vertices.length / 3; vertices.push(...polar(x, stations[0][0], angle));
+    const last = vertices.length / 3; vertices.push(...polar(x, stations.at(-1)[0], angle));
+    for (let j = 0; j < sides; j++) {
+      faces.push(first, (j + 1) % sides, j);
+      faces.push(last, (stations.length - 1) * sides + j, (stations.length - 1) * sides + (j + 1) % sides);
+    }
+    const solid = M.ofMesh({ numProp: 3, vertProperties: new Float32Array(vertices), triVerts: new Uint32Array(faces) });
+    if (solid.status() !== 'NoError' || solid.volume() <= 0) throw new Error('Invalid radial hydrogen loft');
     return solid;
   }
 
@@ -71,11 +98,11 @@ export function buildFluidNetworks({ M, P, C, union, cylinder, tubePath, roundPa
     if (stage !== undefined) cutters[stage].push(tubePath(pp, outer + margin));
     return { outer: wall, bore, points: pp };
   }
-  function manifold(key, x, radius, start, end, outer, inner, stage, closed = false) {
+  function manifold(key, x, radius, start, end, outer, inner, stage, closed = false, openStart = false) {
     const wall = arc(x, radius, start, end, outer, closed);
     // Unused ends of an independent module manifold remain sealed.
     const inset = closed ? 0 : .9 / radius / rad;
-    const bore = arc(x, radius, start + inset, end - inset, inner, closed);
+    const bore = arc(x, radius, start + (openStart ? 0 : inset), end - inset, inner, closed);
     networks[key].outer.push(wall); networks[key].voids.push(bore);
     if (stage !== undefined) cutters[stage].push(arc(x, radius, start, end, outer + margin, closed));
     return { outer: wall, bore };
@@ -109,9 +136,11 @@ export function buildFluidNetworks({ M, P, C, union, cylinder, tubePath, roundPa
 
     for (const module of layout.modules) {
       const j = module.index, theta = module.centre, start = module.caseStart + 4, end = module.caseEnd - 4;
+      const feedTheta = (module.caseStart + module.activeStart - layout.sealAngle) / 2;
+      const feedPortTheta = feedTheta + 3;
       const airArc = manifold('air', airX, root, start, end, 4, 2.6, i);
       const wetArc = manifold('cathode', wetX, root, start, end, 4, 2.6, i);
-      const feedArc = manifold('feed', internalFeedX, root, start, end, 3, 1.8, i);
+      const feedArc = manifold('feed', internalFeedX, root, feedTheta, end, 3, 1.8, i, false, true);
       const returnArc = manifold('return', internalReturnX, root, start, end, 3, 1.8, i);
 
       // Large radial ports end flat inside the root rail, never in a large
@@ -120,8 +149,44 @@ export function buildFluidNetworks({ M, P, C, union, cylinder, tubePath, roundPa
       const airBranch = path('air', [[airX, 0, 0], polar(airX, root, theta)], 9, 6.5, { stage: i, end: .8 });
       const wetBranch = path('cathode', [polar(wetX, 85, theta - 15), polar(wetX, root, theta - 15)], 7, 4.5,
         { stage: i, end: .8 });
-      const feedBranch = path('feed', [polar(feedX, 50, theta), polar(feedX, root, theta), polar(internalFeedX, root, theta)],
-        3.8, 2.2, { stage: i, end: .8, rounded: 5 });
+      // All 11 supply interfaces now enter the OUTSIDE cylindrical face. The
+      // core spoke first turns around the return/wet headers, then follows the
+      // projected side end plate behind the stack as a thin oval duct. It does
+      // not run across any active cell outlet. A round outside elbow finally
+      // enters a recessed radial seat in the outer frame.
+      // The last-stage bend also skirts the cathode separator's low drain leg.
+      const coreRadius = s.inner - (i === P.stacks.length - 1 ? 6 : 14);
+      const feedCore = path('feed', [polar(feedX, 50, theta), polar(feedX, coreRadius, theta)], 3.8, 2.2);
+      const feedTurn = manifold('feed', feedX, coreRadius, feedTheta, theta, 3.8, 2.2);
+      const spokeOuter = radialLoft(feedX, feedTheta, [
+        [coreRadius, 3.8, 3.8], [s.inner - 2, 3.8, .7], [s.outer + .8, 3.8, .7], [s.outer + 5, 3.8, 3.8],
+      ]);
+      const spokeBore = radialLoft(feedX, feedTheta, [
+        [coreRadius - .15, 2.2, 2.2], [s.inner - 2, 2.2, .3], [s.outer + .8, 2.2, .3], [s.outer + 5.15, 2.2, 2.2],
+      ]);
+      networks.feed.outer.push(spokeOuter); networks.feed.voids.push(spokeBore);
+      const outsidePoints = [polar(feedX, s.outer + 5, feedTheta), polar(feedX, s.outer + 7, feedTheta),
+        polar(internalFeedX, s.outer + 7, feedTheta)];
+      for (let k = 1; k <= 6; k++) outsidePoints.push(polar(internalFeedX, s.outer + 7, feedTheta + 3 * k / 6));
+      outsidePoints.push(polar(internalFeedX, s.outer - 1.5, feedPortTheta));
+      const feedOutside = path('feed', outsidePoints, 3.8, 2.2, { stage: i, rounded: 3, end: .8 });
+      networks.feed.outer.push(cylinder(polar(internalFeedX, s.outer + .05, feedPortTheta),
+        polar(internalFeedX, s.outer + 2.8, feedPortTheta), 5.2, 5.2, 6));
+      // Move the round coupling away from the module seam. An oval metal tube
+      // within the outside rail crosses the insulating-strip seat with its own
+      // continuous pressure wall, then opens into the end-plate passage.
+      const outsideArc = arc(internalFeedX, s.outer - 1, feedTheta, feedPortTheta, 3.8, false, .85);
+      const outsideArcBore = arc(internalFeedX, s.outer - 1, feedTheta, feedPortTheta, 2.2, false, .4);
+      networks.feed.outer.push(outsideArc); networks.feed.voids.push(outsideArcBore);
+      cutters[i].push(arc(internalFeedX, s.outer - 1, feedTheta, feedPortTheta, 3.825, false, .875));
+      // Only a thin closed passage is bored through the side end plate. The
+      // circle flattens before reaching the cell tips, and never cuts a plate or
+      // its cooling gap. The corresponding fastener is a pair of short screws.
+      const feedEndPlateBore = radialLoft(internalFeedX, feedTheta, [
+        [root - .2, 2.2, .4], [s.outer - 1, 2.2, .4],
+      ]);
+      networks.feed.voids.push(feedEndPlateBore); cutters[i].push(feedEndPlateBore);
+      const feedBranch = { bore: union([feedCore.bore, feedTurn.bore, spokeBore, feedOutside.bore, outsideArcBore, feedEndPlateBore]) };
       const returnBranch = path('return', [polar(returnX, 120, theta), polar(returnX, root, theta), polar(internalReturnX, root, theta)],
         3.8, 2.2, { stage: i, end: .8, rounded: 4 });
 
@@ -139,7 +204,7 @@ export function buildFluidNetworks({ M, P, C, union, cylinder, tubePath, roundPa
       for (const [fluid, x, r, angle, direction, inner, outer] of [
         ['air', airX, s.inner, theta, [0, Math.cos(theta * rad), Math.sin(theta * rad)], 6.5, 9],
         ['cathode', wetX, s.inner, theta - 15, [0, -Math.cos((theta - 15) * rad), -Math.sin((theta - 15) * rad)], 4.5, 7],
-        ['hydrogen', s.rear, root, theta, [-1, 0, 0], 2.2, 3.8],
+        ['hydrogen', internalFeedX, s.outer, feedPortTheta, [0, -Math.cos(feedPortTheta * rad), -Math.sin(feedPortTheta * rad)], 2.2, 3.8],
         ['return', s.front, root, theta, [-1, 0, 0], 2.2, 3.8],
       ]) ports.push({ id: `${fluid}-${i + 1}-${j + 1}`, fluid, medium: fluid, stage: i + 1, module: j + 1,
         position: polar(x, r, angle), direction, inner, outer });
@@ -152,7 +217,10 @@ export function buildFluidNetworks({ M, P, C, union, cylinder, tubePath, roundPa
         ['return-channel', anodeOut.bore, returnArc.bore], ['return-port', returnArc.bore, returnBranch.bore],
       ]) junctionChecks.push({ name: `${i + 1}-${j + 1}-${name}`, a, b });
       moduleChecks.push({ stage: i + 1, module: j + 1, rootRadius: root, airX, wetX,
-        internalFeedX, internalReturnX, manifoldAngles: [start, end], cathodeRepresentativeLength: wetX - airX });
+        internalFeedX, internalReturnX, manifoldAngles: [start, end], cathodeRepresentativeLength: wetX - airX,
+        hydrogenInlet: { face: 'outer cylindrical face', radius: s.outer, angle: feedPortTheta, endPlateAngle: feedTheta, x: internalFeedX,
+          direction: 'radially inward', rearSpokeTangentialWidth: 1.4, endPlateBoreTangentialWidth: .8,
+          endPlateBoreAxialWidth: 4.4, maximumExternalRadius: s.outer + 10.8 } });
     }
   }
 
@@ -175,12 +243,26 @@ export function buildFluidNetworks({ M, P, C, union, cylinder, tubePath, roundPa
     { rounded: 8, separatorStart: true });
 
   const bores = Object.fromEntries(keys.map(k => [k, union(networks[k].voids)]));
+  const hydrogenSeamChecks = [];
+  for (const [i, s] of P.stacks.entries()) {
+    const layout = getStackLayout(s);
+    for (const module of layout.modules) {
+      // The tiny inter-module wedge is convex. Its eight corners define the
+      // actual faceted gap, including the complete stack axial length.
+      const gap = M.hull([s.front, s.rear].flatMap(x => [s.inner, s.outer].flatMap(radius =>
+        [module.caseStart - layout.gapAngle, module.caseStart].map(angle => polar(x, radius, angle)))));
+      const leakage = gap.intersect(bores.feed), volume = Math.max(0, leakage.volume());
+      leakage.delete(); gap.delete();
+      hydrogenSeamChecks.push({ stage: i + 1, module: module.index + 1, feedBoreIntersectionVolume: volume });
+      if (volume > .001) throw new Error(`Hydrogen inlet opens into module seam ${i + 1}-${module.index + 1}: ${volume}`);
+    }
+  }
   const fullCathode = union([bores.air, bores.cathode]);
   const fullAnode = union([bores.feed, bores.return]);
   const color = { air: C.air, cathode: C.cathode ?? '#66a5b5', feed: C.hydrogen, return: C.return };
   const groups = { air: 'air', cathode: 'cathodeExhaust', feed: 'hydrogen', return: 'return' };
   const names = { air: '空气主管 · 11模块独立进气支路', cathode: '11模块阴极湿尾气 · 分离器连接',
-    feed: '氢气供给 · 11模块独立支路', return: '11模块阳极回气 · 除水后进循环泵' };
+    feed: '氢气供给 · 11路外圆径向进堆', return: '11模块阳极回气 · 除水后进循环泵' };
   const solids = {};
   for (const key of keys) {
     // Both halves of each colour boundary use the same full fluid cavity.
@@ -193,6 +275,9 @@ export function buildFluidNetworks({ M, P, C, union, cylinder, tubePath, roundPa
     junctionChecks, solids,
     checks: { units: 'mm', independentModules: 11, portCounts: { air: 11, cathode: 11, hydrogen: 11, return: 11 },
       moduleManifoldsAreIsolatedArcs: true, manifoldRootOffset: 5, modules: moduleChecks,
+      hydrogenInletFace: 'outer cylindrical face, radial inward', hydrogenReturnFace: 'front face unchanged',
+      hydrogenEndPlatePassages: 11, activeCoolingFacesCrossedByHydrogenSpokes: false,
+      hydrogenSeamChecks,
       internalChannelStatus: 'representative module connectivity; axial cooling gaps remain open',
       feedHeader: { radius: 70, angle: 45 }, returnHeader: { radius: 70, angle: 225 },
       wetHeader: { radius: 95, angle: 315 }, wetSeparatorRouteRadius: 125 },

@@ -1,3 +1,5 @@
+import { getInnerShellLayout } from './inner-shell-layout.mjs';
+
 /**
  * Continuous casing envelopes with recessed assembly details.
  * Dimensions are in mm. Detail pieces are seated in explicit matching pockets;
@@ -8,9 +10,8 @@ export function buildDetailedShells({ M, CS, P, union, cylinder, revolved, polar
   const relief = .025;
   const smooth = t => t * t * (3 - 2 * t);
   const expansionStart = ins.expansionStart;
-  if (!(ins.front < expansionStart && expansionStart < ins.shoulder && ins.shoulder < ins.rear)) {
-    throw new Error('innerShell requires front < expansionStart < shoulder < rear');
-  }
+  const innerLayout = getInnerShellLayout(P);
+  if (!(ins.front < expansionStart && expansionStart < P.stacks[0].front)) throw new Error('Invalid inner casing expansion station');
   if (!(os.front + 25 <= os.taperStart && os.taperStart < os.waistStart
       && os.waistStart < os.shoulder && os.shoulder < os.rear)) {
     throw new Error('outerShell requires inlet < taperStart < waistStart < shoulder < rear');
@@ -36,28 +37,11 @@ export function buildDetailedShells({ M, CS, P, union, cylinder, revolved, polar
       os.waistRadius + (os.outletRadius - os.waistRadius) * smooth(t)]);
   }
 
-  // Cubic Hermite transitions have exactly zero slope at every join. Unlike a
-  // linear loft, this retains a level forward section and no expansion shoulder.
-  const midStation = ins.midStation ?? ins.shoulder;
-  const midRadius = ins.midRadius ?? ins.radius;
-  const innerRadius = x => x <= expansionStart ? ins.inletRadius
-    : x <= midStation ? ins.inletRadius + (midRadius - ins.inletRadius)
-      * smooth((x - expansionStart) / (midStation - expansionStart))
-    : x <= ins.shoulder ? midRadius + (ins.radius - midRadius)
-      * smooth((x - midStation) / (ins.shoulder - midStation))
-      : ins.radius + (ins.outletRadius - ins.radius)
-      * smooth((x - ins.shoulder) / (ins.rear - ins.shoulder));
-  const innerProfile = [[ins.front, ins.inletRadius], [expansionStart, ins.inletRadius]];
-  for (let i = 1; i <= 96; i++) {
-    const x = expansionStart + (ins.shoulder - expansionStart) * i / 96;
-    innerProfile.push([x, innerRadius(x)]);
-  }
-  for (let i = 1; i <= 40; i++) {
-    const x = ins.shoulder + (ins.rear - ins.shoulder) * i / 40;
-    innerProfile.push([x, innerRadius(x)]);
-  }
+  // The grey casing ends at the third-stage front frame. It has no material
+  // around that stack or downstream of it; the thin lip meets its endface only.
+  const innerProfile = innerLayout.profile;
   const outerEnvelope = revolved(outerProfile, os.wall);
-  const innerEnvelope = revolved(innerProfile, ins.wall);
+  const innerEnvelope = revolved(innerProfile, innerLayout.wallAt);
 
   // All machining details use the same sampled surface as the body. Inserting
   // exact boundary stations preserves that piecewise-linear envelope at seats.
@@ -94,6 +78,9 @@ export function buildDetailedShells({ M, CS, P, union, cylinder, revolved, polar
   };
   const axialSlice = (front, rear, radius) => cylinder([front, 0, 0], [rear, 0, 0], radius, radius, 144);
   const outerCuts = [], innerCuts = [], outerScrews = [], innerScrews = [];
+  const eg = innerLayout.egress;
+  innerCuts.push(cylinder(polar(eg.x, eg.innerRadius - 1, eg.angle),
+    polar(eg.x, eg.outerRadius + 1, eg.angle), eg.holeRadius, eg.holeRadius, 40));
 
   // End trim is taken from the existing lip and nozzle material. Axial relief
   // keeps the separately exported parts disjoint after Float32 mesh conversion.
@@ -157,8 +144,7 @@ export function buildDetailedShells({ M, CS, P, union, cylinder, revolved, polar
         outerEnvelope, outerCuts, outerScrews);
     }
   }
-  // The inner casing remains one connected, continuous shell. Only the front
-  // inspection fasteners are inset, within the flat-radius portion of its wall.
+  // Front fasteners sit in the unchanged, full-thickness stator support region.
   for (let j = 0; j < 8; j++) {
     countersunk(ins.front + 15, ins.inletRadius, 0, 22.5 + j * 45, 2.4, 1.5,
       innerEnvelope, innerCuts, innerScrews);
@@ -173,7 +159,7 @@ export function buildDetailedShells({ M, CS, P, union, cylinder, revolved, polar
     { clip: true, metallic: .82, roughness: .37, finish: 'satin-aluminium' });
   add('outer-shell-fasteners', '机匣沉头内六角紧固件', 'outerShell', '#596975', union(outerScrews),
     { clip: true, metallic: .88, roughness: .25 });
-  add('inner-shell', '等径前段与连续渐扩收缩内壳', 'innerShell', '#8897a2',
+  add('inner-shell', '提前渐扩内壳 · 接第三级前端外框', 'innerShell', '#8897a2',
     innerEnvelope.subtract(union(innerCuts)),
     { clip: true, metallic: .78, roughness: .32, finish: 'satin-aluminium' });
   add('inner-shell-fasteners', '内壳前端沉头检修紧固件', 'innerShell', '#c1cbd1', union(innerScrews),
@@ -185,13 +171,20 @@ export function buildDetailedShells({ M, CS, P, union, cylinder, revolved, polar
   const minimumAt = (stations, gapAt) => stations.map(x => ({ x, gap: gapAt(x) }))
     .reduce((a, b) => a.gap < b.gap ? a : b);
   const stackClearances = P.stacks.map((s, i) => {
-    const stations = [s.front, s.rear, ...innerProfile.filter(p => p[0] > s.front && p[0] < s.rear).map(p => p[0])];
-    const minimum = minimumAt(stations, x => (sampledRadius(innerProfile, x) - ins.wall) * polygonFactor - s.outer);
+    if (s.front >= innerLayout.rear) return { stage: i + 1, enclosed: false,
+      frontRimContact: s.front === innerLayout.rear, casingAfterFront: false };
+    const rear = Math.min(s.rear, innerLayout.rear);
+    const stations = [s.front, rear, ...innerProfile.filter(p => p[0] > s.front && p[0] < rear).map(p => p[0])];
+    const minimum = minimumAt(stations, x => (sampledRadius(innerProfile, x) - innerLayout.wallAt(x)) * polygonFactor - s.outer);
     if (minimum.gap < P.clearance) throw new Error(`Inner casing clearance too small at stack ${i + 1}: ${minimum.gap}`);
-    return { stage: i + 1, minimumRadialClearance: minimum.gap, x: minimum.x,
-      rearRadialClearance: (sampledRadius(innerProfile, s.rear) - ins.wall) * polygonFactor - s.outer };
+    return { stage: i + 1, enclosed: true, minimumRadialClearance: minimum.gap, x: minimum.x,
+      rearRadialClearance: (sampledRadius(innerProfile, rear) - innerLayout.wallAt(rear)) * polygonFactor - s.outer };
   });
-  const overlapFront = Math.max(ins.front, os.front), overlapRear = Math.min(ins.rear, os.rear);
+  const lastStack = P.stacks.at(-1);
+  const terminalCoolingClearance = (lastStack.outer - innerLayout.terminalWall) * polygonFactor
+    - Math.hypot(lastStack.cellOuter, P.cells.plateThickness / 2);
+  if (terminalCoolingClearance < P.clearance) throw new Error('Inner-shell terminal lip obstructs third-stage cooling channels');
+  const overlapFront = Math.max(ins.front, os.front), overlapRear = Math.min(innerLayout.rear, os.rear);
   const shellStations = [overlapFront, overlapRear, ...[...outerProfile, ...innerProfile]
     .filter(p => p[0] > overlapFront && p[0] < overlapRear).map(p => p[0])];
   const shellGap = minimumAt(shellStations, x => (sampledRadius(outerProfile, x) - os.wall)
@@ -209,11 +202,15 @@ export function buildDetailedShells({ M, CS, P, union, cylinder, revolved, polar
   return {
     profiles: { outer: outerProfile, inner: innerProfile },
     verification: {
-      innerCurve: 'cubic Hermite, zero slope at expansionStart, shoulder and rear',
+      innerCurve: 'monotone cubic Hermite; level stator support, early expansion, third-stage front-rim endface contact',
       outerCurve: 'preserved fan inlet; cubic Hermite contraction, constant waist, cubic Hermite tail contraction',
       outerWaist: { front: os.waistStart, rear: os.shoulder, radius: os.waistRadius },
       innerConstantRadius: { front: ins.front, rear: expansionStart, radius: ins.inletRadius },
       innerWall: ins.wall, stackClearances, seamStations,
+      innerTerminal: { x: innerLayout.rear, outerRadius: lastStack.outer, wall: innerLayout.terminalWall,
+        coolingRadialClearance: terminalCoolingClearance, contact: 'stage 3 outer frame endface only',
+        casingAroundStage3: false, aftCasing: false },
+      wiringFeedthrough: { x: eg.x, angle: eg.angle, boreRadius: eg.holeRadius },
       fanSweptClearance: { front: P.fan.front, rear: P.fan.rear, radius: P.fan.radius,
         minimumRadialClearance: fanGap.gap, x: fanGap.x, intersectionVolume: sweptOverlapVolume },
       interShellClearance: { minimumRadialClearance: shellGap.gap, x: shellGap.x },

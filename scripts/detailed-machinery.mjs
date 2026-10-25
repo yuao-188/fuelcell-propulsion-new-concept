@@ -1,5 +1,23 @@
 import { buildTwoStageCompressor } from './two-stage-compressor.mjs';
 
+/** Physical chord stations, with the angle measured from the engine axis. */
+export function fanBladeSections(F) {
+  const smooth = t => t * t * (3 - 2 * t), lerp = (a, b, t) => a + (b - a) * t;
+  return Array.from({ length: 29 }, (_, k) => {
+    const s = k / 28;
+    const chord = s <= .45
+      ? lerp(F.hubRadius * .60, F.radius * .273, smooth(s / .45))
+      : lerp(F.radius * .273, F.radius * .285, smooth((s - .45) / .55));
+    const angleToAxisDeg = lerp(25, 76, smooth(s));
+    // Move the root slightly aft so its longer axial projection remains behind
+    // the conical spinner. No airfoil coordinate is flattened by an axial clamp.
+    const centreX = F.x + F.hubRadius * .1 * (1 - s) ** 2;
+    const radius = Math.min(lerp(F.hubRadius * .78, F.radius, s),
+      Math.sqrt((F.radius - .25) ** 2 - (.56 * chord) ** 2));
+    return { span: s, chord, angleToAxisDeg, centreX, radius, sweep: .035 + .23 * s * s };
+  });
+}
+
 /**
  * Detailed, watertight front machinery. All installation envelopes come from P.
  * Blade sections, bolts, cooling ribs and the centrifugal impeller are schematic
@@ -11,7 +29,6 @@ import { buildTwoStageCompressor } from './two-stage-compressor.mjs';
 export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved, sector, add }) {
   const tau = Math.PI * 2;
   const lerp = (a, b, t) => a + (b - a) * t;
-  const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
   const smooth = t => t * t * (3 - 2 * t);
   const axisCylinder = (a, b, r, n = 96) => cylinder([a, 0, 0], [b, 0, 0], r, r, n);
   const metal = { metallic: .83, roughness: .27, finish: 'machined' };
@@ -54,31 +71,21 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
     for (let j = 0; j <= chordSegments; j++) perimeter.push([(1 - Math.cos(j * Math.PI / chordSegments)) / 2, 1]);
     for (let j = chordSegments - 1; j > 0; j--) perimeter.push([(1 - Math.cos(j * Math.PI / chordSegments)) / 2, -1]);
     const vertices = [], triangles = [], ringSize = perimeter.length;
-    const fanFront = F.front ?? (F.x - (P.motorHousing.front - F.x));
-    const fanRear = F.rear ?? P.motorHousing.front;
-    const halfAxial = Math.min(F.x - fanFront, fanRear - F.x) * .86;
-    const rootRadius = F.hubRadius * .78;
-    for (let k = 0; k <= spanSegments; k++) {
-      const s = k / spanSegments;
+    for (const section of fanBladeSections(F)) {
       // The visible midspan and tip have similar chord. Only the buried/root
       // region narrows enough to keep twelve neighbouring blades separate.
-      const chord = s <= .45
-        ? lerp(F.hubRadius * .60, F.radius * .273, smooth(s / .45))
-        : lerp(F.radius * .273, F.radius * .285, smooth((s - .45) / .55));
-      const beta = lerp(36, 17, s) * Math.PI / 180;
-      const sweep = .035 + .23 * s * s;
+      const { chord, centreX, radius: radial, sweep } = section;
+      const beta = (90 - section.angleToAxisDeg) * Math.PI / 180;
       // Tangential section coordinates increase the swept radius. The centre
       // is pulled inward near the tip so every vertex stays within F.radius.
-      const radial = Math.min(lerp(rootRadius, F.radius, s),
-        Math.sqrt((F.radius - .25) ** 2 - (.56 * chord) ** 2));
       for (const [u, side] of perimeter) {
         const q = chord * (u - .48);
         const thickness = 5 * .105 * chord * Math.max(0,
           .2969 * Math.sqrt(u) - .1260 * u - .3516 * u ** 2 + .2843 * u ** 3 - .1036 * u ** 4);
         const normal = side * thickness + .018 * chord * Math.sin(Math.PI * u);
         const tangential = q * Math.cos(beta) - normal * Math.sin(beta);
-        const axial = clamp(q * Math.sin(beta) + normal * Math.cos(beta), -halfAxial, halfAxial);
-        vertices.push(F.x + axial, radial * Math.cos(sweep) - tangential * Math.sin(sweep),
+        const axial = q * Math.sin(beta) + normal * Math.cos(beta);
+        vertices.push(centreX + axial, radial * Math.cos(sweep) - tangential * Math.sin(sweep),
           radial * Math.sin(sweep) + tangential * Math.cos(sweep));
       }
     }
@@ -113,7 +120,8 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
   const hubGroove = axisCylinder(grooveFront, grooveRear, F.hubRadius + .2)
     .subtract(axisCylinder(grooveFront - .1, grooveRear + .1, F.hubRadius * .978));
   const fanSolid = union(fanPieces).subtract(hubGroove);
-  add('fan', '十二叶宽弦后掠扭转风扇', 'front', steel, fanSolid, { ...metal, rotor: 'main', bladeCount: fanBladeCount });
+  add('fan', '十二叶后掠扭转风扇 · 叶根25°至叶尖76°', 'front', steel, fanSolid,
+    { ...metal, rotor: 'main', bladeCount: fanBladeCount, rootChordAngleToAxis: 25, tipChordAngleToAxis: 76 });
 
   const nose = [];
   for (let i = 0; i <= 28; i++) {

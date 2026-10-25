@@ -6,7 +6,8 @@ import { createEngineeringMaterials } from './materials';
 
 type Props = {
   viewMode: 'complete' | 'cutaway'; sectionDepth: number;
-  cameraView: 'perspective' | 'side' | 'front' | 'fan' | 'machinery' | 'stacks' | 'cells' | 'water';
+  cameraView: 'perspective' | 'side' | 'front' | 'fan' | 'machinery' | 'compressor' | 'stacks' | 'cells' | 'water';
+  compressorView: 'passage' | 'rotors';
   showOuterShell: boolean; showInnerShell: boolean; showStacks: boolean;
   showIntake: boolean; showIntakeInner: boolean; showCompressorCase: boolean;
   showAir: boolean; showHydrogen: boolean; showReturn: boolean;
@@ -32,6 +33,26 @@ export default function ModelViewport(props: Props) {
     renderer.shadowMap.type=THREE.PCFSoftShadowMap;
     renderer.domElement.setAttribute('aria-label','燃料电池推进系统三维模型，可拖动旋转、滚轮缩放');
     element.appendChild(renderer.domElement);
+    // Labels point to physical components and move with the camera. They do
+    // not create another solid or cover the real flow-passage geometry.
+    const svgNS='http://www.w3.org/2000/svg';
+    const callouts=document.createElementNS(svgNS,'svg');
+    callouts.setAttribute('class','compressor-callouts');callouts.setAttribute('aria-hidden','true');
+    element.appendChild(callouts);
+    const anchors:[string,number[],number,boolean][]=[
+      ['一级离心叶轮',[541,95,-35],.38,false],
+      ['一级扩压静叶',[541,155,-20],.52,false],
+      ['级间回流静叶',[565,105,-30],.66,false],
+      ['二级离心叶轮',[606,75,-35],.38,true],
+      ['二级扩压静叶',[608,126,-20],.52,true],
+      ['出口 → 空气主管',[681,18,0],.66,true],
+    ];
+    const calloutItems=anchors.map(([label,point,row,rightSide])=>{
+      const group=document.createElementNS(svgNS,'g'), line=document.createElementNS(svgNS,'polyline');
+      const dot=document.createElementNS(svgNS,'circle'), text=document.createElementNS(svgNS,'text');
+      text.textContent=label;dot.setAttribute('r','2.3');group.append(line,dot,text);callouts.append(group);
+      return {point:new THREE.Vector3(...point),row,rightSide,group,line,dot,text};
+    });
     const scene=new THREE.Scene(); scene.background=new THREE.Color('#e9eef1');
     const finishes=createEngineeringMaterials(renderer);
     const camera=new THREE.PerspectiveCamera(30,1,1,18000);
@@ -84,8 +105,8 @@ export default function ModelViewport(props: Props) {
     let priorReset=-1,priorCamera='',priorMode='',priorDepth=-1,priorVisibility='';
     function fit() {
       const view=latest.current.cameraView;
-      const direction=view==='side'?new THREE.Vector3(0,0,1):view==='front'?new THREE.Vector3(-1,0,0):view==='fan'?new THREE.Vector3(-1,.17,.5).normalize():view==='machinery'?new THREE.Vector3(.2,.18,1).normalize():view==='cells'?new THREE.Vector3(-1,.28,.9).normalize():view==='water'?new THREE.Vector3(.25,.2,1).normalize():new THREE.Vector3(-.52,.30,1).normalize();
-      let box=view==='fan'?[[40,220],[-505,505],[-505,505]]:view==='machinery'?[[205,705],[-180,180],[-180,180]]:view==='stacks'?[[680,1780],[-340,340],[-340,340]]:view==='cells'?[[680,910],[90,240],[-140,35]]:view==='water'?[[1480,1900],[-180,100],[-120,220]]:[[-12,2030],[-525,525],[-525,525]];
+      const direction=view==='side'?new THREE.Vector3(0,0,1):view==='front'?new THREE.Vector3(-1,0,0):view==='fan'?new THREE.Vector3(-1,.17,.5).normalize():view==='compressor'?(latest.current.compressorView==='rotors'?new THREE.Vector3(-1,.25,1.6).normalize():new THREE.Vector3(-.08,.08,1).normalize()):view==='machinery'?new THREE.Vector3(.2,.18,1).normalize():view==='cells'?new THREE.Vector3(-1,.28,.9).normalize():view==='water'?new THREE.Vector3(.25,.2,1).normalize():new THREE.Vector3(-.52,.30,1).normalize();
+      let box=view==='fan'?[[40,220],[-505,505],[-505,505]]:view==='compressor'?[[465,705],[-185,230],[-180,180]]:view==='machinery'?[[205,705],[-180,180],[-180,180]]:view==='stacks'?[[680,1780],[-365,365],[-365,365]]:view==='cells'?[[680,910],[90,240],[-140,35]]:view==='water'?[[1480,1900],[-180,100],[-120,220]]:[[-12,2030],[-525,525],[-525,525]];
       if(view==='water') {
         const waterBounds=new THREE.Box3();
         meshes.filter(mesh=>['cathodeSeparator','anodeSeparator'].includes(mesh.userData.group))
@@ -126,7 +147,7 @@ export default function ModelViewport(props: Props) {
       cap.onAfterRender=()=>renderer.clearStencil();
       scene.add(stencil,cap);sections.push({source:mesh,stencil,cap});
     }
-    const modelUrl=new URL('model.glb?v=20261023-radial-cells-twin-compressor-1',document.baseURI);
+    const modelUrl=new URL('model.glb?v=20261025-open-core-outer-hydrogen-1',document.baseURI);
     const modelRequest=new AbortController();
     const loadFailed=()=>{if(!cancelled)setStatus('模型加载失败，请刷新页面重试。');};
     // Read the binary directly. FileLoader's rewrapped progress stream can
@@ -156,34 +177,62 @@ export default function ModelViewport(props: Props) {
     const observer=new ResizeObserver(resize);observer.observe(element);resize();
     const render=()=>{
       frame=requestAnimationFrame(render);const p=latest.current;
-      if(priorReset!==p.resetKey||priorCamera!==p.cameraView){fit();priorReset=p.resetKey;priorCamera=p.cameraView;}
-      if(priorMode!==p.viewMode||priorDepth!==p.sectionDepth){
-        clipping.constant=530*(1-2*p.sectionDepth/100);
+      const cameraKey=`${p.cameraView}:${p.compressorView}`;
+      const isolated=p.cameraView==='compressor', rotors=isolated&&p.compressorView==='rotors';
+      const modeKey=`${p.viewMode}:${isolated}:${rotors}`;
+      const cut=p.viewMode==='cutaway'&&!rotors;
+      if(priorReset!==p.resetKey||priorCamera!==cameraKey){fit();priorReset=p.resetKey;priorCamera=cameraKey;}
+      if(priorMode!==modeKey||priorDepth!==p.sectionDepth){
+        clipping.constant=(isolated?180:530)*(1-2*p.sectionDepth/100);
         for(const {source,cap} of sections){
           const material=source.material as THREE.MeshStandardMaterial;
-          if(priorMode!==p.viewMode){material.clippingPlanes=p.viewMode==='cutaway'?[clipping]:[];material.needsUpdate=true;}
+          if(priorMode!==modeKey){material.clippingPlanes=cut?[clipping]:[];material.needsUpdate=true;}
           cap.position.z=clipping.constant;
         }
-        priorMode=p.viewMode;priorDepth=p.sectionDepth;dirty=true;
+        priorMode=modeKey;priorDepth=p.sectionDepth;dirty=true;
       }
-      const visibility=[p.showOuterShell,p.showInnerShell,p.showStacks,p.showAir,p.showHydrogen,p.showReturn,p.showIntake,p.showIntakeInner,p.showCompressorCase,p.showCathodeWater,p.showAnodeSeparator,p.showWiring].join();
+      const visibility=[isolated,rotors,p.showOuterShell,p.showInnerShell,p.showStacks,p.showAir,p.showHydrogen,p.showReturn,p.showIntake,p.showIntakeInner,p.showCompressorCase,p.showCathodeWater,p.showAnodeSeparator,p.showWiring].join();
       if(priorVisibility!==visibility){
         const visible:Record<string,boolean>={outerShell:p.showOuterShell,innerShell:p.showInnerShell,intakeOuter:p.showIntake,intakeInner:p.showIntakeInner,compressorCase:p.showCompressorCase,stacks:p.showStacks,air:p.showAir,hydrogen:p.showHydrogen,return:p.showReturn,anodeInternal:p.showHydrogen||p.showReturn,cathodeExhaust:p.showCathodeWater,cathodeSeparator:p.showCathodeWater,cathodeDrain:p.showCathodeWater,anodeSeparator:p.showAnodeSeparator,anodeDrain:p.showAnodeSeparator,wiring:p.showWiring};
-        meshes.forEach(mesh=>{mesh.visible=visible[mesh.userData.group]??true;});priorVisibility=visibility;dirty=true;
+        meshes.forEach(mesh=>{
+          const id=String(mesh.userData.id??'');
+          if(isolated) {
+            mesh.visible=id.startsWith('compressor-') && !(rotors && (mesh.userData.group==='compressorCase' || id.startsWith('compressor-shroud-') || id==='compressor-return-diaphragm'));
+          } else mesh.visible=visible[mesh.userData.group]??true;
+        });priorVisibility=visibility;dirty=true;
       }
       for(const {source,stencil,cap} of sections){
         if(!source.geometry.boundingBox)source.geometry.computeBoundingBox();
         const bounds=source.geometry.boundingBox!;
-        stencil.visible=cap.visible=source.visible&&p.viewMode==='cutaway'&&clipping.constant>bounds.min.z&&clipping.constant<bounds.max.z;
+        stencil.visible=cap.visible=source.visible&&cut&&clipping.constant>bounds.min.z&&clipping.constant<bounds.max.z;
       }
-      controls.update();grid.visible=floor.visible=p.cameraView!=='front';
-      if(dirty){renderer.render(scene,camera);dirty=false;}
+      controls.update();grid.visible=floor.visible=p.cameraView!=='front'&&!isolated;
+      if(dirty){
+        renderer.render(scene,camera);
+        callouts.style.display=isolated?'block':'none';
+        if(isolated) {
+          const w=element.clientWidth,h=element.clientHeight;
+          callouts.setAttribute('viewBox',`0 0 ${w} ${h}`);
+          for(const label of calloutItems) {
+            const projected=label.point.clone().project(camera),x=(projected.x+1)*w/2,y=(1-projected.y)*h/2;
+            const edge=label.rightSide?w-18:18,baseline=label.row*h;
+            const end=label.rightSide?w-130:130;
+            const outletHidden=rotors&&label.text.textContent==='出口 → 空气主管';
+            label.group.style.display=(outletHidden||projected.z>1||projected.z< -1||cut&&label.point.z>clipping.constant)?'none':'';
+            label.line.setAttribute('points',`${x},${y} ${end},${baseline+5} ${edge},${baseline+5}`);
+            label.dot.setAttribute('cx',String(x));label.dot.setAttribute('cy',String(y));
+            label.text.setAttribute('x',String(edge));label.text.setAttribute('y',String(baseline));
+            label.text.setAttribute('text-anchor',label.rightSide?'end':'start');
+          }
+        }
+        dirty=false;
+      }
     };render();
     return()=>{
       cancelled=true;modelRequest.abort();cancelAnimationFrame(frame);observer.disconnect();controls.dispose();
       if(root)disposeObject(root);
       sections.forEach(({stencil,cap})=>{stencil.children.forEach(o=>((o as THREE.Mesh).material as THREE.Material).dispose());(cap.material as THREE.Material).dispose();});
-      capGeometry.dispose();disposeObject(grid);disposeObject(floor);finishes.dispose();environment.dispose();pmrem.dispose();renderer.dispose();renderer.domElement.remove();
+      capGeometry.dispose();disposeObject(grid);disposeObject(floor);finishes.dispose();environment.dispose();pmrem.dispose();renderer.dispose();renderer.domElement.remove();callouts.remove();
     };
   },[]);
   return <div className="model-viewport" style={{position:'relative'}}>

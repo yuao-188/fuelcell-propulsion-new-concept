@@ -3,7 +3,7 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
   const tau = Math.PI * 2, lerp = (a, b, t) => a + (b - a) * t;
   const clamp = (x, a, b) => Math.max(a, Math.min(b, x)), smooth = t => t * t * (3 - 2 * t);
   const metal = { metallic: .83, roughness: .27, finish: 'machined' };
-  const steel = '#aebcc7', darkSteel = '#526673', paleSteel = '#d2dce2';
+  const steel = '#dce6ed', darkSteel = '#526673', paleSteel = '#b2bec6', vaneSteel = '#718794';
   const K = P.compressor, axialScale = (K.outlet - K.front) / 210;
   const ax = nominal => K.front + (nominal - 480) * axialScale;
   const rr = nominal => nominal * K.inner / 165;
@@ -23,9 +23,9 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
   }
   const casingOutside = casingInside.map(([x, r]) => [x, r + lerp(P.air.outer - P.air.inner,
     K.outer - K.inner, clamp((r - P.air.inner) / (K.inner - P.air.inner), 0, 1))]);
-  const caseOuterSolid = solidLathe(casingOutside);
+  const caseLumen = solidLathe(casingInside);
   const caseFree = solidLathe(casingInside.map(([x, r]) => [x, r - .08]));
-  const casingParts = [hollowLathe(casingOutside, casingInside)];
+  const casingWall = hollowLathe(casingOutside, casingInside);
 
   function radialVane(inner, outer, angle, sweep, width, start, end, heightAt) {
     const profile = [], steps = 28;
@@ -65,7 +65,7 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
     for (let i = 0; i < 12; i++) rotor.push(radialVane(S.bladeInner, S.bladeOuter, i * tau / 12,
       -.52, rr(2.6), 0, S.plate, t => lerp(S.heightIn, S.heightOut, t)));
     add(`compressor-rotor-${S.number}`, `第${S.number}级离心叶轮与独立短轴`, 'front', steel,
-      union(rotor), { ...metal, clip: true, rotor: `compressor-${S.number}`, bladeCount: 12, stage: S.number });
+      union(rotor), { ...metal, roughness: .21, clip: true, rotor: `compressor-${S.number}`, bladeCount: 12, stage: S.number });
 
     // Separate stationary covers block each direct outer bypass. Their bores
     // remain open, with a positive running gap above the corresponding rotor.
@@ -80,22 +80,30 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
     add(`compressor-shroud-${S.number}`, `第${S.number}级静止叶轮罩与入口眼`, 'front', paleSteel,
       new CS([cover.reverse()]).revolve(128).rotate([0, 90, 0]),
       { ...metal, clip: true, stationary: true, stage: S.number });
-    for (let i = 0; i < 18; i++) casingParts.push(radialVane(S.diffuserInner, K.inner + .5,
-      (i + .35) * tau / 18, .10, rr(2.1), S.diffuserStart, S.diffuserEnd).intersect(caseOuterSolid));
+    // Separate mesh identity permits removing the external casing in an
+    // inspection view while retaining the real diffuser vanes and passage.
+    // Cut against the exact wall so each vane meets its support at a face.
+    const diffuser = [];
+    for (let i = 0; i < 18; i++) diffuser.push(radialVane(S.diffuserInner, K.inner + .5,
+      (i + .35) * tau / 18, .10, rr(2.1), S.diffuserStart, S.diffuserEnd).intersect(caseLumen));
+    add(`compressor-diffuser-${S.number}`, `第${S.number}级十八扩压静叶`, 'front', vaneSteel,
+      union(diffuser), { ...metal, roughness: .34, clip: true, stationary: true, bladeCount: 18, stage: S.number });
   }
 
   // The first shaft stops before this diaphragm. Flow goes around its rim,
   // through the inward return vanes, and into the second impeller's central eye.
-  const returnParts = [axisCylinder(ax(551.5), ax(554.5), rr(153), 128)];
-  for (let i = 0; i < 18; i++) returnParts.push(radialVane(rr(48), rr(152.8),
-    (i + .15) * tau / 18, .18, rr(2.2), ax(554.45), ax(577)));
+  const diaphragm = [axisCylinder(ax(551.5), ax(554.5), rr(153), 128)], returnVanes = [];
+  for (let i = 0; i < 18; i++) returnVanes.push(radialVane(rr(48), rr(152.8),
+    (i + .15) * tau / 18, .18, rr(2.2), ax(554.5), ax(577)));
   for (let i = 0; i < 3; i++) {
     const angle = (i + .15) * tau / 3;
     const p = r => [ax(552.7), r * Math.cos(angle), r * Math.sin(angle)];
-    returnParts.push(cylinder(p(rr(151)), p(K.inner + 1), rr(1.05), rr(1.05), 24).intersect(caseFree));
+    diaphragm.push(cylinder(p(rr(151)), p(K.inner + 1), rr(1.05), rr(1.05), 24).intersect(caseFree));
   }
-  add('compressor-return-channel', '级间封心隔板与十八回流静叶', 'front', paleSteel,
-    union(returnParts).intersect(caseFree), { ...metal, clip: true, stationary: true, returnVaneCount: 18 });
+  add('compressor-return-diaphragm', '级间封心隔板与三处固定支座', 'front', paleSteel,
+    union(diaphragm).intersect(caseFree), { ...metal, clip: true, stationary: true });
+  add('compressor-return-channel', '级间十八回流静叶', 'front', vaneSteel,
+    union(returnVanes).intersect(caseFree), { ...metal, roughness: .34, clip: true, stationary: true, bladeCount: 18 });
 
   // The fixed motor cases have shaft bores and three slim mounting struts.
   // These are packaging placeholders, not validated power-rated motor models.
@@ -144,8 +152,8 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
       i === 0 ? '压气机前装配法兰' : '第二级后装配法兰', 'compressorCase', paleSteel,
       flange.subtract(union(headVoids)), { ...metal, clip: true });
   }
-  add('compressor-casing', '双级离心压气机渐缩机匣与两级扩压静叶', 'compressorCase', C.compressorCase ?? '#b6a77c',
-    union(casingParts).subtract(union(flangeSlots)),
+  add('compressor-casing', '双级离心压气机渐缩机匣', 'compressorCase', C.compressorCase ?? '#b6a77c',
+    casingWall.subtract(union(flangeSlots)),
     { metallic: .64, roughness: .31, finish: 'satin-champagne-metal', clip: true, stages: 2 });
   add('compressor-fasteners', '压气机装配法兰沉头紧固件', 'compressorCase', darkSteel,
     union(compressorScrews), { ...metal, clip: true });

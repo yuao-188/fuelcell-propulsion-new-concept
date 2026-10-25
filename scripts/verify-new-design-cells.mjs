@@ -70,6 +70,8 @@ for (let stage=1; stage<=P.stacks.length; stage++) {
       assert.ok(Math.abs(Math.min(...radial)-s.cellInner)<.00012,`${id}: inner cell radius changed`);
       assert.ok(Math.abs(Math.max(...radial)-s.cellOuter)<.00012,`${id}: outer cell radius changed`);
       assert.ok(Math.abs(Math.min(...axial)-s.front)<.00012 && Math.abs(Math.max(...axial)-s.rear)<.00012,`${id}: axial plate length changed`);
+      const expectedVolume=P.cells.plateThickness*(s.rear-s.front)*(s.cellOuter-s.cellInner);
+      assert.ok(Math.abs(component.volume()-expectedVolume)/expectedVolume<.0001,`${id}: a cell was cut by a port or manifold`);
       result.minimumMeasuredThickness=Math.min(result.minimumMeasuredThickness,thickness);
       result.maximumMeasuredThickness=Math.max(result.maximumMeasuredThickness,thickness);
       const frontInner = points.filter((p,i)=>Math.abs(p[0]-s.front)<.001 && radial[i]<s.cellInner+.001);
@@ -89,7 +91,8 @@ for (let stage=1; stage<=P.stacks.length; stage++) {
     const angles=[(degrees(module.activeStart)+firstCorner)/2,
       ...measured.slice(1).map((plate,k)=>(plate.angle+measured[k].angle)/2),
       (lastCorner+degrees(module.activeEnd))/2];
-    const probes=angles.map(theta=>cylinder(polar(s.front-.15,s.cellInner+.3,theta),polar(s.rear+.15,s.cellInner+.3,theta),.2));
+    // Continue beyond the rear face to check the new external H2 supply spokes.
+    const probes=angles.map(theta=>cylinder(polar(s.front-.15,s.cellInner+.3,theta),polar(s.rear+9,s.cellInner+.3,theta),.2));
     const probeSolid=M.union(probes), bounds=probeSolid.boundingBox();
     for(const obstacle of solids) {
       if(!overlap(bounds,obstacle.bounds))continue;
@@ -107,6 +110,18 @@ for (let stage=1; stage<=P.stacks.length; stage++) {
 assert.equal(result.physicalCells,3813);
 assert.equal(result.modules.length,11);
 assert.equal(result.axialCoolingProbes,3824);
+result.assemblyEnvelopes=P.stacks.map((s,i)=>{
+  const frames=solids.filter(p=>p.id.startsWith(`stack-frames-${i+1}-`));
+  const radius=Math.max(...frames.map(p=>Math.max(...pointsOf(p.solid).map(v=>Math.hypot(v[1],v[2])))));
+  assert.ok(Math.abs(radius-s.outer)<.00012,`Stage ${i+1}: exported outer radius differs from parameter`);
+  return {stage:i+1,measuredOuterDiameter:2*radius,specifiedOuterDiameter:2*s.outer};
+});
+assert.equal(P.stacks[2].outer*2,700,'The third stage must use the confirmed 700 mm assembly diameter');
+const innerCasing=solids.find(p=>p.id==='inner-shell');
+assert.ok(innerCasing,'Missing main inner casing');
+assert.ok(Math.abs(innerCasing.bounds.max[0]-P.stacks[2].front)<.00012,'Inner casing must end on the third-stage front face');
+assert.ok(solids.filter(p=>p.extras.group==='innerShell').every(p=>p.bounds.max[0]<=P.stacks[2].front+.00012),'Unexpected inner casing or tail cone behind third-stage front');
+result.innerCasingRear=innerCasing.bounds.max[0];
 assert.equal(report.ports.length,44,'Expected four independent module interfaces per module');
 for(const fluid of ['air','hydrogen','return','cathode']) {
   const ports=report.ports.filter(p=>p.fluid===fluid);
@@ -116,6 +131,13 @@ for(const fluid of ['air','hydrogen','return','cathode']) {
     const found=ports.filter(p=>p.stage===stage&&p.module===module);
     assert.equal(found.length,1,`${fluid}: missing or duplicate interface for ${stage}-${module}`);
     assert.ok(found[0].position?.length===3&&found[0].position.every(Number.isFinite),'Interface position missing');
+    if(fluid==='hydrogen') {
+      const port=found[0],s=P.stacks[stage-1],r=Math.hypot(port.position[1],port.position[2]);
+      assert.ok(Math.abs(r-s.outer)<.00001,`${port.id}: feed port is not on the outer cylindrical surface`);
+      assert.ok(port.position[0]>s.front&&port.position[0]<s.rear,`${port.id}: feed port must enter the sidewall`);
+      assert.ok(Math.abs(port.direction[0])<1e-8&&Math.abs(port.direction[1]*port.position[1]/r+port.direction[2]*port.position[2]/r+1)<1e-8,`${port.id}: hydrogen feed direction must be radially inward`);
+    }
+    if(fluid==='return') assert.equal(found[0].position[0],P.stacks[stage-1].front,'Hydrogen return must remain on the front face');
   }
   result.portCounts[fluid]=ports.length;
 }

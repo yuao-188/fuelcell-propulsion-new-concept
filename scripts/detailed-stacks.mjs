@@ -77,10 +77,19 @@ export function buildDetailedStack({ M, P, C, union, cylinder, sector, polar, ad
       (module.caseStart + module.activeStart - layout.sealAngle) / 2,
       (module.activeEnd + layout.sealAngle + module.caseEnd) / 2,
     ];
-    for (const theta of boltAngles) {
+    for (const [side, theta] of boltAngles.entries()) {
       const at = x => polar(x, orbit, theta);
-      fasteners.push(cylinder(at(s.front + headDepth), at(s.rear - headDepth), shaftRadius, shaftRadius, 12));
-      hardwarePockets.push(cylinder(at(s.front - .03), at(s.rear + .03), shaftPocket, shaftPocket, 16));
+      // The first side end plate carries the radial H2 inlet passage at rear-16.
+      // Two short screws replace its former full-length tie rod, so neither a
+      // rod nor an empty through-hole crosses the sealed feed passage.
+      const shaftIntervals = side === 0
+        ? [[s.front + headDepth, s.front + 8], [s.rear - 8, s.rear - headDepth]]
+        : [[s.front + headDepth, s.rear - headDepth]];
+      const pocketIntervals = side === 0
+        ? [[s.front - .03, s.front + 8.1], [s.rear - 8.1, s.rear + .03]]
+        : [[s.front - .03, s.rear + .03]];
+      for (const [a, b] of shaftIntervals) fasteners.push(cylinder(at(a), at(b), shaftRadius, shaftRadius, 12));
+      for (const [a, b] of pocketIntervals) hardwarePockets.push(cylinder(at(a), at(b), shaftPocket, shaftPocket, 16));
       for (const [a, b, wa, wb, sa, sb] of [
         [s.front, s.front + headDepth, s.front + headDepth, s.front + headDepth + washerDepth, s.front - .05, s.front + .6],
         [s.rear - headDepth, s.rear, s.rear - headDepth - washerDepth, s.rear - headDepth, s.rear - .6, s.rear + .05],
