@@ -156,7 +156,7 @@ const shells=buildDetailedShells({M,CS,P,union,cylinder,revolved,polar,add});
 const wiring=buildWiring({M,P,C,union,cylinder,tubePath,roundPath,polar,add});
 
 console.log(`Built ${parts.length} solid components. Checking exact intersections...`);
-const report={schema:4,units:P.units,dimensionSource:'user-confirmed 16-blade fan with 66-degree tip, aft diffusers, larger first-stage rotor with unchanged disk, stage-2 ID420/OD579.002 and 372 cells with 0.36 cooling gap, 2026-10-25',
+const report={schema:4,units:P.units,dimensionSource:'user-confirmed 134.8 mm second impeller blade radius with unchanged 114.8 mm backplate and 110 mm front spinner, 2026-10-26; previous stack and fan dimensions retained',
   performanceScope:'geometry only; prior thermal/power results are not recalculated',
   pumpPlacement:'stage 3 central cavity',envelopes:{length:os.rear-os.front,ductBore:2*(os.radius-os.wall),nozzleBore:2*(os.outletRadius-os.wall),motorDiameter:2*P.motor.radius,motorLength:P.motor.rear-P.motor.front,stackLength:P.stacks.at(-1).rear-P.stacks[0].front},
   modules:P.stacks.map(s=>s.modules),portCounts:Object.fromEntries(['air','hydrogen','return','cathode'].map(fluid=>[fluid,ports.filter(p=>p.fluid===fluid).length])),

@@ -66,8 +66,7 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
   const shaftRadius = rr(12.375), bladeCount = K.bladesPerStage;
   const backplateSegments = K.backplateSegments;
   for (const S of stages) {
-    // The first stage's working blades now extend beyond its unchanged rear
-    // disk; the second stage retains equal blade-tip and backplate radii.
+    // Both stages' working blades extend beyond their unchanged rear disks.
     // The supported blade bottoms embed 0.15 mm into the corresponding disk.
     const rootFront = S.plate - S.heightIn, rootInner = S.eye * .69 - rr(.8);
     const rotor = [axisCylinder(S.shaftFront, S.shaftRear, shaftRadius, 64),

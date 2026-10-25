@@ -43,7 +43,7 @@ export default function ModelViewport(props: Props) {
       ['一级离心叶轮',[536.638,99.8717715,-14.3679942],.38,false],
       ['一级扩压静叶',[559.5,151.548,-32.53],.52,false],
       ['一级背盘',[546.5,100,-18],.66,false],
-      ['二级离心叶轮',[601.584,74.313,-10.131],.38,true],
+      ['二级离心叶轮',[601.584,76.428834,-8.627901],.38,true],
       ['二级扩压静叶',[624,122.831,-28.079],.52,true],
       ['二级背盘',[613.5,80,-15],.66,true],
     ];
@@ -106,7 +106,7 @@ export default function ModelViewport(props: Props) {
     function fit() {
       const view=latest.current.cameraView;
       const direction=view==='side'?new THREE.Vector3(0,0,1):view==='front'?new THREE.Vector3(-1,0,0):view==='fan'?new THREE.Vector3(-1,.17,.5).normalize():view==='compressor'?(latest.current.compressorView==='rotors'?new THREE.Vector3(-1,.25,1.6).normalize():new THREE.Vector3(-.08,.08,1).normalize()):view==='machinery'?new THREE.Vector3(.2,.18,1).normalize():view==='cells'?new THREE.Vector3(-1,.28,.9).normalize():view==='water'?new THREE.Vector3(.25,.2,1).normalize():new THREE.Vector3(-.52,.30,1).normalize();
-      let box=view==='fan'?[[40,220],[-505,505],[-505,505]]:view==='compressor'?[[465,705],[-185,230],[-180,180]]:view==='machinery'?[[205,705],[-180,180],[-180,180]]:view==='stacks'?[[680,1780],[-365,365],[-365,365]]:view==='cells'?[[680,910],[90,240],[-140,35]]:view==='water'?[[1480,1900],[-180,100],[-120,220]]:[[-12,2030],[-525,525],[-525,525]];
+      let box=view==='fan'?[[-10,220],[-505,505],[-505,505]]:view==='compressor'?[[465,705],[-185,230],[-180,180]]:view==='machinery'?[[205,705],[-180,180],[-180,180]]:view==='stacks'?[[680,1780],[-365,365],[-365,365]]:view==='cells'?[[680,910],[90,240],[-140,35]]:view==='water'?[[1480,1900],[-180,100],[-120,220]]:[[-12,2030],[-525,525],[-525,525]];
       if(view==='water') {
         const waterBounds=new THREE.Box3();
         meshes.filter(mesh=>['cathodeSeparator','anodeSeparator'].includes(mesh.userData.group))
@@ -148,7 +148,7 @@ export default function ModelViewport(props: Props) {
       cap.onAfterRender=()=>renderer.clearStencil();
       scene.add(stencil,cap);sections.push({source:mesh,stencil,cap});
     }
-    const modelUrl=new URL('model.glb?v=20261025-aft-diffusers-16blade',document.baseURI);
+    const modelUrl=new URL('model.glb?v=20261026-stage2-tip-long-spinner',document.baseURI);
     const modelRequest=new AbortController();
     const loadFailed=()=>{if(!cancelled)setStatus('模型加载失败，请刷新页面重试。');};
     // Read the binary directly. FileLoader's rewrapped progress stream can

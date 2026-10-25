@@ -2,7 +2,7 @@
 // Pipe diameters, small compressor drives, blade profiles and fasteners are schematic.
 export const parameters = {
   units: 'mm',
-  fan: { x: 130, front: 50, rear: 210, radius: 498, hubRadius: 100, blades: 16, stators: 18, tipAngleToAxisDeg: 66 },
+  fan: { x: 130, front: 50, rear: 210, spinnerFront: 0, radius: 498, hubRadius: 100, blades: 16, stators: 18, tipAngleToAxisDeg: 66 },
   motor: { front: 245, rear: 438, radius: 150 },
   // Latest user sketch reallocates this shared bay: shorter intake, longer compressor.
   motorHousing: { front: 210, rear: 480, outer: 172, inner: 165 },
@@ -11,7 +11,7 @@ export const parameters = {
     bladesPerStage: 18, backplateSegments: 512,
     stages: [
       { bladeOuter: 162.8, backplateRadius: 143.8, diffuserFront: 552, diffuserRear: 567, diffuserInner: 148.2 },
-      { bladeOuter: 114.8, backplateRadius: 114.8, diffuserFront: 619, diffuserRear: 629, diffuserInner: 119.2 },
+      { bladeOuter: 134.8, backplateRadius: 114.8, diffuserFront: 619, diffuserRear: 629, diffuserInner: 119.2 },
     ] },
   stacks: [
     { front: 690, rear: 972, inner: 128, outer: 236.701, cellInner: 138, cellOuter: 233.7, modules: 3, firstSeam: 30, cells: 279 },

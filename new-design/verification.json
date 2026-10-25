@@ -1,7 +1,7 @@
 {
   "schema": 4,
   "units": "mm",
-  "dimensionSource": "user-confirmed 16-blade fan with 66-degree tip, aft diffusers, larger first-stage rotor with unchanged disk, stage-2 ID420/OD579.002 and 372 cells with 0.36 cooling gap, 2026-10-25",
+  "dimensionSource": "user-confirmed 16-blade fan with 66-degree tip, aft diffusers, larger first-stage rotor with unchanged disk, stage-2 ID420/OD579.002 and 372 cells with 0.36 cooling gap, 2026-10-25; targeted spinner extension and second-stage rotor blade-radius revision, 2026-10-26",
   "performanceScope": "geometry only; prior thermal/power results are not recalculated",
   "pumpPlacement": "stage 3 central cavity",
   "envelopes": {
@@ -24,8 +24,8 @@
     "cathode": 11
   },
   "parts": 98,
-  "solidChecks": 1071,
-  "broadPhasePairs": 4753,
+  "solidChecks": 13,
+  "broadPhasePairs": 193,
   "collisions": [],
   "fluidChecks": {
     "gasSeparation": {
@@ -1296,6 +1296,9 @@
   "machinery": {
     "fanFront": 50,
     "fanRear": 210,
+    "spinnerFront": 0,
+    "spinnerRear": 110,
+    "spinnerLength": 110,
     "mainFanRadius": 498,
     "fanBladeCount": 16,
     "fanStatorCount": 18,
@@ -1835,7 +1838,7 @@
         "radius": 114.8,
         "eye": 35.6,
         "bladeInner": 33.5,
-        "bladeOuter": 114.8,
+        "bladeOuter": 134.8,
         "heightIn": 27,
         "heightOut": 11,
         "hubStart": 576,
@@ -2375,11 +2378,1370 @@
     "wetSeparatorRouteRadius": 125
   },
   "errors": [],
+  "exportedCellGeometry": {
+    "modelBytes": 78270040,
+    "modules": [
+      {
+        "id": "stack-1-1",
+        "stage": 1,
+        "module": 1,
+        "physicalCells": 279,
+        "nominalInnerCoolingGap": 0.46,
+        "probeDiameter": 0.36800000000000005,
+        "axialCoolingProbes": 280
+      },
+      {
+        "id": "stack-1-2",
+        "stage": 1,
+        "module": 2,
+        "physicalCells": 279,
+        "nominalInnerCoolingGap": 0.46,
+        "probeDiameter": 0.36800000000000005,
+        "axialCoolingProbes": 280
+      },
+      {
+        "id": "stack-1-3",
+        "stage": 1,
+        "module": 3,
+        "physicalCells": 279,
+        "nominalInnerCoolingGap": 0.46,
+        "probeDiameter": 0.36800000000000005,
+        "axialCoolingProbes": 280
+      },
+      {
+        "id": "stack-2-1",
+        "stage": 2,
+        "module": 1,
+        "physicalCells": 372,
+        "nominalInnerCoolingGap": 0.36,
+        "probeDiameter": 0.288,
+        "axialCoolingProbes": 373
+      },
+      {
+        "id": "stack-2-2",
+        "stage": 2,
+        "module": 2,
+        "physicalCells": 372,
+        "nominalInnerCoolingGap": 0.36,
+        "probeDiameter": 0.288,
+        "axialCoolingProbes": 373
+      },
+      {
+        "id": "stack-2-3",
+        "stage": 2,
+        "module": 3,
+        "physicalCells": 372,
+        "nominalInnerCoolingGap": 0.36,
+        "probeDiameter": 0.288,
+        "axialCoolingProbes": 373
+      },
+      {
+        "id": "stack-2-4",
+        "stage": 2,
+        "module": 4,
+        "physicalCells": 372,
+        "nominalInnerCoolingGap": 0.36,
+        "probeDiameter": 0.288,
+        "axialCoolingProbes": 373
+      },
+      {
+        "id": "stack-3-1",
+        "stage": 3,
+        "module": 1,
+        "physicalCells": 372,
+        "nominalInnerCoolingGap": 0.46,
+        "probeDiameter": 0.36800000000000005,
+        "axialCoolingProbes": 373
+      },
+      {
+        "id": "stack-3-2",
+        "stage": 3,
+        "module": 2,
+        "physicalCells": 372,
+        "nominalInnerCoolingGap": 0.46,
+        "probeDiameter": 0.36800000000000005,
+        "axialCoolingProbes": 373
+      },
+      {
+        "id": "stack-3-3",
+        "stage": 3,
+        "module": 3,
+        "physicalCells": 372,
+        "nominalInnerCoolingGap": 0.46,
+        "probeDiameter": 0.36800000000000005,
+        "axialCoolingProbes": 373
+      },
+      {
+        "id": "stack-3-4",
+        "stage": 3,
+        "module": 4,
+        "physicalCells": 372,
+        "nominalInnerCoolingGap": 0.46,
+        "probeDiameter": 0.36800000000000005,
+        "axialCoolingProbes": 373
+      }
+    ],
+    "physicalCells": 3813,
+    "minimumMeasuredThickness": 0.5499903655552316,
+    "maximumMeasuredThickness": 0.5500235144984345,
+    "minimumMeasuredInnerCoolingGap": 0.3601883360912436,
+    "maximumMeasuredInnerCoolingGap": 0.4602124767568812,
+    "axialCoolingProbes": 3824,
+    "maximumSolidObstruction": 0,
+    "obstructionChecks": 199,
+    "portCounts": {
+      "air": 11,
+      "hydrogen": 11,
+      "return": 11,
+      "cathode": 11
+    },
+    "assemblyEnvelopes": [
+      {
+        "stage": 1,
+        "measuredOuterDiameter": 473.4020180501664,
+        "specifiedOuterDiameter": 473.402
+      },
+      {
+        "stage": 2,
+        "measuredOuterDiameter": 579.0020208597766,
+        "specifiedOuterDiameter": 579.002
+      },
+      {
+        "stage": 3,
+        "measuredOuterDiameter": 700.0000281521953,
+        "specifiedOuterDiameter": 700
+      }
+    ],
+    "innerCasingRear": 1387,
+    "passed": true
+  },
+  "previousAssemblyChecks": {
+    "sourceModelSha256": "bc5178d7f330f24fc31ef76982298b5251a588c11361877ccae4390513d0f582",
+    "sourceReportSha256": "74f2fa4d69ca833a7c45b9cb4f78c5d2035d87231de0a0a4e96c9d11f5096d1e",
+    "inheritedAt": "2026-10-25T16:31:23.782Z",
+    "fullAssemblyRecomputed": false,
+    "solidChecks": 1071,
+    "broadPhasePairs": 4753,
+    "collisions": [],
+    "fluidChecks": {
+      "gasSeparation": {
+        "intersectionVolume": 0
+      },
+      "completeCathode": {
+        "connectedComponents": 1,
+        "obstructions": []
+      },
+      "completeAnode": {
+        "connectedComponents": 1,
+        "obstructions": []
+      },
+      "1-1-air-port": {
+        "connectedVolume": 86.37524214806534
+      },
+      "1-1-air-channel": {
+        "connectedVolume": 43.26076053322393
+      },
+      "1-1-cathode-midpoint": {
+        "connectedVolume": 5.39385722310117
+      },
+      "1-1-wet-channel": {
+        "connectedVolume": 43.26043923531832
+      },
+      "1-1-wet-port": {
+        "connectedVolume": 57.35693558935399
+      },
+      "1-1-feed-port": {
+        "connectedVolume": 2.0559866255468773
+      },
+      "1-1-feed-channel": {
+        "connectedVolume": 22.46257020104281
+      },
+      "1-1-anode-midpoint": {
+        "connectedVolume": 4.532338361078069
+      },
+      "1-1-return-channel": {
+        "connectedVolume": 22.608109344987113
+      },
+      "1-1-return-port": {
+        "connectedVolume": 9.244941907094569
+      },
+      "1-2-air-port": {
+        "connectedVolume": 86.37544350570727
+      },
+      "1-2-air-channel": {
+        "connectedVolume": 43.260803493776436
+      },
+      "1-2-cathode-midpoint": {
+        "connectedVolume": 5.393857223100999
+      },
+      "1-2-wet-channel": {
+        "connectedVolume": 43.260482039335564
+      },
+      "1-2-wet-port": {
+        "connectedVolume": 57.35690801458012
+      },
+      "1-2-feed-port": {
+        "connectedVolume": 2.055980152948323
+      },
+      "1-2-feed-channel": {
+        "connectedVolume": 22.462568058799697
+      },
+      "1-2-anode-midpoint": {
+        "connectedVolume": 4.532338361078062
+      },
+      "1-2-return-channel": {
+        "connectedVolume": 22.608108601333775
+      },
+      "1-2-return-port": {
+        "connectedVolume": 9.245063746423865
+      },
+      "1-3-air-port": {
+        "connectedVolume": 86.37544350576724
+      },
+      "1-3-air-channel": {
+        "connectedVolume": 43.2608034031464
+      },
+      "1-3-cathode-midpoint": {
+        "connectedVolume": 5.393857223100998
+      },
+      "1-3-wet-channel": {
+        "connectedVolume": 43.26048231932198
+      },
+      "1-3-wet-port": {
+        "connectedVolume": 57.35693217950571
+      },
+      "1-3-feed-port": {
+        "connectedVolume": 2.0559776858975383
+      },
+      "1-3-feed-channel": {
+        "connectedVolume": 22.462579623902233
+      },
+      "1-3-anode-midpoint": {
+        "connectedVolume": 4.532338361078033
+      },
+      "1-3-return-channel": {
+        "connectedVolume": 22.608096914976972
+      },
+      "1-3-return-port": {
+        "connectedVolume": 9.245062893602109
+      },
+      "2-1-air-port": {
+        "connectedVolume": 86.40719660363818
+      },
+      "2-1-air-channel": {
+        "connectedVolume": 43.27362656943572
+      },
+      "2-1-cathode-midpoint": {
+        "connectedVolume": 5.393857223105072
+      },
+      "2-1-wet-channel": {
+        "connectedVolume": 43.27362656500862
+      },
+      "2-1-wet-port": {
+        "connectedVolume": 57.64394565473319
+      },
+      "2-1-feed-port": {
+        "connectedVolume": 2.0559991073339283
+      },
+      "2-1-feed-channel": {
+        "connectedVolume": 22.762724698523538
+      },
+      "2-1-anode-midpoint": {
+        "connectedVolume": 4.532338361081438
+      },
+      "2-1-return-channel": {
+        "connectedVolume": 22.52612992068866
+      },
+      "2-1-return-port": {
+        "connectedVolume": 9.247767050381952
+      },
+      "2-2-air-port": {
+        "connectedVolume": 86.40719660363817
+      },
+      "2-2-air-channel": {
+        "connectedVolume": 43.27362656943584
+      },
+      "2-2-cathode-midpoint": {
+        "connectedVolume": 5.3938572231055515
+      },
+      "2-2-wet-channel": {
+        "connectedVolume": 43.27362659686361
+      },
+      "2-2-wet-port": {
+        "connectedVolume": 57.64394565473157
+      },
+      "2-2-feed-port": {
+        "connectedVolume": 2.0559991073339483
+      },
+      "2-2-feed-channel": {
+        "connectedVolume": 22.762724698522067
+      },
+      "2-2-anode-midpoint": {
+        "connectedVolume": 4.532338361081267
+      },
+      "2-2-return-channel": {
+        "connectedVolume": 22.52612992068851
+      },
+      "2-2-return-port": {
+        "connectedVolume": 9.247767050382025
+      },
+      "2-3-air-port": {
+        "connectedVolume": 86.40719736589607
+      },
+      "2-3-air-channel": {
+        "connectedVolume": 43.27362656943581
+      },
+      "2-3-cathode-midpoint": {
+        "connectedVolume": 5.393857223105048
+      },
+      "2-3-wet-channel": {
+        "connectedVolume": 43.273626492941595
+      },
+      "2-3-wet-port": {
+        "connectedVolume": 57.64394565473306
+      },
+      "2-3-feed-port": {
+        "connectedVolume": 2.0559991073339265
+      },
+      "2-3-feed-channel": {
+        "connectedVolume": 22.76272469852232
+      },
+      "2-3-anode-midpoint": {
+        "connectedVolume": 4.532338361081423
+      },
+      "2-3-return-channel": {
+        "connectedVolume": 22.52612992068896
+      },
+      "2-3-return-port": {
+        "connectedVolume": 9.2477670503818
+      },
+      "2-4-air-port": {
+        "connectedVolume": 86.40719736589587
+      },
+      "2-4-air-channel": {
+        "connectedVolume": 43.273626569435855
+      },
+      "2-4-cathode-midpoint": {
+        "connectedVolume": 5.393857223105524
+      },
+      "2-4-wet-channel": {
+        "connectedVolume": 43.27362649294127
+      },
+      "2-4-wet-port": {
+        "connectedVolume": 57.64394565473225
+      },
+      "2-4-feed-port": {
+        "connectedVolume": 2.055999107333954
+      },
+      "2-4-feed-channel": {
+        "connectedVolume": 22.762724698522366
+      },
+      "2-4-anode-midpoint": {
+        "connectedVolume": 4.532338361081325
+      },
+      "2-4-return-channel": {
+        "connectedVolume": 22.526129920688284
+      },
+      "2-4-return-port": {
+        "connectedVolume": 9.24776705038194
+      },
+      "3-1-air-port": {
+        "connectedVolume": 86.4119332301022
+      },
+      "3-1-air-channel": {
+        "connectedVolume": 43.27361689962995
+      },
+      "3-1-cathode-midpoint": {
+        "connectedVolume": 5.393857223105091
+      },
+      "3-1-wet-channel": {
+        "connectedVolume": 43.2736168118478
+      },
+      "3-1-wet-port": {
+        "connectedVolume": 57.70095521242618
+      },
+      "3-1-feed-port": {
+        "connectedVolume": 2.055950777314944
+      },
+      "3-1-feed-channel": {
+        "connectedVolume": 22.83625483093044
+      },
+      "3-1-anode-midpoint": {
+        "connectedVolume": 4.532338361081688
+      },
+      "3-1-return-channel": {
+        "connectedVolume": 22.569620527404602
+      },
+      "3-1-return-port": {
+        "connectedVolume": 9.24771168241546
+      },
+      "3-2-air-port": {
+        "connectedVolume": 86.41193224361858
+      },
+      "3-2-air-channel": {
+        "connectedVolume": 43.27361689962932
+      },
+      "3-2-cathode-midpoint": {
+        "connectedVolume": 5.393857223105176
+      },
+      "3-2-wet-channel": {
+        "connectedVolume": 43.273616894758305
+      },
+      "3-2-wet-port": {
+        "connectedVolume": 57.7009552124256
+      },
+      "3-2-feed-port": {
+        "connectedVolume": 2.055950777314852
+      },
+      "3-2-feed-channel": {
+        "connectedVolume": 22.836254830929366
+      },
+      "3-2-anode-midpoint": {
+        "connectedVolume": 4.532338361081301
+      },
+      "3-2-return-channel": {
+        "connectedVolume": 22.569620527404496
+      },
+      "3-2-return-port": {
+        "connectedVolume": 9.247711682415819
+      },
+      "3-3-air-port": {
+        "connectedVolume": 86.41193224361861
+      },
+      "3-3-air-channel": {
+        "connectedVolume": 43.27361689962999
+      },
+      "3-3-cathode-midpoint": {
+        "connectedVolume": 5.393857223105323
+      },
+      "3-3-wet-channel": {
+        "connectedVolume": 43.27361689475816
+      },
+      "3-3-wet-port": {
+        "connectedVolume": 57.700955212426145
+      },
+      "3-3-feed-port": {
+        "connectedVolume": 2.055950777314951
+      },
+      "3-3-feed-channel": {
+        "connectedVolume": 22.83625483092968
+      },
+      "3-3-anode-midpoint": {
+        "connectedVolume": 4.532338361081671
+      },
+      "3-3-return-channel": {
+        "connectedVolume": 22.5696205274039
+      },
+      "3-3-return-port": {
+        "connectedVolume": 9.247711682415956
+      },
+      "3-4-air-port": {
+        "connectedVolume": 86.41193224361817
+      },
+      "3-4-air-channel": {
+        "connectedVolume": 43.273616899629324
+      },
+      "3-4-cathode-midpoint": {
+        "connectedVolume": 5.393857223105181
+      },
+      "3-4-wet-channel": {
+        "connectedVolume": 43.27361689475815
+      },
+      "3-4-wet-port": {
+        "connectedVolume": 57.700955212427836
+      },
+      "3-4-feed-port": {
+        "connectedVolume": 2.0559507773148447
+      },
+      "3-4-feed-channel": {
+        "connectedVolume": 22.836254830929484
+      },
+      "3-4-anode-midpoint": {
+        "connectedVolume": 4.532338361081165
+      },
+      "3-4-return-channel": {
+        "connectedVolume": 22.569620527404016
+      },
+      "3-4-return-port": {
+        "connectedVolume": 9.247711682415842
+      }
+    },
+    "errors": []
+  },
+  "verificationScope": "Targeted exported-machinery update; full prior assembly checks retained under previousAssemblyChecks",
+  "targetedUpdate": {
+    "status": "passed",
+    "updatedAt": "2026-10-25T16:31:23.782Z",
+    "source": "C:\\Users\\孟宇奥\\Desktop\\新构型\\fuelcell-propulsion-new-concept-github\\new-design\\model.glb",
+    "output": "C:\\Users\\孟宇奥\\Desktop\\新构型\\fuelcell-propulsion-new-concept-github\\new-design\\public\\model.glb",
+    "oldModelSha256": "bc5178d7f330f24fc31ef76982298b5251a588c11361877ccae4390513d0f582",
+    "newModelSha256": "5f058aeffcd513090cc211e3a9733b7143f742abeee5dd4fffd347204e6cb4bd",
+    "oldReportSha256": "74f2fa4d69ca833a7c45b9cb4f78c5d2035d87231de0a0a4e96c9d11f5096d1e",
+    "oldModelBytes": 78270040,
+    "newModelBytes": 78268204,
+    "changedNodes": [
+      {
+        "id": "fan-spinner",
+        "oldGeometrySha256": "8540c66d4e7f0dc9682c4fda799be6441683b2e7d99e614e98ed7247b799bb92",
+        "newGeometrySha256": "54a94b28f86964d7acb24d91d27cf5f764d30e99693a79efa96f16061d0787d7",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "8c4f64d3fc250a49b006aa7ef74bd3cdee81d976af616d39a67814412c51a50b"
+      },
+      {
+        "id": "compressor-rotor-2",
+        "oldGeometrySha256": "cfb942382d27985b86dcb3b77462a246a29db77ae4e71ce9d512953ed7cd6c35",
+        "newGeometrySha256": "7763ac3476c5b2f0c304054df7e4873952ce4cd8a563b991ebde712ac12fc7ad",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "a7dc117d7619a57569bcb3674d8e8f000b62cda0103b2db13dc2bd6b9a55dd3d"
+      }
+    ],
+    "unchangedNodeCount": 96,
+    "unchangedNodeGeometryHashes": [
+      {
+        "id": "anode-separator",
+        "oldGeometrySha256": "7a75c3c01032d5ab99bd773ba7c6063add2f3d787985a5f78d8ec32e219b3460",
+        "newGeometrySha256": "7a75c3c01032d5ab99bd773ba7c6063add2f3d787985a5f78d8ec32e219b3460",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "d004b7062de6d0c7d0e1737897c9a1c4777b389a66a0acac1167581e2b7bfcec"
+      },
+      {
+        "id": "anode-separator-baffles",
+        "oldGeometrySha256": "496de51881ace9a789b130df4fefa8ab8d3ac01f9a265a873767dc06e88aee8f",
+        "newGeometrySha256": "496de51881ace9a789b130df4fefa8ab8d3ac01f9a265a873767dc06e88aee8f",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "e57bd21dd380215787a8dcf788992bb4b76b77e2b4fe0181b87b4bcef56b086d"
+      },
+      {
+        "id": "anode-drain-valve",
+        "oldGeometrySha256": "612ecd692f60a54d897e0bd970cc7c7f8a1e1a5b71bda415be61634095c4616d",
+        "newGeometrySha256": "612ecd692f60a54d897e0bd970cc7c7f8a1e1a5b71bda415be61634095c4616d",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "aec1346433aa1510c1f13ee6bb42058598ad0f4c06314284a2bc435de8b92ed8"
+      },
+      {
+        "id": "anode-drain-pipe",
+        "oldGeometrySha256": "5d53eed203b78d78db4bb0cc6a382f003f5b25792264b8448e8c2e1b2a38b989",
+        "newGeometrySha256": "5d53eed203b78d78db4bb0cc6a382f003f5b25792264b8448e8c2e1b2a38b989",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "3c66b4283c61d8466b11aa6586a5f8918c4b1fdc2dc9bfc25d4ee332a88e7657"
+      },
+      {
+        "id": "cathode-separator",
+        "oldGeometrySha256": "cf055e729614f83202ec58d21eea65252d715d210ffc49c4006d39cc83210938",
+        "newGeometrySha256": "cf055e729614f83202ec58d21eea65252d715d210ffc49c4006d39cc83210938",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "d004b7062de6d0c7d0e1737897c9a1c4777b389a66a0acac1167581e2b7bfcec"
+      },
+      {
+        "id": "cathode-separator-baffles",
+        "oldGeometrySha256": "4372f7b02c9bf288dc0c536abed010ed4953135fa395c9cbbd64faf8cad54ade",
+        "newGeometrySha256": "4372f7b02c9bf288dc0c536abed010ed4953135fa395c9cbbd64faf8cad54ade",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "e57bd21dd380215787a8dcf788992bb4b76b77e2b4fe0181b87b4bcef56b086d"
+      },
+      {
+        "id": "cathode-drain-valve",
+        "oldGeometrySha256": "f8dcde2ff2670cbdb1eeb48771b449d7517e69b7768cfe7a8e1163841d132f35",
+        "newGeometrySha256": "f8dcde2ff2670cbdb1eeb48771b449d7517e69b7768cfe7a8e1163841d132f35",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "aec1346433aa1510c1f13ee6bb42058598ad0f4c06314284a2bc435de8b92ed8"
+      },
+      {
+        "id": "cathode-drain-pipe",
+        "oldGeometrySha256": "c66b32e0c30c6baa2b7bce0b7666b1ab0e04950338cee288258d013bcc275dc2",
+        "newGeometrySha256": "c66b32e0c30c6baa2b7bce0b7666b1ab0e04950338cee288258d013bcc275dc2",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "3c66b4283c61d8466b11aa6586a5f8918c4b1fdc2dc9bfc25d4ee332a88e7657"
+      },
+      {
+        "id": "air-network",
+        "oldGeometrySha256": "804971e98e4d0e62bd48682811dff780c14ba1878b31158e1366988d134a8624",
+        "newGeometrySha256": "804971e98e4d0e62bd48682811dff780c14ba1878b31158e1366988d134a8624",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "766b828318489de98d4d474c2035f4d049cafc2347165343332b990af080f57c"
+      },
+      {
+        "id": "cathodeExhaust-network",
+        "oldGeometrySha256": "d6335d9318ea88c5332b15f78ce29f97ba5ee848873bcc679c2996436849fac0",
+        "newGeometrySha256": "d6335d9318ea88c5332b15f78ce29f97ba5ee848873bcc679c2996436849fac0",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "6977a71e4221674f089346e9a11badaf2729fe1af96bcf9ca088f93c599b12d2"
+      },
+      {
+        "id": "hydrogen-network",
+        "oldGeometrySha256": "d7b98bab772a70919d3529135f2c953178e389edf6b512125175b63a336dc540",
+        "newGeometrySha256": "d7b98bab772a70919d3529135f2c953178e389edf6b512125175b63a336dc540",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "10ca7dc31acbf2adaf2ee9f1e8c3d496b28d589978ba13d6864fb012ca59b619"
+      },
+      {
+        "id": "return-network",
+        "oldGeometrySha256": "714115787c078c6c18fe819320bd9ee326bad15fe308087e282b1bfef110ccce",
+        "newGeometrySha256": "714115787c078c6c18fe819320bd9ee326bad15fe308087e282b1bfef110ccce",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "1b6036b7f43031644b4d8e1a31e4a93b750806beccfa5f43ec19d6ee4f65a01a"
+      },
+      {
+        "id": "stack-1-1",
+        "oldGeometrySha256": "24853361ed55e67f33cb36c947f187d30c437a5d0cd7ce250ef1ce3168ad8a48",
+        "newGeometrySha256": "24853361ed55e67f33cb36c947f187d30c437a5d0cd7ce250ef1ce3168ad8a48",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "85e0c18d1d9581642a83cb9f0e7cf9cb06b8f70b5216a5ebac3bf21e782bfe60"
+      },
+      {
+        "id": "stack-frames-1-1",
+        "oldGeometrySha256": "1655a0a0acac146b4899df6f8abab74f03bc7fc73cb3340cf6d4ccfac5970a4f",
+        "newGeometrySha256": "1655a0a0acac146b4899df6f8abab74f03bc7fc73cb3340cf6d4ccfac5970a4f",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "26685d23f4fbe044f1bc25e57026e4e55af3587793fc3e654cfa065414c70271"
+      },
+      {
+        "id": "stack-fasteners-1-1",
+        "oldGeometrySha256": "4d6d4a9194f961cd40b4a6b10b07679f83960d931fa95e6f53dafea3a9ba780d",
+        "newGeometrySha256": "4d6d4a9194f961cd40b4a6b10b07679f83960d931fa95e6f53dafea3a9ba780d",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "9ff4136c4332c59290c936fc337121d10cec107fa6d125c7bb0aa8c6914937eb"
+      },
+      {
+        "id": "stack-washers-1-1",
+        "oldGeometrySha256": "f0efd7cb89f13fd750c0ef933c1e2a8db2137b55a37044e72d3f28d3bc1eaa4b",
+        "newGeometrySha256": "f0efd7cb89f13fd750c0ef933c1e2a8db2137b55a37044e72d3f28d3bc1eaa4b",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "6919f83d1f054e2b781b8f5769d6c07ae075346634452155c2e02f7d4de93425"
+      },
+      {
+        "id": "stack-seals-1-1",
+        "oldGeometrySha256": "3cdfa9c24dfe7c377db8b2aabaff253ed5330b0f7b94cf51995a4fed339f351d",
+        "newGeometrySha256": "3cdfa9c24dfe7c377db8b2aabaff253ed5330b0f7b94cf51995a4fed339f351d",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "a3cab3e14a5b39c259e268da3752734817384591d2ac7cd6d80f5dfd75a8fb4e"
+      },
+      {
+        "id": "stack-1-2",
+        "oldGeometrySha256": "358429bae442450dea18c2a899c87ee042bc8325ef9168aa2dd0fef7e611b670",
+        "newGeometrySha256": "358429bae442450dea18c2a899c87ee042bc8325ef9168aa2dd0fef7e611b670",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "85e0c18d1d9581642a83cb9f0e7cf9cb06b8f70b5216a5ebac3bf21e782bfe60"
+      },
+      {
+        "id": "stack-frames-1-2",
+        "oldGeometrySha256": "e0dbdffef906f27a1714616c3340c14cf5abbd9a808dea95699b3188656a1178",
+        "newGeometrySha256": "e0dbdffef906f27a1714616c3340c14cf5abbd9a808dea95699b3188656a1178",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "26685d23f4fbe044f1bc25e57026e4e55af3587793fc3e654cfa065414c70271"
+      },
+      {
+        "id": "stack-fasteners-1-2",
+        "oldGeometrySha256": "d53b511247b41a1a2444aa8a2e1fe1eb5dfb9704c4024c4c5a5d735384e583b1",
+        "newGeometrySha256": "d53b511247b41a1a2444aa8a2e1fe1eb5dfb9704c4024c4c5a5d735384e583b1",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "9ff4136c4332c59290c936fc337121d10cec107fa6d125c7bb0aa8c6914937eb"
+      },
+      {
+        "id": "stack-washers-1-2",
+        "oldGeometrySha256": "e5aaa83f4c135cbe03531878ed3158b91553b4ab8f6ddf7f9c9051703c3f6fa0",
+        "newGeometrySha256": "e5aaa83f4c135cbe03531878ed3158b91553b4ab8f6ddf7f9c9051703c3f6fa0",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "6919f83d1f054e2b781b8f5769d6c07ae075346634452155c2e02f7d4de93425"
+      },
+      {
+        "id": "stack-seals-1-2",
+        "oldGeometrySha256": "719ef768084564284813012c76dd19e625ca68c416d38e4930935a54dbd29941",
+        "newGeometrySha256": "719ef768084564284813012c76dd19e625ca68c416d38e4930935a54dbd29941",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "a3cab3e14a5b39c259e268da3752734817384591d2ac7cd6d80f5dfd75a8fb4e"
+      },
+      {
+        "id": "stack-1-3",
+        "oldGeometrySha256": "b3a873d966f4228c64451beeafb00d46f4be8388b5b76e663334204c9539e964",
+        "newGeometrySha256": "b3a873d966f4228c64451beeafb00d46f4be8388b5b76e663334204c9539e964",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "85e0c18d1d9581642a83cb9f0e7cf9cb06b8f70b5216a5ebac3bf21e782bfe60"
+      },
+      {
+        "id": "stack-frames-1-3",
+        "oldGeometrySha256": "18830af14e63cdec7ef92db00b0533e92d061f199e0e0ea33ae1c67c8a1c2aed",
+        "newGeometrySha256": "18830af14e63cdec7ef92db00b0533e92d061f199e0e0ea33ae1c67c8a1c2aed",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "26685d23f4fbe044f1bc25e57026e4e55af3587793fc3e654cfa065414c70271"
+      },
+      {
+        "id": "stack-fasteners-1-3",
+        "oldGeometrySha256": "279aded1b88ad3c3a87217f74a4ddd3beb6c3aadcd6f94dde9cdd5dd21f5a747",
+        "newGeometrySha256": "279aded1b88ad3c3a87217f74a4ddd3beb6c3aadcd6f94dde9cdd5dd21f5a747",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "9ff4136c4332c59290c936fc337121d10cec107fa6d125c7bb0aa8c6914937eb"
+      },
+      {
+        "id": "stack-washers-1-3",
+        "oldGeometrySha256": "448905c5669fe1ce2f2a2feb639a07b99de69c0676d04a6b4409dc23a595d556",
+        "newGeometrySha256": "448905c5669fe1ce2f2a2feb639a07b99de69c0676d04a6b4409dc23a595d556",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "6919f83d1f054e2b781b8f5769d6c07ae075346634452155c2e02f7d4de93425"
+      },
+      {
+        "id": "stack-seals-1-3",
+        "oldGeometrySha256": "0369fa157d3c8219358145a9a8b334a1cf75ae53800e946384efd98f2b3999ba",
+        "newGeometrySha256": "0369fa157d3c8219358145a9a8b334a1cf75ae53800e946384efd98f2b3999ba",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "a3cab3e14a5b39c259e268da3752734817384591d2ac7cd6d80f5dfd75a8fb4e"
+      },
+      {
+        "id": "stack-2-1",
+        "oldGeometrySha256": "01ebb3f0320c7b4250a66f4f75b9b39506fb24d1ff702472f1cff4bb7e334956",
+        "newGeometrySha256": "01ebb3f0320c7b4250a66f4f75b9b39506fb24d1ff702472f1cff4bb7e334956",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "85e0c18d1d9581642a83cb9f0e7cf9cb06b8f70b5216a5ebac3bf21e782bfe60"
+      },
+      {
+        "id": "stack-frames-2-1",
+        "oldGeometrySha256": "500277ce06cdbbf0a8e124b2530a6d0335fd36bc3fb00197497780916042688f",
+        "newGeometrySha256": "500277ce06cdbbf0a8e124b2530a6d0335fd36bc3fb00197497780916042688f",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "26685d23f4fbe044f1bc25e57026e4e55af3587793fc3e654cfa065414c70271"
+      },
+      {
+        "id": "stack-fasteners-2-1",
+        "oldGeometrySha256": "f32993447d065b5891e458849f644ea06880a13e8f5fd1919c2be34d9bb3f2e2",
+        "newGeometrySha256": "f32993447d065b5891e458849f644ea06880a13e8f5fd1919c2be34d9bb3f2e2",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "9ff4136c4332c59290c936fc337121d10cec107fa6d125c7bb0aa8c6914937eb"
+      },
+      {
+        "id": "stack-washers-2-1",
+        "oldGeometrySha256": "722e74593806292006d0590619392ec0e4341e72d551617663aad3b1e26a01c8",
+        "newGeometrySha256": "722e74593806292006d0590619392ec0e4341e72d551617663aad3b1e26a01c8",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "6919f83d1f054e2b781b8f5769d6c07ae075346634452155c2e02f7d4de93425"
+      },
+      {
+        "id": "stack-seals-2-1",
+        "oldGeometrySha256": "b8c67a82dbc7430dca3734d145ab3e4974da04cd73e187ed1737f87fd12ad4bc",
+        "newGeometrySha256": "b8c67a82dbc7430dca3734d145ab3e4974da04cd73e187ed1737f87fd12ad4bc",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "a3cab3e14a5b39c259e268da3752734817384591d2ac7cd6d80f5dfd75a8fb4e"
+      },
+      {
+        "id": "stack-2-2",
+        "oldGeometrySha256": "824603eeb887e33258be3f9637d866dea2f9a2ec3c184efccbb9a2f5fef9b17d",
+        "newGeometrySha256": "824603eeb887e33258be3f9637d866dea2f9a2ec3c184efccbb9a2f5fef9b17d",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "85e0c18d1d9581642a83cb9f0e7cf9cb06b8f70b5216a5ebac3bf21e782bfe60"
+      },
+      {
+        "id": "stack-frames-2-2",
+        "oldGeometrySha256": "f3ae1522aea59678f16433f02efab5dd0195af1caef80dd7d0edd473b6d0ddd7",
+        "newGeometrySha256": "f3ae1522aea59678f16433f02efab5dd0195af1caef80dd7d0edd473b6d0ddd7",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "26685d23f4fbe044f1bc25e57026e4e55af3587793fc3e654cfa065414c70271"
+      },
+      {
+        "id": "stack-fasteners-2-2",
+        "oldGeometrySha256": "814a14a52d1b7d06073bb4f643d130d97da775598dba4279c2ff9c024798d749",
+        "newGeometrySha256": "814a14a52d1b7d06073bb4f643d130d97da775598dba4279c2ff9c024798d749",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "9ff4136c4332c59290c936fc337121d10cec107fa6d125c7bb0aa8c6914937eb"
+      },
+      {
+        "id": "stack-washers-2-2",
+        "oldGeometrySha256": "b81acc2c08e8e0de78a945bfddf91ce5b23717eeace9b8a73e4a85dbbb962a1e",
+        "newGeometrySha256": "b81acc2c08e8e0de78a945bfddf91ce5b23717eeace9b8a73e4a85dbbb962a1e",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "6919f83d1f054e2b781b8f5769d6c07ae075346634452155c2e02f7d4de93425"
+      },
+      {
+        "id": "stack-seals-2-2",
+        "oldGeometrySha256": "4095c496e2f9a56c92943858868a08bcd2ffeda6b9458d816c96ad71c2a5daae",
+        "newGeometrySha256": "4095c496e2f9a56c92943858868a08bcd2ffeda6b9458d816c96ad71c2a5daae",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "a3cab3e14a5b39c259e268da3752734817384591d2ac7cd6d80f5dfd75a8fb4e"
+      },
+      {
+        "id": "stack-2-3",
+        "oldGeometrySha256": "011c9523865d1010e322786f5ec3c234adbac7c9b3053319a706e8b66248bbd7",
+        "newGeometrySha256": "011c9523865d1010e322786f5ec3c234adbac7c9b3053319a706e8b66248bbd7",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "85e0c18d1d9581642a83cb9f0e7cf9cb06b8f70b5216a5ebac3bf21e782bfe60"
+      },
+      {
+        "id": "stack-frames-2-3",
+        "oldGeometrySha256": "d0c515ec5fdde4bf360e8e064c8a0b5deacebac456b92e7c070b9ce2e185be82",
+        "newGeometrySha256": "d0c515ec5fdde4bf360e8e064c8a0b5deacebac456b92e7c070b9ce2e185be82",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "26685d23f4fbe044f1bc25e57026e4e55af3587793fc3e654cfa065414c70271"
+      },
+      {
+        "id": "stack-fasteners-2-3",
+        "oldGeometrySha256": "3da3b97f1b866028cd380279ba32d677228722a2e4bb1889975008f03c5294e9",
+        "newGeometrySha256": "3da3b97f1b866028cd380279ba32d677228722a2e4bb1889975008f03c5294e9",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "9ff4136c4332c59290c936fc337121d10cec107fa6d125c7bb0aa8c6914937eb"
+      },
+      {
+        "id": "stack-washers-2-3",
+        "oldGeometrySha256": "a3b24a883817d7867517f0990b14d33a703bbd12dd312658cefff41235d97a40",
+        "newGeometrySha256": "a3b24a883817d7867517f0990b14d33a703bbd12dd312658cefff41235d97a40",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "6919f83d1f054e2b781b8f5769d6c07ae075346634452155c2e02f7d4de93425"
+      },
+      {
+        "id": "stack-seals-2-3",
+        "oldGeometrySha256": "22b32ca6c93fd5d09fcf36cee27cb53c3e7bee33ac1c823b8b2e91ffc87a2e13",
+        "newGeometrySha256": "22b32ca6c93fd5d09fcf36cee27cb53c3e7bee33ac1c823b8b2e91ffc87a2e13",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "a3cab3e14a5b39c259e268da3752734817384591d2ac7cd6d80f5dfd75a8fb4e"
+      },
+      {
+        "id": "stack-2-4",
+        "oldGeometrySha256": "868887509fe9ed21a36db9c70392e0e068d4dc68ca49c37ef478e43ff50a8742",
+        "newGeometrySha256": "868887509fe9ed21a36db9c70392e0e068d4dc68ca49c37ef478e43ff50a8742",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "85e0c18d1d9581642a83cb9f0e7cf9cb06b8f70b5216a5ebac3bf21e782bfe60"
+      },
+      {
+        "id": "stack-frames-2-4",
+        "oldGeometrySha256": "1a1d59df1054784e51aac5deb44e4e5842a95cfec80019bfa48a428fe680d4c0",
+        "newGeometrySha256": "1a1d59df1054784e51aac5deb44e4e5842a95cfec80019bfa48a428fe680d4c0",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "26685d23f4fbe044f1bc25e57026e4e55af3587793fc3e654cfa065414c70271"
+      },
+      {
+        "id": "stack-fasteners-2-4",
+        "oldGeometrySha256": "2b8ade05c8166bc4865c45d202f62124f495d1a3b329a1afdd81f162d053baef",
+        "newGeometrySha256": "2b8ade05c8166bc4865c45d202f62124f495d1a3b329a1afdd81f162d053baef",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "9ff4136c4332c59290c936fc337121d10cec107fa6d125c7bb0aa8c6914937eb"
+      },
+      {
+        "id": "stack-washers-2-4",
+        "oldGeometrySha256": "09698c0fdb604ae82555951d740ddf80f76b153472f918df863f8f97bc3a7ff8",
+        "newGeometrySha256": "09698c0fdb604ae82555951d740ddf80f76b153472f918df863f8f97bc3a7ff8",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "6919f83d1f054e2b781b8f5769d6c07ae075346634452155c2e02f7d4de93425"
+      },
+      {
+        "id": "stack-seals-2-4",
+        "oldGeometrySha256": "53b73ab7366af4d8bcfc5b2d500aff43b96348e9dfcc0956a0c7b8c2a0eff3f7",
+        "newGeometrySha256": "53b73ab7366af4d8bcfc5b2d500aff43b96348e9dfcc0956a0c7b8c2a0eff3f7",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "a3cab3e14a5b39c259e268da3752734817384591d2ac7cd6d80f5dfd75a8fb4e"
+      },
+      {
+        "id": "stack-3-1",
+        "oldGeometrySha256": "75a5eb2abbbaba37e1942ab4745a56e68ee3ec5f811e964bfac5d22d0f64f94a",
+        "newGeometrySha256": "75a5eb2abbbaba37e1942ab4745a56e68ee3ec5f811e964bfac5d22d0f64f94a",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "85e0c18d1d9581642a83cb9f0e7cf9cb06b8f70b5216a5ebac3bf21e782bfe60"
+      },
+      {
+        "id": "stack-frames-3-1",
+        "oldGeometrySha256": "5642fbf0b94f73a85c3d985236cc6bfb649f9fc855c0cf6d62b8c693a9cde218",
+        "newGeometrySha256": "5642fbf0b94f73a85c3d985236cc6bfb649f9fc855c0cf6d62b8c693a9cde218",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "26685d23f4fbe044f1bc25e57026e4e55af3587793fc3e654cfa065414c70271"
+      },
+      {
+        "id": "stack-fasteners-3-1",
+        "oldGeometrySha256": "a08658381c2937b599fb21d5b21f0aaf663b5806f923d6adaecf635f5c775d21",
+        "newGeometrySha256": "a08658381c2937b599fb21d5b21f0aaf663b5806f923d6adaecf635f5c775d21",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "9ff4136c4332c59290c936fc337121d10cec107fa6d125c7bb0aa8c6914937eb"
+      },
+      {
+        "id": "stack-washers-3-1",
+        "oldGeometrySha256": "112aadd2c17bc9e4b7474f2cc9a37fdb18890bd1942f9617cfff9bddb109029d",
+        "newGeometrySha256": "112aadd2c17bc9e4b7474f2cc9a37fdb18890bd1942f9617cfff9bddb109029d",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "6919f83d1f054e2b781b8f5769d6c07ae075346634452155c2e02f7d4de93425"
+      },
+      {
+        "id": "stack-seals-3-1",
+        "oldGeometrySha256": "19c9836a8df0d86b2649d752c4496863ca106af00caa85cfdce417478c9c462c",
+        "newGeometrySha256": "19c9836a8df0d86b2649d752c4496863ca106af00caa85cfdce417478c9c462c",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "a3cab3e14a5b39c259e268da3752734817384591d2ac7cd6d80f5dfd75a8fb4e"
+      },
+      {
+        "id": "stack-3-2",
+        "oldGeometrySha256": "17c00cfc01ac06dc830a4cf54bf7a8232ba7d221bb67e74e55c8ddd65dc5a589",
+        "newGeometrySha256": "17c00cfc01ac06dc830a4cf54bf7a8232ba7d221bb67e74e55c8ddd65dc5a589",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "85e0c18d1d9581642a83cb9f0e7cf9cb06b8f70b5216a5ebac3bf21e782bfe60"
+      },
+      {
+        "id": "stack-frames-3-2",
+        "oldGeometrySha256": "32842af64cd3dae87c6739130972214d34c287836d13534e35f75e53a6eea147",
+        "newGeometrySha256": "32842af64cd3dae87c6739130972214d34c287836d13534e35f75e53a6eea147",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "26685d23f4fbe044f1bc25e57026e4e55af3587793fc3e654cfa065414c70271"
+      },
+      {
+        "id": "stack-fasteners-3-2",
+        "oldGeometrySha256": "76355b056d93058ef4bd13adf8c9b249b7c1a76a1235708f41e1289712ce27d4",
+        "newGeometrySha256": "76355b056d93058ef4bd13adf8c9b249b7c1a76a1235708f41e1289712ce27d4",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "9ff4136c4332c59290c936fc337121d10cec107fa6d125c7bb0aa8c6914937eb"
+      },
+      {
+        "id": "stack-washers-3-2",
+        "oldGeometrySha256": "5f9b7dc16c15e835bcda3dc2914aed92cc977ee0bc4c2e74c8b8de24e7b88f30",
+        "newGeometrySha256": "5f9b7dc16c15e835bcda3dc2914aed92cc977ee0bc4c2e74c8b8de24e7b88f30",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "6919f83d1f054e2b781b8f5769d6c07ae075346634452155c2e02f7d4de93425"
+      },
+      {
+        "id": "stack-seals-3-2",
+        "oldGeometrySha256": "a6bdd8b847b97d4b42e25969d4c52963a0867592e207384de1215c0d43c9989c",
+        "newGeometrySha256": "a6bdd8b847b97d4b42e25969d4c52963a0867592e207384de1215c0d43c9989c",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "a3cab3e14a5b39c259e268da3752734817384591d2ac7cd6d80f5dfd75a8fb4e"
+      },
+      {
+        "id": "stack-3-3",
+        "oldGeometrySha256": "969d6d12bcb4f3c8912d4361b1a136e7444863dcb68ab43c571ae3fe7ba2640b",
+        "newGeometrySha256": "969d6d12bcb4f3c8912d4361b1a136e7444863dcb68ab43c571ae3fe7ba2640b",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "85e0c18d1d9581642a83cb9f0e7cf9cb06b8f70b5216a5ebac3bf21e782bfe60"
+      },
+      {
+        "id": "stack-frames-3-3",
+        "oldGeometrySha256": "a3a11b6c16eadc0cbb176a88ce31f39a4c24f836ec8f86cf9fc3d17c29dc8568",
+        "newGeometrySha256": "a3a11b6c16eadc0cbb176a88ce31f39a4c24f836ec8f86cf9fc3d17c29dc8568",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "26685d23f4fbe044f1bc25e57026e4e55af3587793fc3e654cfa065414c70271"
+      },
+      {
+        "id": "stack-fasteners-3-3",
+        "oldGeometrySha256": "7539ef183db70e0e03711291fe2bc8986a0d6674db64373bf8e2b82498b36501",
+        "newGeometrySha256": "7539ef183db70e0e03711291fe2bc8986a0d6674db64373bf8e2b82498b36501",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "9ff4136c4332c59290c936fc337121d10cec107fa6d125c7bb0aa8c6914937eb"
+      },
+      {
+        "id": "stack-washers-3-3",
+        "oldGeometrySha256": "3702e0ae2b88f5c078ead149902d9a52379acc8145f27bd1b33959c5b4c27019",
+        "newGeometrySha256": "3702e0ae2b88f5c078ead149902d9a52379acc8145f27bd1b33959c5b4c27019",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "6919f83d1f054e2b781b8f5769d6c07ae075346634452155c2e02f7d4de93425"
+      },
+      {
+        "id": "stack-seals-3-3",
+        "oldGeometrySha256": "7e7e725febefc456e6a5d3df3ad5d84475b3cb19aaa15a91b6f452a09ff7e1a3",
+        "newGeometrySha256": "7e7e725febefc456e6a5d3df3ad5d84475b3cb19aaa15a91b6f452a09ff7e1a3",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "a3cab3e14a5b39c259e268da3752734817384591d2ac7cd6d80f5dfd75a8fb4e"
+      },
+      {
+        "id": "stack-3-4",
+        "oldGeometrySha256": "d5d614c2706988b426162e04b759e9ac090b51599168210880916b07c8cbb0eb",
+        "newGeometrySha256": "d5d614c2706988b426162e04b759e9ac090b51599168210880916b07c8cbb0eb",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "85e0c18d1d9581642a83cb9f0e7cf9cb06b8f70b5216a5ebac3bf21e782bfe60"
+      },
+      {
+        "id": "stack-frames-3-4",
+        "oldGeometrySha256": "c33f0b0f612129d45cfc2176d281e705dcf491bc1a830c2eaced030204dc28ca",
+        "newGeometrySha256": "c33f0b0f612129d45cfc2176d281e705dcf491bc1a830c2eaced030204dc28ca",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "26685d23f4fbe044f1bc25e57026e4e55af3587793fc3e654cfa065414c70271"
+      },
+      {
+        "id": "stack-fasteners-3-4",
+        "oldGeometrySha256": "73e7fd25b1dcb498b90521399e5beb466cc54988afb584c8f0324f22c5795f91",
+        "newGeometrySha256": "73e7fd25b1dcb498b90521399e5beb466cc54988afb584c8f0324f22c5795f91",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "9ff4136c4332c59290c936fc337121d10cec107fa6d125c7bb0aa8c6914937eb"
+      },
+      {
+        "id": "stack-washers-3-4",
+        "oldGeometrySha256": "ab7c0295656c0791e5b0ad9a8041a006db02ac02044d3265473be94390bd16ac",
+        "newGeometrySha256": "ab7c0295656c0791e5b0ad9a8041a006db02ac02044d3265473be94390bd16ac",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "6919f83d1f054e2b781b8f5769d6c07ae075346634452155c2e02f7d4de93425"
+      },
+      {
+        "id": "stack-seals-3-4",
+        "oldGeometrySha256": "c34f3692ac0f2261f46e44f58d86dafaf32cfa7071562068c2e6b79c46c8b697",
+        "newGeometrySha256": "c34f3692ac0f2261f46e44f58d86dafaf32cfa7071562068c2e6b79c46c8b697",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "a3cab3e14a5b39c259e268da3752734817384591d2ac7cd6d80f5dfd75a8fb4e"
+      },
+      {
+        "id": "fan",
+        "oldGeometrySha256": "eca56a034bbb351fb651eded3d7b7896518ad01850e54ef0a74886e46d6554ec",
+        "newGeometrySha256": "eca56a034bbb351fb651eded3d7b7896518ad01850e54ef0a74886e46d6554ec",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "ac395bf1431172e31ade1b9d4bfb92e3605d180c56d62281e1b52795a62bacb0"
+      },
+      {
+        "id": "fan-stators",
+        "oldGeometrySha256": "d0f64513a5d40733cda6c70d949a7f938521a110c936cadb6529050c311fb2da",
+        "newGeometrySha256": "d0f64513a5d40733cda6c70d949a7f938521a110c936cadb6529050c311fb2da",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "ac395bf1431172e31ade1b9d4bfb92e3605d180c56d62281e1b52795a62bacb0"
+      },
+      {
+        "id": "main-motor",
+        "oldGeometrySha256": "03fd5df9d50c26bbd2937c50004cb8798b4ab4b0a8965e2462fc6b2a61ef052e",
+        "newGeometrySha256": "03fd5df9d50c26bbd2937c50004cb8798b4ab4b0a8965e2462fc6b2a61ef052e",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "ce06e8bc40ded3ad6d91758fe1d3e5ca6725054e505a8240b9e147e5213641ca"
+      },
+      {
+        "id": "motor-front-cap",
+        "oldGeometrySha256": "bb8d5e131b1fc4d5f31f0700017851f851db914319137eace73af16213846a49",
+        "newGeometrySha256": "bb8d5e131b1fc4d5f31f0700017851f851db914319137eace73af16213846a49",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "8c4f64d3fc250a49b006aa7ef74bd3cdee81d976af616d39a67814412c51a50b"
+      },
+      {
+        "id": "motor-rear-cap",
+        "oldGeometrySha256": "7e79dab4912be779469d09b3dd2a1ad06428f814c3ac7f1f3e903781ed792626",
+        "newGeometrySha256": "7e79dab4912be779469d09b3dd2a1ad06428f814c3ac7f1f3e903781ed792626",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "ac395bf1431172e31ade1b9d4bfb92e3605d180c56d62281e1b52795a62bacb0"
+      },
+      {
+        "id": "motor-shaft-collar",
+        "oldGeometrySha256": "f6699412a12f5ecaf03bb6eef760a2c160562bec651613f347fb793c27912e9c",
+        "newGeometrySha256": "f6699412a12f5ecaf03bb6eef760a2c160562bec651613f347fb793c27912e9c",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "e0ab49a6a24dcfd2487a9df26e78e08e77e19e74b6206bcb260fb9e721d79cb3"
+      },
+      {
+        "id": "motor-housing",
+        "oldGeometrySha256": "3652b74da5b23fbeac2358f2764286d2f0b64f31e27030723d08ae9f7258aa09",
+        "newGeometrySha256": "3652b74da5b23fbeac2358f2764286d2f0b64f31e27030723d08ae9f7258aa09",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "a0d9a237050ea7f6fec6f95fd8f020f3636c8730fbd6b02dda800eef8aa3c704"
+      },
+      {
+        "id": "intake-fasteners",
+        "oldGeometrySha256": "4ab816cb2a815124d7aaef47d2408683889055651ef268e11c5ed99b69a324a4",
+        "newGeometrySha256": "4ab816cb2a815124d7aaef47d2408683889055651ef268e11c5ed99b69a324a4",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "e0ab49a6a24dcfd2487a9df26e78e08e77e19e74b6206bcb260fb9e721d79cb3"
+      },
+      {
+        "id": "intake-inner-shell",
+        "oldGeometrySha256": "fff886bd91bc108c0a57fc1e3baa68df80e9b0bd5bfe9a49a280aeb7d8d1f74a",
+        "newGeometrySha256": "fff886bd91bc108c0a57fc1e3baa68df80e9b0bd5bfe9a49a280aeb7d8d1f74a",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "d4dbbff4a467ba8fef34de738744c691bf5c81f7d3ec222386a31e3189282446"
+      },
+      {
+        "id": "compressor-rotor-1",
+        "oldGeometrySha256": "21af41fa4aded1b7d99d179773bebaf9f8430ea1845b0a800a2d3585b8fcd75a",
+        "newGeometrySha256": "21af41fa4aded1b7d99d179773bebaf9f8430ea1845b0a800a2d3585b8fcd75a",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "a7dc117d7619a57569bcb3674d8e8f000b62cda0103b2db13dc2bd6b9a55dd3d"
+      },
+      {
+        "id": "compressor-diffuser-1",
+        "oldGeometrySha256": "5aa4c7c4cc484a2a536043cf42692272a457508377577107b2eb2fa581368bb6",
+        "newGeometrySha256": "5aa4c7c4cc484a2a536043cf42692272a457508377577107b2eb2fa581368bb6",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "866ca8cc085f0d5bffc16454aeee3fcc036738a699e8e359bfa4d20280fea798"
+      },
+      {
+        "id": "compressor-diffuser-2",
+        "oldGeometrySha256": "76142b55eb56ebd8fac6bbb198268da9b8b501c45b34e07a200b114ac26b4d24",
+        "newGeometrySha256": "76142b55eb56ebd8fac6bbb198268da9b8b501c45b34e07a200b114ac26b4d24",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "866ca8cc085f0d5bffc16454aeee3fcc036738a699e8e359bfa4d20280fea798"
+      },
+      {
+        "id": "compressor-motor-1",
+        "oldGeometrySha256": "67e8a98616e10eda3927187eab18603c395036f53c3fad868726fcf8277334f3",
+        "newGeometrySha256": "67e8a98616e10eda3927187eab18603c395036f53c3fad868726fcf8277334f3",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "e0ab49a6a24dcfd2487a9df26e78e08e77e19e74b6206bcb260fb9e721d79cb3"
+      },
+      {
+        "id": "compressor-motor-2",
+        "oldGeometrySha256": "890646b317fcc3dadf4cda0e5497093ae2a08aa0b707cd0fc15dc16f8d3da6f7",
+        "newGeometrySha256": "890646b317fcc3dadf4cda0e5497093ae2a08aa0b707cd0fc15dc16f8d3da6f7",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "e0ab49a6a24dcfd2487a9df26e78e08e77e19e74b6206bcb260fb9e721d79cb3"
+      },
+      {
+        "id": "compressor-front-flange",
+        "oldGeometrySha256": "9dfa93f0ade5f74185a284f64e7adfd33187f7be8bb368e113fb86939eec9ecb",
+        "newGeometrySha256": "9dfa93f0ade5f74185a284f64e7adfd33187f7be8bb368e113fb86939eec9ecb",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "8f12b95040f2f7daa2e669c86ec0b5ca0f7fd1075cbac2665b76bad04ea86a7a"
+      },
+      {
+        "id": "compressor-rear-flange",
+        "oldGeometrySha256": "39fccd8a3c5856de449d7d91185b28ef943cced705021e21682384f76fa07891",
+        "newGeometrySha256": "39fccd8a3c5856de449d7d91185b28ef943cced705021e21682384f76fa07891",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "8f12b95040f2f7daa2e669c86ec0b5ca0f7fd1075cbac2665b76bad04ea86a7a"
+      },
+      {
+        "id": "compressor-casing",
+        "oldGeometrySha256": "71b5cdaebee2aa11c6693e1110fc87245b879abf889ca1ba7da6cedc6f743ffe",
+        "newGeometrySha256": "71b5cdaebee2aa11c6693e1110fc87245b879abf889ca1ba7da6cedc6f743ffe",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "201c990c68a1254ccefe2ef4e0e0d1ba40c62b0be6eeb5d521db31976f332d1a"
+      },
+      {
+        "id": "compressor-fasteners",
+        "oldGeometrySha256": "95ad46d23ee6834f990a333a53804c6794be462550d1a6d067bda264baf1ff2b",
+        "newGeometrySha256": "95ad46d23ee6834f990a333a53804c6794be462550d1a6d067bda264baf1ff2b",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "e0ab49a6a24dcfd2487a9df26e78e08e77e19e74b6206bcb260fb9e721d79cb3"
+      },
+      {
+        "id": "pump",
+        "oldGeometrySha256": "e331c01032dd91cbb77b065359337204b7c863891178eb8f06526fdf39a13dba",
+        "newGeometrySha256": "e331c01032dd91cbb77b065359337204b7c863891178eb8f06526fdf39a13dba",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "6adb845a7232f704700216a880c56bc47fbfda568639f5e5a3654fc8d3c34767"
+      },
+      {
+        "id": "pump-hardware",
+        "oldGeometrySha256": "b811556eadcbaae818efe260ba96e501add2f849492ba1aad7ed8bc3e0b0c252",
+        "newGeometrySha256": "b811556eadcbaae818efe260ba96e501add2f849492ba1aad7ed8bc3e0b0c252",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "06220526750dc1014b7cabe60230d7bca6bcabb034449daf0753a94cb72ff8fc"
+      },
+      {
+        "id": "outer-shell",
+        "oldGeometrySha256": "ae03f670f84bc735b3e1b7c32a28bbb308e7fd31f9e16e77968cac7448d413b6",
+        "newGeometrySha256": "ae03f670f84bc735b3e1b7c32a28bbb308e7fd31f9e16e77968cac7448d413b6",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "b9277ad0d90ab95585c67e62fae90e6f7e14f01aba2a8aff8960a03dc34e4eb9"
+      },
+      {
+        "id": "outer-shell-port-trims",
+        "oldGeometrySha256": "7e2a11b307279aca8271be232c4bb474e7baaeebe72f9a0eadcb9ef2dc4f73a4",
+        "newGeometrySha256": "7e2a11b307279aca8271be232c4bb474e7baaeebe72f9a0eadcb9ef2dc4f73a4",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "3ab9fc8dc08dbc50aae9bf7710771aab505e9dfdca08bebcec37870f3caa5999"
+      },
+      {
+        "id": "outer-shell-access-covers",
+        "oldGeometrySha256": "a945fe76a21758aa29b2e436097a3e55a12b607a92b639ba96b986d5ed7c2f35",
+        "newGeometrySha256": "a945fe76a21758aa29b2e436097a3e55a12b607a92b639ba96b986d5ed7c2f35",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "d52b3d379508e0bed1c262841ec258bc434fa76ee1f78384efe6c2c0449763b2"
+      },
+      {
+        "id": "outer-shell-fasteners",
+        "oldGeometrySha256": "8f7f50e4e60d1f03c2b5e429ff983d49838a64f6b246722b9cf7c107f0d7c2dd",
+        "newGeometrySha256": "8f7f50e4e60d1f03c2b5e429ff983d49838a64f6b246722b9cf7c107f0d7c2dd",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "b74d217c6a6d8e884d7d60e9487b4e51fc363ac1e3486661dfae6422d8954629"
+      },
+      {
+        "id": "inner-shell",
+        "oldGeometrySha256": "23865f68d2a6dceb2b2e374837d8612a3a86a65967bd6be0c67c5df2849a50a6",
+        "newGeometrySha256": "23865f68d2a6dceb2b2e374837d8612a3a86a65967bd6be0c67c5df2849a50a6",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "c2fee99e32eba57fab1168ec124b9dc23800110a3e33f89fb2f56637291de095"
+      },
+      {
+        "id": "inner-shell-fasteners",
+        "oldGeometrySha256": "c722a4b0c3020e522d4966ee1b0c88f8eefd9ffc6273182ca98aa00b1a82091f",
+        "newGeometrySha256": "c722a4b0c3020e522d4966ee1b0c88f8eefd9ffc6273182ca98aa00b1a82091f",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "40d08ede4e1514769277270995dac138774808547e4b57b5b397347c60ab68e8"
+      },
+      {
+        "id": "wiring-harness",
+        "oldGeometrySha256": "0fb92b25484c0cc57733252481fa0a4970e4f284384a9e337c2d5d38c5652dde",
+        "newGeometrySha256": "0fb92b25484c0cc57733252481fa0a4970e4f284384a9e337c2d5d38c5652dde",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "e7e92ebbd730e0ba0559071149a291ef70da4e683e95281e4571f4a82110a46a"
+      },
+      {
+        "id": "wiring-connectors",
+        "oldGeometrySha256": "dd32e28cfd9d9a9e58fd3c6029ab9035d72364082f644cfd5375d5c5c69fe745",
+        "newGeometrySha256": "dd32e28cfd9d9a9e58fd3c6029ab9035d72364082f644cfd5375d5c5c69fe745",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "0908e716191650806fdf09451adcc2195b0e6b348069c0619c242e68a993ebee"
+      },
+      {
+        "id": "wiring-clamps",
+        "oldGeometrySha256": "6c3c402204b9345a3ee3aeeeccd6a1226a6a97661016500b7f49242db0bb90b7",
+        "newGeometrySha256": "6c3c402204b9345a3ee3aeeeccd6a1226a6a97661016500b7f49242db0bb90b7",
+        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
+        "materialsSha256": "4099294c926d2912def0b80ed55f7173b94eff89911fb4b0e97c2e7dda20e6e3"
+      }
+    ],
+    "allUnchangedGeometryHashesMatch": true,
+    "allNodeTransformsUnchanged": true,
+    "allMaterialsUnchanged": true,
+    "collisionScope": "Only the two updated exported solids against every other exported assembly part; previous non-target pairs are reused",
+    "toleranceSource": "scripts/verify-new-design-compressor.mjs solidIntersections.toleranceMm3",
+    "toleranceMm3": 0.02,
+    "broadPhasePairs": 193,
+    "exactChecks": 13,
+    "maximumIntersectionVolumeMm3": 0,
+    "checks": [
+      {
+        "parts": [
+          "fan-spinner",
+          "fan"
+        ],
+        "volumeMm3": 0
+      },
+      {
+        "parts": [
+          "fan-spinner",
+          "outer-shell"
+        ],
+        "volumeMm3": 0
+      },
+      {
+        "parts": [
+          "fan-spinner",
+          "outer-shell-port-trims"
+        ],
+        "volumeMm3": 0
+      },
+      {
+        "parts": [
+          "fan-spinner",
+          "outer-shell-fasteners"
+        ],
+        "volumeMm3": 0
+      },
+      {
+        "parts": [
+          "compressor-rotor-2",
+          "compressor-diffuser-2"
+        ],
+        "volumeMm3": 0
+      },
+      {
+        "parts": [
+          "compressor-rotor-2",
+          "compressor-motor-2"
+        ],
+        "volumeMm3": 0
+      },
+      {
+        "parts": [
+          "compressor-rotor-2",
+          "compressor-rear-flange"
+        ],
+        "volumeMm3": 0
+      },
+      {
+        "parts": [
+          "compressor-rotor-2",
+          "compressor-casing"
+        ],
+        "volumeMm3": 0
+      },
+      {
+        "parts": [
+          "compressor-rotor-2",
+          "compressor-fasteners"
+        ],
+        "volumeMm3": 0
+      },
+      {
+        "parts": [
+          "compressor-rotor-2",
+          "outer-shell"
+        ],
+        "volumeMm3": 0
+      },
+      {
+        "parts": [
+          "compressor-rotor-2",
+          "outer-shell-port-trims"
+        ],
+        "volumeMm3": 0
+      },
+      {
+        "parts": [
+          "compressor-rotor-2",
+          "outer-shell-fasteners"
+        ],
+        "volumeMm3": 0
+      },
+      {
+        "parts": [
+          "compressor-rotor-2",
+          "inner-shell"
+        ],
+        "volumeMm3": 0
+      }
+    ],
+    "collisions": [],
+    "fluidAndStackGeneratorsRun": false
+  },
+  "exportedCellGeometryReuse": {
+    "sourceModelSha256": "bc5178d7f330f24fc31ef76982298b5251a588c11361877ccae4390513d0f582",
+    "reason": "All stack, plumbing, shell and wiring mesh/transform hashes are unchanged",
+    "unchangedStackNodeIds": [
+      "stack-1-1",
+      "stack-frames-1-1",
+      "stack-fasteners-1-1",
+      "stack-washers-1-1",
+      "stack-seals-1-1",
+      "stack-1-2",
+      "stack-frames-1-2",
+      "stack-fasteners-1-2",
+      "stack-washers-1-2",
+      "stack-seals-1-2",
+      "stack-1-3",
+      "stack-frames-1-3",
+      "stack-fasteners-1-3",
+      "stack-washers-1-3",
+      "stack-seals-1-3",
+      "stack-2-1",
+      "stack-frames-2-1",
+      "stack-fasteners-2-1",
+      "stack-washers-2-1",
+      "stack-seals-2-1",
+      "stack-2-2",
+      "stack-frames-2-2",
+      "stack-fasteners-2-2",
+      "stack-washers-2-2",
+      "stack-seals-2-2",
+      "stack-2-3",
+      "stack-frames-2-3",
+      "stack-fasteners-2-3",
+      "stack-washers-2-3",
+      "stack-seals-2-3",
+      "stack-2-4",
+      "stack-frames-2-4",
+      "stack-fasteners-2-4",
+      "stack-washers-2-4",
+      "stack-seals-2-4",
+      "stack-3-1",
+      "stack-frames-3-1",
+      "stack-fasteners-3-1",
+      "stack-washers-3-1",
+      "stack-seals-3-1",
+      "stack-3-2",
+      "stack-frames-3-2",
+      "stack-fasteners-3-2",
+      "stack-washers-3-2",
+      "stack-seals-3-2",
+      "stack-3-3",
+      "stack-frames-3-3",
+      "stack-fasteners-3-3",
+      "stack-washers-3-3",
+      "stack-seals-3-3",
+      "stack-3-4",
+      "stack-frames-3-4",
+      "stack-fasteners-3-4",
+      "stack-washers-3-4",
+      "stack-seals-3-4"
+    ],
+    "changedNodesOutsideStackAxialEnvelope": true
+  },
   "compressorGeometry": {
     "status": "passed",
     "scope": "Two backed eighteen-blade rotors; static covers and interstage return assembly removed; structural geometry only",
     "source": "exported GLB",
-    "modelModifiedAt": "2026-10-25T16:06:57.147Z",
+    "modelModifiedAt": "2026-10-25T16:31:23.909Z",
     "units": "mm",
     "frontParts": 20,
     "componentCounts": {
@@ -2650,6 +4012,27 @@
         "separatedBlades": 16
       }
     ],
+    "fanSpinner": {
+      "frontMm": 0,
+      "baseMm": 110,
+      "axialLengthMm": 110,
+      "frontTipRadiusMm": 0.3500000148912188,
+      "baseRadiusMm": 100.00000470917108,
+      "maximumConicalProfileErrorMm": 0.000007620330691793242,
+      "retainedFanPlacement": {
+        "frontMm": 50,
+        "centreMm": 130,
+        "rearMm": 210
+      },
+      "sharedHubBaseVertex": {
+        "position": [
+          110,
+          100,
+          0
+        ],
+        "errorMm": 0
+      }
+    },
     "fanBladeSeparation": {
       "exposedBladeCount": 16,
       "sharedHubExcludedToRadiusMm": 100.1,
@@ -2887,6 +4270,12 @@
         "radiusMm": 100,
         "separatedBlades": 18,
         "metadataBlades": 18
+      },
+      {
+        "stage": 2,
+        "radiusMm": 125,
+        "separatedBlades": 18,
+        "metadataBlades": 18
       }
     ],
     "restoredBackplates": [
@@ -2911,9 +4300,9 @@
         "rearMm": 616,
         "specifiedRadiusMm": 114.8,
         "measuredRearVertexRadiusMm": 114.80000383625237,
-        "specifiedBladeTipRadiusMm": 114.8,
-        "measuredBladeTipRadiusMm": 114.80000430467994,
-        "bladeRadialOverhangMm": 0,
+        "specifiedBladeTipRadiusMm": 134.8,
+        "measuredBladeTipRadiusMm": 134.80000319451995,
+        "bladeRadialOverhangMm": 20.000000000000014,
         "materialBeyondBackplateMm3": 0,
         "missingMaterialMm3": 0,
         "verifiedRunningGapMm": 0.8,
@@ -2941,7 +4330,7 @@
         "continuousRootProbeSegments": 216,
         "backplateBridgeProbes": 162,
         "bridgeProbeMaximumRadiusMm": 114.3,
-        "bladeRadialOverhangMm": 0,
+        "bladeRadialOverhangMm": 20.000000000000014,
         "rootMissingMaterialMm3": 0,
         "bladeBottomMissingMaterialMm3": 0,
         "rotorConnectedComponents": 1
@@ -2980,7 +4369,7 @@
     "inletToOutlet": {
       "interpretation": "A clear structural path through the open rotor and stator arrangement; no sealed pressure-stage claim",
       "probeRadiusMm": 0.5,
-      "segments": 88,
+      "segments": 89,
       "toleranceMm3": 0.001,
       "maximumObstructionVolumeMm3": 0,
       "obstructions": []
@@ -2995,7 +4384,7 @@
       {
         "id": "compressor-shroud-2",
         "absentPartId": true,
-        "witnessVolumeMm3": 0.0585270966048304,
+        "witnessVolumeMm3": 0.058527096604830346,
         "obstructions": []
       },
       {
@@ -3322,142 +4711,5 @@
       "obstructions": []
     },
     "failures": []
-  },
-  "exportedCellGeometry": {
-    "modelBytes": 78270040,
-    "modules": [
-      {
-        "id": "stack-1-1",
-        "stage": 1,
-        "module": 1,
-        "physicalCells": 279,
-        "nominalInnerCoolingGap": 0.46,
-        "probeDiameter": 0.36800000000000005,
-        "axialCoolingProbes": 280
-      },
-      {
-        "id": "stack-1-2",
-        "stage": 1,
-        "module": 2,
-        "physicalCells": 279,
-        "nominalInnerCoolingGap": 0.46,
-        "probeDiameter": 0.36800000000000005,
-        "axialCoolingProbes": 280
-      },
-      {
-        "id": "stack-1-3",
-        "stage": 1,
-        "module": 3,
-        "physicalCells": 279,
-        "nominalInnerCoolingGap": 0.46,
-        "probeDiameter": 0.36800000000000005,
-        "axialCoolingProbes": 280
-      },
-      {
-        "id": "stack-2-1",
-        "stage": 2,
-        "module": 1,
-        "physicalCells": 372,
-        "nominalInnerCoolingGap": 0.36,
-        "probeDiameter": 0.288,
-        "axialCoolingProbes": 373
-      },
-      {
-        "id": "stack-2-2",
-        "stage": 2,
-        "module": 2,
-        "physicalCells": 372,
-        "nominalInnerCoolingGap": 0.36,
-        "probeDiameter": 0.288,
-        "axialCoolingProbes": 373
-      },
-      {
-        "id": "stack-2-3",
-        "stage": 2,
-        "module": 3,
-        "physicalCells": 372,
-        "nominalInnerCoolingGap": 0.36,
-        "probeDiameter": 0.288,
-        "axialCoolingProbes": 373
-      },
-      {
-        "id": "stack-2-4",
-        "stage": 2,
-        "module": 4,
-        "physicalCells": 372,
-        "nominalInnerCoolingGap": 0.36,
-        "probeDiameter": 0.288,
-        "axialCoolingProbes": 373
-      },
-      {
-        "id": "stack-3-1",
-        "stage": 3,
-        "module": 1,
-        "physicalCells": 372,
-        "nominalInnerCoolingGap": 0.46,
-        "probeDiameter": 0.36800000000000005,
-        "axialCoolingProbes": 373
-      },
-      {
-        "id": "stack-3-2",
-        "stage": 3,
-        "module": 2,
-        "physicalCells": 372,
-        "nominalInnerCoolingGap": 0.46,
-        "probeDiameter": 0.36800000000000005,
-        "axialCoolingProbes": 373
-      },
-      {
-        "id": "stack-3-3",
-        "stage": 3,
-        "module": 3,
-        "physicalCells": 372,
-        "nominalInnerCoolingGap": 0.46,
-        "probeDiameter": 0.36800000000000005,
-        "axialCoolingProbes": 373
-      },
-      {
-        "id": "stack-3-4",
-        "stage": 3,
-        "module": 4,
-        "physicalCells": 372,
-        "nominalInnerCoolingGap": 0.46,
-        "probeDiameter": 0.36800000000000005,
-        "axialCoolingProbes": 373
-      }
-    ],
-    "physicalCells": 3813,
-    "minimumMeasuredThickness": 0.5499903655552316,
-    "maximumMeasuredThickness": 0.5500235144984345,
-    "minimumMeasuredInnerCoolingGap": 0.3601883360912436,
-    "maximumMeasuredInnerCoolingGap": 0.4602124767568812,
-    "axialCoolingProbes": 3824,
-    "maximumSolidObstruction": 0,
-    "obstructionChecks": 199,
-    "portCounts": {
-      "air": 11,
-      "hydrogen": 11,
-      "return": 11,
-      "cathode": 11
-    },
-    "assemblyEnvelopes": [
-      {
-        "stage": 1,
-        "measuredOuterDiameter": 473.4020180501664,
-        "specifiedOuterDiameter": 473.402
-      },
-      {
-        "stage": 2,
-        "measuredOuterDiameter": 579.0020208597766,
-        "specifiedOuterDiameter": 579.002
-      },
-      {
-        "stage": 3,
-        "measuredOuterDiameter": 700.0000281521953,
-        "specifiedOuterDiameter": 700
-      }
-    ],
-    "innerCasingRear": 1387,
-    "passed": true
   }
 }

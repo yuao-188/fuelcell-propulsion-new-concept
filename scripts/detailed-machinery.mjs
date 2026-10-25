@@ -124,10 +124,10 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
   add('fan', `${fanBladeCount}叶后掠扭转风扇 · 叶根25°至叶尖${F.tipAngleToAxisDeg}°`, 'front', steel, fanSolid,
     { ...metal, rotor: 'main', bladeCount: fanBladeCount, rootChordAngleToAxis: 25, tipChordAngleToAxis: F.tipAngleToAxisDeg });
 
-  const nose = [];
+  const nose = [], spinnerFront = F.spinnerFront ?? fanFront;
   for (let i = 0; i <= 28; i++) {
     const t = i / 28;
-    nose.push([lerp(fanFront, hubFront, t), Math.max(.35, F.hubRadius * t)]);
+    nose.push([lerp(spinnerFront, hubFront, t), Math.max(.35, F.hubRadius * t)]);
   }
   add('fan-spinner', '锥形金属整流罩', 'front', paleSteel, solidLathe(nose), metal);
   // This recessed annular groove is cut into the hub itself, never laid on top
@@ -278,6 +278,6 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
 
   const compressor = buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCylinder, solidLathe, hollowLathe, add });
   void revolved;
-  return { fanFront, fanRear, mainFanRadius: F.radius, fanBladeCount,
+  return { fanFront, fanRear, spinnerFront, spinnerRear: hubFront, spinnerLength: hubFront-spinnerFront, mainFanRadius: F.radius, fanBladeCount,
     fanStatorCount: 18, statorFront, statorRear, intakeLiner, ...compressor };
 }

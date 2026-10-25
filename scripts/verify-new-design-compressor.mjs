@@ -203,6 +203,32 @@ try {
   if (P.fan.blades !== 16 || result.fanRadialSections.some(section => section.separatedBlades !== 16)) failures.push('The main fan must retain sixteen separate blades outside the hub');
   if (Math.abs(result.fanTwist.tip.measuredAngleToAxisDeg - 66) > .004) failures.push('Main fan tip chord must make 66 degrees with the axis');
 
+  // Lengthen only the cone upstream. Its original base plane and hub radius
+  // remain at x=110 and R=100; the fan itself keeps its original placement.
+  const spinner = getPart('fan-spinner'), spinnerMesh = spinner.solid.getMesh();
+  let spinnerFrontRadius = 0, spinnerBaseRadius = 0, spinnerProfileError = 0;
+  for (let i = 0; i < spinnerMesh.vertProperties.length; i += spinnerMesh.numProp) {
+    const x = spinnerMesh.vertProperties[i], radius = Math.hypot(spinnerMesh.vertProperties[i + 1], spinnerMesh.vertProperties[i + 2]);
+    if (Math.abs(x) < .001) spinnerFrontRadius = Math.max(spinnerFrontRadius, radius);
+    if (Math.abs(x - 110) < .001) spinnerBaseRadius = Math.max(spinnerBaseRadius, radius);
+    if (radius > .1) spinnerProfileError = Math.max(spinnerProfileError, Math.abs(radius - Math.max(.35, 100 * x / 110)));
+  }
+  result.fanSpinner = {
+    frontMm: spinner.bounds.min[0], baseMm: spinner.bounds.max[0],
+    axialLengthMm: spinner.bounds.max[0] - spinner.bounds.min[0],
+    frontTipRadiusMm: spinnerFrontRadius, baseRadiusMm: spinnerBaseRadius,
+    maximumConicalProfileErrorMm: spinnerProfileError,
+    retainedFanPlacement: { frontMm: P.fan.front, centreMm: P.fan.x, rearMm: P.fan.rear },
+    sharedHubBaseVertex: nearestVertex([110, 100, 0]),
+  };
+  if (P.fan.spinnerFront !== 0 || P.fan.front !== 50 || P.fan.x !== 130 || P.fan.rear !== 210
+    || Math.abs(result.fanSpinner.frontMm) > .001 || Math.abs(result.fanSpinner.baseMm - 110) > .001
+    || Math.abs(result.fanSpinner.axialLengthMm - 110) > .001
+    || Math.abs(spinnerFrontRadius - .35) > .001 || Math.abs(spinnerBaseRadius - 100) > .001
+    || spinnerProfileError > .001 || result.fanSpinner.sharedHubBaseVertex.errorMm > .001) {
+    failures.push('The extended conical spinner must run from x=0 to the unchanged x=110/R=100 hub base without moving the fan');
+  }
+
   // Remove the shared hub and examine every complete exposed leaf. This catches
   // a merger between the radial checkpoints and measures actual triangle-based
   // separation, instead of treating the whole joined rotor as collision proof.
@@ -281,8 +307,8 @@ try {
   const rotorMotionProfiles = [
     [[487, 12.375], [514, 12.375], [514, 12.375 * 1.15], [522, 41 * .69],
       [522, 39], [534.5, 162.8], [544.15, 162.8], [544.15, 143.8], [549, 143.8]],
-    [[576, 12.375 * 1.15], [584, 35.6 * .69], [584, 33.5], [600, 114.8],
-      [616, 114.8], [616, 12.375], [638, 12.375]],
+    [[576, 12.375 * 1.15], [584, 35.6 * .69], [584, 33.5], [600, 134.8],
+      [611.15, 134.8], [611.15, 114.8], [616, 114.8], [616, 12.375], [638, 12.375]],
   ];
   result.compressorMotionEnvelopes = rotorMotionProfiles.map((profile, index) => {
     const rotor = compressorRotors[index], segments = 256, cornerSegments = 96;
@@ -359,11 +385,11 @@ try {
   const compressorStages = [
     { stage: 1, plate: 544, back: 549, inner: 39, outer: 162.8, backplateRadius: 143.8, eye: 41,
       heightIn: 22, heightOut: 9.5, witness: 80, diffuserInner: 148.2, diffuserFront: 552, diffuserRear: 567 },
-    { stage: 2, plate: 611, back: 616, inner: 33.5, outer: 114.8, backplateRadius: 114.8, eye: 35.6,
+    { stage: 2, plate: 611, back: 616, inner: 33.5, outer: 134.8, backplateRadius: 114.8, eye: 35.6,
       heightIn: 27, heightOut: 11, witness: 65, diffuserInner: 119.2, diffuserFront: 619, diffuserRear: 629 },
   ];
   result.compressorBladeSections = compressorRotors.flatMap((rotor, i) => {
-    return (i === 0 ? [75, 120, 155] : [60, 100]).map(nominalRadius => {
+    return (i === 0 ? [75, 120, 155] : [60, 100, 125]).map(nominalRadius => {
       // Stop ahead of the restored backplate, otherwise the disk joins all of
       // the blade intersections into one ring and hides the actual leaf count.
       const radius = rr(nominalRadius), front = rotor.bounds.min[0] - .1, rear = ax(compressorStages[i].plate) - .3;
@@ -507,8 +533,9 @@ try {
     polar(ax(569), rr(144), entryAngle), polar(ax(569), rr(44), entryAngle), polar(ax(578), rr(31), entryAngle),
     polar(ax(580), rr(31), entryAngle), polar(ax(582), rr(31), entryAngle),
   );
-  bladePassage(611, 33.5, 114.8, 27, 11);
-  path.push(polar(ax(606.05), rr(126), exitAngle), polar(ax(619), rr(126), exitAngle),
+  bladePassage(611, 33.5, 134.8, 27, 11);
+  path.push(polar(ax(606.05), rr(135.8), exitAngle), polar(ax(616), rr(135), exitAngle),
+    polar(ax(619), rr(133), exitAngle),
     polar(ax(624), rr(85), exitAngle), polar(ax(635), rr(60), exitAngle),
     polar(ax(650), rr(43), exitAngle), polar(ax(660), rr(25), exitAngle), polar(ax(665), rr(12), exitAngle),
     [neckStart, 0, 0], [K.outlet - .5, 0, 0],
