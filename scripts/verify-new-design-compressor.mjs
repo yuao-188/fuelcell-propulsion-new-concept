@@ -250,6 +250,111 @@ try {
   const K = P.compressor, axialScale = (K.outlet - K.front) / 210;
   const ax = nominal => K.front + (nominal - 480) * axialScale;
   const rr = nominal => nominal * K.inner / 165;
+
+  // Independently specified axial/radial profiles enclose the complete rotor
+  // sweep, including the shafts, cones, blade tips and backplates. Expanding
+  // these profiles verifies a running gap at every azimuth, not just at the
+  // current eighteen blade positions. Circumscribed facets prevent the
+  // verification envelope from shrinking between revolution vertices.
+  const rotorMotionProfiles = [
+    [[487, 12.375], [514, 12.375], [514, 12.375 * 1.15], [522, 41 * .69],
+      [522, 39], [534.5, 143.8], [549, 143.8]],
+    [[576, 12.375 * 1.15], [584, 35.6 * .69], [584, 33.5], [600, 114.8],
+      [616, 114.8], [616, 12.375], [638, 12.375]],
+  ];
+  result.compressorMotionEnvelopes = rotorMotionProfiles.map((profile, index) => {
+    const rotor = compressorRotors[index], segments = 256, cornerSegments = 96;
+    const section = new CS([[
+      ...profile.map(([x, r]) => [rr(r), ax(x)]),
+      [0, ax(profile.at(-1)[0])], [0, ax(profile[0][0])],
+    ]]);
+    const expanded = section.offset((P.clearance + .0001) / Math.cos(Math.PI / cornerSegments), 'Round', 2, cornerSegments);
+    const circumscribed = expanded.scale([1 / Math.cos(Math.PI / segments), 1]);
+    const envelope = circumscribed.revolve(segments).rotate([0, 90, 0]);
+    section.delete(); expanded.delete(); circumscribed.delete();
+    const missing = rotor.solid.subtract(envelope), uncoveredRotorMm3 = Math.max(0, missing.volume());
+    missing.delete();
+    const bounds = envelope.boundingBox();
+    const intersections = parts.filter(part => part.id !== rotor.id && overlaps(bounds, part.bounds))
+      .map(part => ({ id: part.id, volumeMm3: intersectionVolume(envelope, part.solid) }));
+    const report = { stage: index + 1, method: 'continuous 360-degree swept profile with circumscribed facets',
+      verifiedRunningGapMm: P.clearance, uncoveredRotorMm3,
+      maximumIntersectionMm3: Math.max(0, ...intersections.map(item => item.volumeMm3)), intersections };
+    envelope.delete();
+    if (uncoveredRotorMm3 > .001 || report.maximumIntersectionMm3 > .001) {
+      failures.push(`Compressor stage ${index + 1} full rotational envelope lacks the specified running clearance`);
+    }
+    return report;
+  });
+
+  const inletMotor = compressorMotors[0], inletGuide = K.inletGuide;
+  assert.ok(inletGuide, 'First compressor inlet guide parameters are required');
+  const guideSections = [45, 70, 100, 130, 155].map(nominalRadius => {
+    const radius = rr(nominalRadius);
+    const outside = probeCylinder([ax(488), 0, 0], [ax(513), 0, 0], radius + .1, 256);
+    const inside = probeCylinder([ax(487.9), 0, 0], [ax(513.1), 0, 0], radius - .1, 256);
+    const ring = outside.subtract(inside), cut = inletMotor.solid.intersect(ring), components = cut.decompose();
+    const leaves = components.filter(component => component.volume() > .001).map(component => {
+      const bounds = component.boundingBox(), mesh = component.getMesh(), centre = [0, 0, 0];
+      const vertices = mesh.vertProperties.length / mesh.numProp;
+      for (let i = 0; i < mesh.vertProperties.length; i += mesh.numProp) {
+        for (let k = 0; k < 3; k++) centre[k] += mesh.vertProperties[i + k] / vertices;
+      }
+      return { centreXmm: centre[0], centreAngleDeg: (Math.atan2(centre[2], centre[1]) * 180 / Math.PI + 360) % 360,
+        axialChordMm: bounds.max[0] - bounds.min[0] };
+    }).sort((a, b) => a.centreAngleDeg - b.centreAngleDeg);
+    components.forEach(component => component.delete()); cut.delete(); ring.delete(); outside.delete(); inside.delete();
+    return { radiusMm: radius, separatedVanes: leaves.length, leaves };
+  });
+  // A separate sector around each guide must connect its motor root to the
+  // casing. Testing each sector prevents one touching tip from concealing
+  // five unmounted tips in a whole-assembly connected-component count.
+  const mountedGuide = M.union([inletMotor.solid, getPart('compressor-casing').solid]);
+  const guideMounts = Array.from({ length: 6 }, (_, index) => {
+    const angle = inletGuide.phaseDeg + index * 60;
+    const witness = sector(ax(489), ax(512), rr(30), rr(166), angle - 12, angle + 28);
+    const cut = mountedGuide.intersect(witness), components = cut.decompose();
+    const connectedComponents = components.filter(component => component.volume() > .001).length;
+    components.forEach(component => component.delete()); cut.delete(); witness.delete();
+    return { guide: index + 1, motorToCasingConnectedComponents: connectedComponents };
+  });
+  mountedGuide.delete();
+  const guidePassages = Array.from({ length: 6 }, (_, index) => {
+    const angle = (inletGuide.phaseDeg - 20 + index * 60) * Math.PI / 180;
+    const radius = (P.motorHousing.inner + P.intakeLiner.outer) / 2;
+    const points = [polar(P.intakeLiner.rear + .5, radius, angle), polar(ax(486), rr(80), angle),
+      polar(ax(512), rr(36.5), angle), polar(ax(520), rr(36.5), angle)];
+    const tubes = points.slice(1).map((point, i) => probeCylinder(points[i], point, 1));
+    const probe = M.union(tubes);
+    const obstructions = parts.map(part => ({ id: part.id, volumeMm3: intersectionVolume(probe, part.solid) }))
+      .filter(item => item.volumeMm3 > .001);
+    probe.delete(); tubes.forEach(tube => tube.delete());
+    return { channel: index + 1, probeRadiusMm: 1, obstructions };
+  });
+  const guideInwardAxialLean = guideSections[0].leaves[0].centreXmm - guideSections.at(-1).leaves[0].centreXmm;
+  const guideSweep = guideSections.at(-1).leaves[0].centreAngleDeg - guideSections[0].leaves[0].centreAngleDeg;
+  const linerGap = inletMotor.bounds.min[0] - getPart('intake-inner-shell').bounds.max[0];
+  result.compressorInletGuides = {
+    stationary: inletMotor.extras.stationary === true && !inletMotor.extras.rotor,
+    specifiedVanes: inletGuide.count, metadataVanes: inletMotor.extras.inletGuideVaneCount,
+    connectedMotorAndVanes: inletMotor.componentCount, motorFrontMm: inletMotor.bounds.min[0],
+    measuredInwardAxialLeanMm: guideInwardAxialLean, measuredSpanSweepDeg: guideSweep,
+    intakeLinerAxialClearanceLowerBoundMm: linerGap, radialSections: guideSections, mounts: guideMounts,
+    openChannels: guidePassages,
+  };
+  if (!result.compressorInletGuides.stationary || inletGuide.count !== 6 || inletMotor.extras.inletGuideVaneCount !== 6
+    || inletMotor.componentCount !== 1 || guideSections.some(section => section.separatedVanes !== 6)
+    || guideMounts.some(mount => mount.motorToCasingConnectedComponents !== 1)) {
+    failures.push('Six fixed inlet guides must each connect the first motor casing to the outer compressor casing');
+  }
+  if (guideInwardAxialLean < 5 * axialScale || guideSweep < 5
+    || guideSections.some(section => section.leaves.some(leaf => leaf.axialChordMm < 7 * axialScale))) {
+    failures.push('First compressor supports do not form curved, inward-swept guide surfaces');
+  }
+  if (linerGap < P.clearance || guidePassages.some(passage => passage.obstructions.length)) {
+    failures.push('First compressor inlet guides obstruct a passage or lack intake-liner clearance');
+  }
+
   const compressorStages = [
     { stage: 1, plate: 544, back: 549, inner: 39, outer: 143.8, eye: 41, heightIn: 22, heightOut: 9.5, witness: 80, diffuserInner: 148.2 },
     { stage: 2, plate: 611, back: 616, inner: 33.5, outer: 114.8, eye: 35.6, heightIn: 27, heightOut: 11, witness: 65, diffuserInner: 119.2 },

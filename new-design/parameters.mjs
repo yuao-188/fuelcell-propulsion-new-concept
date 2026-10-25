@@ -8,7 +8,9 @@ export const parameters = {
   motorHousing: { front: 210, rear: 480, outer: 172, inner: 165 },
   intakeLiner: { front: 210, rear: 480, inner: 152, outer: 156, contractionStart: 440, radialContraction: 16 },
   compressor: { front: 480, rear: 660, outlet: 690, outer: 172, inner: 165,
-    bladesPerStage: 18, backplateSegments: 512 },
+    bladesPerStage: 18, backplateSegments: 512,
+    inletGuide: { count: 6, motorFront: 490, motorRear: 511, innerCentreX: 506.5, outerCentreX: 498,
+      innerChord: 8, outerChord: 14, thickness: 1.8, sweepDeg: 10, phaseDeg: 30, inwardTurn: 5, camber: 1.5 } },
   stacks: [
     { front: 690, rear: 972, inner: 128, outer: 236.701, cellInner: 138, cellOuter: 233.7, modules: 3, firstSeam: 30, cells: 279 },
     { front: 992, rear: 1367, inner: 234, outer: 313.501, cellInner: 244, cellOuter: 310.5, modules: 4, firstSeam: 45, cells: 372 },

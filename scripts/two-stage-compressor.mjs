@@ -1,3 +1,5 @@
+import { getCompressorInletGuideLayout } from './compressor-inlet-guide-layout.mjs';
+
 /** Two independently driven centrifugal stages. All drive sizes are schematic. */
 export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCylinder, solidLathe, hollowLathe, add }) {
   const tau = Math.PI * 2, lerp = (a, b, t) => a + (b - a) * t;
@@ -97,9 +99,48 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
   // The complete eighteen-vane intermediate return assembly stays absent,
   // along with its former central diaphragm and the two stationary covers.
 
-  // The fixed motor cases have shaft bores and three slim mounting struts.
+  const inletGuide = getCompressorInletGuideLayout(P);
+  const { point: guidePoint, ...inletGuideInfo } = inletGuide;
+  function inletGuideBlade(index) {
+    const vertices = [], triangles = [], perimeter = [], ns = inletGuide.spanSegments, nc = inletGuide.chordSegments;
+    for (let j = 0; j <= nc; j++) perimeter.push([j / nc, 1]);
+    for (let j = nc; j >= 0; j--) perimeter.push([j / nc, -1]);
+    const ringSize = perimeter.length;
+    for (let s = 0; s <= ns; s++) for (const [chord, side] of perimeter) {
+      vertices.push(...guidePoint(s / ns, chord, side, index));
+    }
+    for (let s = 0; s < ns; s++) for (let j = 0; j < ringSize; j++) {
+      const a = s * ringSize + j, b = s * ringSize + (j + 1) % ringSize;
+      const c = a + ringSize, d = b + ringSize;
+      triangles.push(a, c, b, b, c, d);
+    }
+    for (const s of [0, ns]) {
+      const centre = guidePoint(s / ns, .5, 0, index), ci = vertices.length / 3;
+      vertices.push(...centre);
+      for (let j = 0; j < ringSize; j++) {
+        const a = s * ringSize + j, b = s * ringSize + (j + 1) % ringSize;
+        triangles.push(...(s === 0 ? [ci, a, b] : [ci, b, a]));
+      }
+    }
+    let sixVolume = 0;
+    for (let i = 0; i < triangles.length; i += 3) {
+      const a = triangles[i] * 3, b = triangles[i + 1] * 3, c = triangles[i + 2] * 3;
+      sixVolume += vertices[a] * (vertices[b + 1] * vertices[c + 2] - vertices[b + 2] * vertices[c + 1])
+        + vertices[a + 1] * (vertices[b + 2] * vertices[c] - vertices[b] * vertices[c + 2])
+        + vertices[a + 2] * (vertices[b] * vertices[c + 1] - vertices[b + 1] * vertices[c]);
+    }
+    if (sixVolume < 0) for (let i = 0; i < triangles.length; i += 3) {
+      [triangles[i + 1], triangles[i + 2]] = [triangles[i + 2], triangles[i + 1]];
+    }
+    return M.ofMesh({ numProp: 3, vertProperties: new Float32Array(vertices),
+      triVerts: new Uint32Array(triangles) }).intersect(caseLumen);
+  }
+
+  // The first motor moves aft and its old three rods become six curved fixed
+  // guide vanes. Their roots join the motor casing; their tips meet the exact
+  // compressor casing wall. The downstream motor retains its three supports.
   // These are packaging placeholders, not validated power-rated motor models.
-  const motors = [{ number: 1, front: ax(484), rear: ax(510), support: ax(492) },
+  const motors = [{ number: 1, front: inletGuide.motorFront, rear: inletGuide.motorRear },
     { number: 2, front: ax(624), rear: ax(649), support: ax(634) }];
   for (const D of motors) {
     const motorRadius = rr(33), bore = shaftRadius + .9;
@@ -107,13 +148,17 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
       D.front - .1, D.number === 1 ? D.rear + .1 : ax(639.5), bore, 64));
     const pieces = [body];
     if (D.number === 2) pieces.push(solidLathe([[D.rear, motorRadius], [ax(662), .25]]));
-    for (let i = 0; i < 3; i++) {
-      const angle = i * tau / 3;
-      const p = r => [D.support, r * Math.cos(angle), r * Math.sin(angle)];
-      pieces.push(cylinder(p(motorRadius - .5), p(K.inner + 1), rr(2.4), rr(2.4), 32).intersect(caseFree));
-    }
-    add(`compressor-motor-${D.number}`, `第${D.number}级独立电机固定壳与支座（尺寸示意）`, 'front', darkSteel,
-      union(pieces), { ...metal, clip: true, stationary: true, stage: D.number, motorSizing: 'schematic-only' });
+    if (D.number === 1) {
+      for (let i = 0; i < inletGuide.count; i++) pieces.push(inletGuideBlade(i));
+    } else for (let i = 0; i < 3; i++) {
+        const angle = i * tau / 3;
+        const p = r => [D.support, r * Math.cos(angle), r * Math.sin(angle)];
+        pieces.push(cylinder(p(motorRadius - .5), p(K.inner + 1), rr(2.4), rr(2.4), 32).intersect(caseFree));
+      }
+    add(`compressor-motor-${D.number}`, D.number === 1 ? '第一级独立电机固定壳与六片曲面入口导叶'
+      : '第二级独立电机固定壳与支座', 'front', darkSteel,
+      union(pieces), { ...metal, clip: true, stationary: true, stage: D.number, motorSizing: 'schematic-only',
+        ...(D.number === 1 ? { inletGuide: inletGuideInfo, inletGuideVaneCount: inletGuide.count } : {}) });
   }
 
   const flangeDepth = 3 * axialScale, flangeGap = .04;
@@ -154,5 +199,5 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
     removedDiscSurfaces: ['compressor-shroud-1', 'compressor-return-diaphragm', 'compressor-shroud-2'],
     restoredBackplates: stages.map(S => ({ stage: S.number, front: S.plate, rear: S.back,
       radius: S.bladeOuter, segments: backplateSegments })),
-    returnVaneCount: 0, returnDiaphragmSupportCount: 0 };
+    returnVaneCount: 0, returnDiaphragmSupportCount: 0, inletGuide: inletGuideInfo };
 }

@@ -148,7 +148,7 @@ export default function ModelViewport(props: Props) {
       cap.onAfterRender=()=>renderer.clearStencil();
       scene.add(stencil,cap);sections.push({source:mesh,stencil,cap});
     }
-    const modelUrl=new URL('model.glb?v=20261025-supported-18-blade-rotors',document.baseURI);
+    const modelUrl=new URL('model.glb?v=20261025-inward-inlet-guides',document.baseURI);
     const modelRequest=new AbortController();
     const loadFailed=()=>{if(!cancelled)setStatus('模型加载失败，请刷新页面重试。');};
     // Read the binary directly. FileLoader's rewrapped progress stream can

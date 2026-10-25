@@ -1,7 +1,7 @@
 {
   "schema": 4,
   "units": "mm",
-  "dimensionSource": "user-confirmed 18-blade compressor rotors with two matching backplates and continuous hub roots; return vanes removed; prior dimensions retained, 2026-10-25",
+  "dimensionSource": "user-confirmed aft-shifted first-stage fixed drive and curved inward inlet guides; two supported 18-blade rotors retained, 2026-10-25",
   "performanceScope": "geometry only; prior thermal/power results are not recalculated",
   "pumpPlacement": "stage 3 central cavity",
   "envelopes": {
@@ -1869,7 +1869,26 @@
       }
     ],
     "returnVaneCount": 0,
-    "returnDiaphragmSupportCount": 0
+    "returnDiaphragmSupportCount": 0,
+    "inletGuide": {
+      "count": 6,
+      "motorFront": 490,
+      "motorRear": 511,
+      "motorRadius": 33,
+      "rootRadius": 32.5,
+      "outerConstructionRadius": 165.5,
+      "innerCentreX": 506.5,
+      "outerCentreX": 498,
+      "innerChord": 8,
+      "outerChord": 14,
+      "maximumThickness": 1.8,
+      "sweepDeg": 10,
+      "phaseDeg": 30,
+      "inwardTurn": 5,
+      "camber": 1.5,
+      "spanSegments": 32,
+      "chordSegments": 24
+    }
   },
   "shellGeometry": {
     "innerCurve": "monotone cubic Hermite; level stator support, early expansion, third-stage front-rim endface contact",
@@ -2378,7 +2397,7 @@
     "status": "passed",
     "scope": "Two backed eighteen-blade rotors; static covers and interstage return assembly removed; structural geometry only",
     "source": "exported GLB",
-    "modelModifiedAt": "2026-10-25T14:37:39.822Z",
+    "modelModifiedAt": "2026-10-25T15:12:23.961Z",
     "units": "mm",
     "frontParts": 20,
     "componentCounts": {
@@ -2680,6 +2699,312 @@
       "motorHousingsStationary": true,
       "axialSeparationBetweenRotorsMm": 27,
       "motorSizing": "geometric placeholders; no 16 kW packaging or operating performance claim"
+    },
+    "compressorMotionEnvelopes": [
+      {
+        "stage": 1,
+        "method": "continuous 360-degree swept profile with circumscribed facets",
+        "verifiedRunningGapMm": 0.8,
+        "uncoveredRotorMm3": 0,
+        "maximumIntersectionMm3": 0,
+        "intersections": [
+          {
+            "id": "compressor-diffuser-1",
+            "volumeMm3": 0
+          },
+          {
+            "id": "compressor-motor-1",
+            "volumeMm3": 0
+          },
+          {
+            "id": "compressor-casing",
+            "volumeMm3": 0
+          },
+          {
+            "id": "compressor-fasteners",
+            "volumeMm3": 0
+          }
+        ]
+      },
+      {
+        "stage": 2,
+        "method": "continuous 360-degree swept profile with circumscribed facets",
+        "verifiedRunningGapMm": 0.8,
+        "uncoveredRotorMm3": 0,
+        "maximumIntersectionMm3": 0,
+        "intersections": [
+          {
+            "id": "compressor-diffuser-2",
+            "volumeMm3": 0
+          },
+          {
+            "id": "compressor-motor-2",
+            "volumeMm3": 0
+          },
+          {
+            "id": "compressor-rear-flange",
+            "volumeMm3": 0
+          },
+          {
+            "id": "compressor-casing",
+            "volumeMm3": 0
+          },
+          {
+            "id": "compressor-fasteners",
+            "volumeMm3": 0
+          }
+        ]
+      }
+    ],
+    "compressorInletGuides": {
+      "stationary": true,
+      "specifiedVanes": 6,
+      "metadataVanes": 6,
+      "connectedMotorAndVanes": 1,
+      "motorFrontMm": 490,
+      "measuredInwardAxialLeanMm": 7.836684210272381,
+      "measuredSpanSweepDeg": 8.743861997812473,
+      "intakeLinerAxialClearanceLowerBoundMm": 10,
+      "radialSections": [
+        {
+          "radiusMm": 45,
+          "separatedVanes": 6,
+          "leaves": [
+            {
+              "centreXmm": 506.05469762690956,
+              "centreAngleDeg": 31.428666263490243,
+              "axialChordMm": 8.547275019384585
+            },
+            {
+              "centreXmm": 505.9984426498415,
+              "centreAngleDeg": 91.42304012707103,
+              "axialChordMm": 8.547451455460816
+            },
+            {
+              "centreXmm": 506.0587134004164,
+              "centreAngleDeg": 151.4366125038306,
+              "axialChordMm": 8.547449021620821
+            },
+            {
+              "centreXmm": 506.0546976269095,
+              "centreAngleDeg": 211.42866626349021,
+              "axialChordMm": 8.547275019384585
+            },
+            {
+              "centreXmm": 505.99844264984137,
+              "centreAngleDeg": 271.423040127071,
+              "axialChordMm": 8.547451455460816
+            },
+            {
+              "centreXmm": 506.0587134004164,
+              "centreAngleDeg": 331.43661250383053,
+              "axialChordMm": 8.547449021620821
+            }
+          ]
+        },
+        {
+          "radiusMm": 70,
+          "separatedVanes": 6,
+          "leaves": [
+            {
+              "centreXmm": 504.7624466149514,
+              "centreAngleDeg": 32.80041780490723,
+              "axialChordMm": 9.468785109332714
+            },
+            {
+              "centreXmm": 504.72681648040503,
+              "centreAngleDeg": 92.79797773464145,
+              "axialChordMm": 9.4688137512847
+            },
+            {
+              "centreXmm": 504.6445215907668,
+              "centreAngleDeg": 152.789580149151,
+              "axialChordMm": 9.469247094127809
+            },
+            {
+              "centreXmm": 504.76244661495144,
+              "centreAngleDeg": 212.80041780490728,
+              "axialChordMm": 9.468785109332714
+            },
+            {
+              "centreXmm": 504.726816480405,
+              "centreAngleDeg": 272.79797773464145,
+              "axialChordMm": 9.4688137512847
+            },
+            {
+              "centreXmm": 504.6445215907668,
+              "centreAngleDeg": 332.789580149151,
+              "axialChordMm": 9.469247094127809
+            }
+          ]
+        },
+        {
+          "radiusMm": 100,
+          "separatedVanes": 6,
+          "leaves": [
+            {
+              "centreXmm": 502.02211426351636,
+              "centreAngleDeg": 35.844443429616774,
+              "axialChordMm": 10.704025413261604
+            },
+            {
+              "centreXmm": 502.1438876713548,
+              "centreAngleDeg": 95.83569701528222,
+              "axialChordMm": 10.703067671812164
+            },
+            {
+              "centreXmm": 502.11504981631305,
+              "centreAngleDeg": 155.8484754360976,
+              "axialChordMm": 10.703436085754277
+            },
+            {
+              "centreXmm": 502.0221142635164,
+              "centreAngleDeg": 215.8444434296168,
+              "axialChordMm": 10.704025413261604
+            },
+            {
+              "centreXmm": 502.1438876713547,
+              "centreAngleDeg": 275.8356970152822,
+              "axialChordMm": 10.703067671812164
+            },
+            {
+              "centreXmm": 502.11504981631293,
+              "centreAngleDeg": 335.84847543609754,
+              "axialChordMm": 10.703436085754277
+            }
+          ]
+        },
+        {
+          "radiusMm": 130,
+          "separatedVanes": 6,
+          "leaves": [
+            {
+              "centreXmm": 499.5333029610768,
+              "centreAngleDeg": 38.76854851300948,
+              "axialChordMm": 12.240389460642461
+            },
+            {
+              "centreXmm": 499.50010839498276,
+              "centreAngleDeg": 98.74784877492277,
+              "axialChordMm": 12.240377071693842
+            },
+            {
+              "centreXmm": 499.53472057524175,
+              "centreAngleDeg": 158.7596246066513,
+              "axialChordMm": 12.239865225760752
+            },
+            {
+              "centreXmm": 499.5333029610769,
+              "centreAngleDeg": 218.7685485130095,
+              "axialChordMm": 12.240389460642461
+            },
+            {
+              "centreXmm": 499.50010839498276,
+              "centreAngleDeg": 278.7478487749227,
+              "axialChordMm": 12.240377071693842
+            },
+            {
+              "centreXmm": 499.5347205752417,
+              "centreAngleDeg": 338.75962460665124,
+              "axialChordMm": 12.239865225760752
+            }
+          ]
+        },
+        {
+          "radiusMm": 155,
+          "separatedVanes": 6,
+          "leaves": [
+            {
+              "centreXmm": 498.2180134166372,
+              "centreAngleDeg": 40.172528261302716,
+              "axialChordMm": 13.525856258666522
+            },
+            {
+              "centreXmm": 498.15440458409915,
+              "centreAngleDeg": 100.16306594714843,
+              "axialChordMm": 13.52626437174689
+            },
+            {
+              "centreXmm": 498.15120803833,
+              "centreAngleDeg": 160.17879893283362,
+              "axialChordMm": 13.525820677864203
+            },
+            {
+              "centreXmm": 498.21801341663706,
+              "centreAngleDeg": 220.17287544792072,
+              "axialChordMm": 13.525856258666522
+            },
+            {
+              "centreXmm": 498.15440458409915,
+              "centreAngleDeg": 280.1630659471484,
+              "axialChordMm": 13.52626437174689
+            },
+            {
+              "centreXmm": 498.1512080383302,
+              "centreAngleDeg": 340.1787989328337,
+              "axialChordMm": 13.525820677864203
+            }
+          ]
+        }
+      ],
+      "mounts": [
+        {
+          "guide": 1,
+          "motorToCasingConnectedComponents": 1
+        },
+        {
+          "guide": 2,
+          "motorToCasingConnectedComponents": 1
+        },
+        {
+          "guide": 3,
+          "motorToCasingConnectedComponents": 1
+        },
+        {
+          "guide": 4,
+          "motorToCasingConnectedComponents": 1
+        },
+        {
+          "guide": 5,
+          "motorToCasingConnectedComponents": 1
+        },
+        {
+          "guide": 6,
+          "motorToCasingConnectedComponents": 1
+        }
+      ],
+      "openChannels": [
+        {
+          "channel": 1,
+          "probeRadiusMm": 1,
+          "obstructions": []
+        },
+        {
+          "channel": 2,
+          "probeRadiusMm": 1,
+          "obstructions": []
+        },
+        {
+          "channel": 3,
+          "probeRadiusMm": 1,
+          "obstructions": []
+        },
+        {
+          "channel": 4,
+          "probeRadiusMm": 1,
+          "obstructions": []
+        },
+        {
+          "channel": 5,
+          "probeRadiusMm": 1,
+          "obstructions": []
+        },
+        {
+          "channel": 6,
+          "probeRadiusMm": 1,
+          "obstructions": []
+        }
+      ]
     },
     "compressorBladeSections": [
       {
@@ -3114,7 +3439,7 @@
     "failures": []
   },
   "exportedCellGeometry": {
-    "modelBytes": 77751668,
+    "modelBytes": 78290492,
     "modules": [
       {
         "id": "stack-1-1",

@@ -109,7 +109,7 @@ const shells=buildDetailedShells({M,CS,P,union,cylinder,revolved,polar,add});
 const wiring=buildWiring({M,P,C,union,cylinder,tubePath,roundPath,polar,add});
 
 console.log(`Built ${parts.length} solid components. Checking exact intersections...`);
-const report={schema:4,units:P.units,dimensionSource:'user-confirmed 18-blade compressor rotors with two matching backplates and continuous hub roots; return vanes removed; prior dimensions retained, 2026-10-25',
+const report={schema:4,units:P.units,dimensionSource:'user-confirmed aft-shifted first-stage fixed drive and curved inward inlet guides; two supported 18-blade rotors retained, 2026-10-25',
   performanceScope:'geometry only; prior thermal/power results are not recalculated',
   pumpPlacement:'stage 3 central cavity',envelopes:{length:os.rear-os.front,ductBore:2*(os.radius-os.wall),nozzleBore:2*(os.outletRadius-os.wall),motorDiameter:2*P.motor.radius,motorLength:P.motor.rear-P.motor.front,stackLength:P.stacks.at(-1).rear-P.stacks[0].front},
   modules:P.stacks.map(s=>s.modules),portCounts:Object.fromEntries(['air','hydrogen','return','cathode'].map(fluid=>[fluid,ports.filter(p=>p.fluid===fluid).length])),
@@ -204,7 +204,7 @@ for(const part of parts) {
     .setAttribute('NORMAL',document.createAccessor().setType('VEC3').setArray(normals).setBuffer(buffer))
     .setIndices(document.createAccessor().setType('SCALAR').setArray(indices).setBuffer(buffer)).setMaterial(materials.get(materialKey));
   const mesh=document.createMesh(part.name).addPrimitive(primitive);
-  scene.addChild(document.createNode(part.name).setMesh(mesh).setExtras({id:part.id,group:part.group,clip:part.clip||false,laminated:part.laminated||false,stage:part.stage||0,module:part.module||0,finish:part.finish||'',layerPitch:part.layerPitch||0,layerOrigin:part.layerOrigin||0,layerCount:part.layerCount||0,physicalCells:part.physicalCells||0,cellArrangement:part.cellArrangement||'',plateThickness:part.plateThickness||0,innerCoolingGap:part.innerCoolingGap||0,rotor:part.rotor||'',stationary:part.stationary||false,bladeCount:part.bladeCount||0,motorSizing:part.motorSizing||''}));
+  scene.addChild(document.createNode(part.name).setMesh(mesh).setExtras({id:part.id,group:part.group,clip:part.clip||false,laminated:part.laminated||false,stage:part.stage||0,module:part.module||0,finish:part.finish||'',layerPitch:part.layerPitch||0,layerOrigin:part.layerOrigin||0,layerCount:part.layerCount||0,physicalCells:part.physicalCells||0,cellArrangement:part.cellArrangement||'',plateThickness:part.plateThickness||0,innerCoolingGap:part.innerCoolingGap||0,rotor:part.rotor||'',stationary:part.stationary||false,bladeCount:part.bladeCount||0,motorSizing:part.motorSizing||'',...(part.inletGuide ? {inletGuide:part.inletGuide,inletGuideVaneCount:part.inletGuideVaneCount} : {})}));
 }
 await new NodeIO().write(resolve(root,'new-design/public/model.glb'),document);
 console.log(JSON.stringify({parts:parts.length,modules:11,checkedPairs:report.solidChecks,collisions:report.collisions.length,fluidChecks:report.fluidChecks},null,2));

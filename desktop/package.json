@@ -1,0 +1,17 @@
+{
+  "name": "fuelcell-propulsion-desktop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "氢能燃料电池发动机 · 离线结构模型",
+  "main": "main.cjs",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "electron .",
+    "package": "node ../scripts/package-desktop.mjs"
+  },
+  "devDependencies": {
+    "@electron/asar": "4.3.1",
+    "electron": "45.0.0",
+    "rcedit": "5.0.2"
+  }
+}
