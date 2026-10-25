@@ -47,6 +47,13 @@ async function waitForModel() {
   throw new Error('Desktop model did not finish loading');
 }
 async function screenshot(name) {
+  // Wait for the changed React state and Three.js scene to reach the compositor.
+  // A fixed short timeout can capture the preceding frame on software rendering.
+  await evaluate(`new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve(true))))`);
+  // Request one hidden-window capture to flush a Windows compositor surface,
+  // then retain the following frame rather than an earlier cached surface.
+  await evaluate(`fetch('propulsion://app/__desktop-test__/capture.png').then(r=>r.arrayBuffer()).then(()=>true)`);
+  await evaluate(`new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve(true))))`);
   const data = await evaluate(`(async()=>{const response=await fetch('propulsion://app/__desktop-test__/capture.png');
     if(!response.ok)throw Error('Desktop test capture unavailable');const bytes=new Uint8Array(await response.arrayBuffer());
     let value='';for(let i=0;i<bytes.length;i+=32768)value+=String.fromCharCode(...bytes.subarray(i,i+32768));return btoa(value)})()`);
@@ -74,6 +81,8 @@ try {
     pending.clear();
   });
   await send('Runtime.enable'); await send('Page.enable'); await send('Network.enable');
+  await send('Emulation.setFocusEmulationEnabled', { enabled: true });
+  await send('Page.setWebLifecycleState', { state: 'active' });
   report.initial = await waitForModel();
   report.assertions.push('Local model loaded in the bundled executable');
   console.log('Desktop loaded; checking offline reload.');
