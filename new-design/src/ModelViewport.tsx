@@ -124,7 +124,8 @@ export default function ModelViewport(props: Props) {
         const p=new THREE.Vector3(x,y,z).sub(target),depth=p.dot(direction);
         distance=Math.max(distance,depth+Math.abs(p.dot(right))/tanH,depth+Math.abs(p.dot(up))/tanV);
       }
-      camera.position.copy(target).add(direction.multiplyScalar(distance*1.015));controls.update();dirty=true;
+      const frameMargin=view==='compressor'&&element!.clientWidth<700?1.2:1.015;
+      camera.position.copy(target).add(direction.multiplyScalar(distance*frameMargin));controls.update();dirty=true;
     }
     const disposeObject=(object:THREE.Object3D)=>object.traverse(item=>{
       const mesh=item as THREE.Mesh;mesh.geometry?.dispose();
