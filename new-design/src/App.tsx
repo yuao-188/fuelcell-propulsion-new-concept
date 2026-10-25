@@ -129,8 +129,8 @@ export default function App() {
                 <button type="button" className={compressorView === 'rotors' ? 'is-active' : ''}
                   aria-pressed={compressorView === 'rotors'} onClick={() => setCompressorView('rotors')}>叶轮与静叶</button>
               </div>
-              <p>{compressorView === 'passage' ? '入口眼 → 一级离心叶轮 → 扩压器 → 级间回流 → 二级离心叶轮 → 出口收集段' : '银色：转子与短轴　深银色：扩压静叶、回流静叶　金色：独立电机'}</p>
-              <span>{compressorView === 'passage' ? '拖动剖切滑块查看通道内壁' : '罩壳与隔盘已隐藏，转子保持完整，可拖动旋转'}</span>
+              <p>{compressorView === 'passage' ? '两级叶片、扩压静叶、回流静叶与独立电机；五处盘面已移除' : '银色：叶片、轮毂与短轴　深银色：扩压静叶、回流静叶　金色：独立电机'}</p>
+              <span>{compressorView === 'passage' ? '拖动滑块查看内部间隙与开口' : '外机匣已隐藏，叶片与短轴保持完整，可拖动旋转'}</span>
             </div>}
           </div>
 
@@ -227,7 +227,7 @@ export default function App() {
               <LayerToggle label="外壳" color="swatch-outer" checked={visibility.outerShell} onChange={() => toggleLayer('outerShell')} />
               <LayerToggle label="整机内壳" detail="提前渐扩 · 止于三级前端外缘" color="swatch-inner" checked={visibility.innerShell} onChange={() => toggleLayer('innerShell')} />
               <LayerToggle label="引气外筒" detail="内外筒之间形成环形引气道" color="swatch-intake" checked={visibility.intake} onChange={() => toggleLayer('intake')} />
-              <LayerToggle label="引气内筒" detail="包围电机 · 前后均开口" color="swatch-intake-inner" checked={visibility.intakeInner} onChange={() => toggleLayer('intakeInner')} />
+              <LayerToggle label="引气内筒" detail="尾端圆弧内收 · 前后均开口" color="swatch-intake-inner" checked={visibility.intakeInner} onChange={() => toggleLayer('intakeInner')} />
               <LayerToggle label="黄色压气机外壳" detail="双级独立电驱 · 级间回流静叶" color="swatch-compressor" checked={visibility.compressorCase} onChange={() => toggleLayer('compressorCase')} />
               <LayerToggle label="电堆模块" detail="环向片组 · 冷却通道前进后出" color="swatch-stack" checked={visibility.stacks} onChange={() => toggleLayer('stacks')} />
             </div>

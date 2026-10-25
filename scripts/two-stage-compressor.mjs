@@ -27,11 +27,16 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
   const caseFree = solidLathe(casingInside.map(([x, r]) => [x, r - .08]));
   const casingWall = hollowLathe(casingOutside, casingInside);
 
-  function radialVane(inner, outer, angle, sweep, width, start, end, heightAt) {
+  function radialVane(inner, outer, angle, sweep, width, start, end, heightAt, extensionOuter = outer) {
     const profile = [], steps = 28;
-    for (const side of [1, -1]) for (let j = 0; j <= steps; j++) {
-      const t = side === 1 ? j / steps : 1 - j / steps;
-      const r = lerp(inner, outer, t), a = angle + sweep * t * t + side * width / (2 * r);
+    const radii = Array.from({ length: steps + 1 }, (_, j) => lerp(inner, outer, j / steps));
+    if (extensionOuter > outer) for (let j = 1; j <= 8; j++) radii.push(lerp(outer, extensionOuter, j / 8));
+    for (const side of [1, -1]) for (const r of side === 1 ? radii : radii.toReversed()) {
+      const t = (r - inner) / (outer - inner);
+      // An optional mounting extension continues the original outer tangent;
+      // all original radial stations and the swept working span stay intact.
+      const turn = t <= 1 ? t * t : 1 + 2 * (t - 1);
+      const a = angle + sweep * turn + side * width / (2 * r);
       profile.push([-r * Math.sin(a), r * Math.cos(a)]);
     }
     let area = 0;
@@ -57,29 +62,20 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
       hubStart: ax(576), hubShoulder: ax(584), shaftFront: ax(611), shaftRear: ax(638),
       diffuserStart: ax(600), diffuserEnd: ax(616.5), diffuserInner: rr(119.2) },
   ];
-  const shaftRadius = rr(12.375), runningClearance = Math.max(.65, P.clearance);
+  const shaftRadius = rr(12.375);
   for (const S of stages) {
-    const rotor = [axisCylinder(S.plate, S.back, S.radius, 128),
-      axisCylinder(S.shaftFront, S.shaftRear, shaftRadius, 64),
+    // The requested open rotor retains the original hub and blade roots. The
+    // full-radius rear disk is physically absent; S.plate is now only the
+    // reference station for blade trailing edges, not a generated plate.
+    const rotor = [axisCylinder(S.shaftFront, S.shaftRear, shaftRadius, 64),
       solidLathe([[S.hubStart, shaftRadius * 1.15], [S.hubShoulder, S.eye * .69], [S.plate, S.eye]])];
     for (let i = 0; i < 12; i++) rotor.push(radialVane(S.bladeInner, S.bladeOuter, i * tau / 12,
       -.52, rr(2.6), 0, S.plate, t => lerp(S.heightIn, S.heightOut, t)));
-    add(`compressor-rotor-${S.number}`, `第${S.number}级离心叶轮与独立短轴`, 'front', steel,
-      union(rotor), { ...metal, roughness: .21, clip: true, rotor: `compressor-${S.number}`, bladeCount: 12, stage: S.number });
+    add(`compressor-rotor-${S.number}`, `第${S.number}级无背盘离心叶轮 · 原轮毂与独立短轴`, 'front', steel,
+      union(rotor), { ...metal, roughness: .21, clip: true, rotor: `compressor-${S.number}`, bladeCount: 12,
+        stage: S.number, backplate: false, shroud: false });
 
-    // Separate stationary covers block each direct outer bypass. Their bores
-    // remain open, with a positive running gap above the corresponding rotor.
-    const eyeFace = S.plate - S.heightIn - runningClearance;
-    const rimFace = S.plate - S.heightOut - runningClearance, thickness = 3 * axialScale;
-    const cover = [[S.bladeInner, eyeFace], [S.bladeOuter, rimFace]];
-    for (let j = 0; j <= 8; j++) {
-      const x = rimFace - thickness * j / 8;
-      cover.push([innerAt(x) - .06, x]);
-    }
-    cover.push([S.bladeInner + rr(6), eyeFace - thickness]);
-    add(`compressor-shroud-${S.number}`, `第${S.number}级静止叶轮罩与入口眼`, 'front', paleSteel,
-      new CS([cover.reverse()]).revolve(128).rotate([0, 90, 0]),
-      { ...metal, clip: true, stationary: true, stage: S.number });
+    // Both static cover disks are also removed from the physical model.
     // Separate mesh identity permits removing the external casing in an
     // inspection view while retaining the real diffuser vanes and passage.
     // Cut against the exact wall so each vane meets its support at a face.
@@ -90,20 +86,14 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
       union(diffuser), { ...metal, roughness: .34, clip: true, stationary: true, bladeCount: 18, stage: S.number });
   }
 
-  // The first shaft stops before this diaphragm. Flow goes around its rim,
-  // through the inward return vanes, and into the second impeller's central eye.
-  const diaphragm = [axisCylinder(ax(551.5), ax(554.5), rr(153), 128)], returnVanes = [];
+  // Retain the eighteen return vanes while removing the entire central
+  // diaphragm and its three radial supports. No replacement disk is added.
+  const returnVanes = [];
   for (let i = 0; i < 18; i++) returnVanes.push(radialVane(rr(48), rr(152.8),
-    (i + .15) * tau / 18, .18, rr(2.2), ax(554.5), ax(577)));
-  for (let i = 0; i < 3; i++) {
-    const angle = (i + .15) * tau / 3;
-    const p = r => [ax(552.7), r * Math.cos(angle), r * Math.sin(angle)];
-    diaphragm.push(cylinder(p(rr(151)), p(K.inner + 1), rr(1.05), rr(1.05), 24).intersect(caseFree));
-  }
-  add('compressor-return-diaphragm', '级间封心隔板与三处固定支座', 'front', paleSteel,
-    union(diaphragm).intersect(caseFree), { ...metal, clip: true, stationary: true });
+    (i + .15) * tau / 18, .18, rr(2.2), ax(554.5), ax(577), undefined, K.inner + .5));
   add('compressor-return-channel', '级间十八回流静叶', 'front', vaneSteel,
-    union(returnVanes).intersect(caseFree), { ...metal, roughness: .34, clip: true, stationary: true, bladeCount: 18 });
+    union(returnVanes).intersect(caseLumen), { ...metal, roughness: .34, clip: true, stationary: true,
+      bladeCount: 18, mount: 'outer-edge-to-casing-inner-wall' });
 
   // The fixed motor cases have shaft bores and three slim mounting struts.
   // These are packaging placeholders, not validated power-rated motor models.
@@ -158,5 +148,8 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
   add('compressor-fasteners', '压气机装配法兰沉头紧固件', 'compressorCase', darkSteel,
     union(compressorScrews), { ...metal, clip: true });
   return { compressorStages: 2, compressorBladeCount: 12, neckStart,
-    driveArchitecture: 'independent-front-and-rear-motors', motorSizing: 'schematic-only', casingInside, stages };
+    driveArchitecture: 'independent-front-and-rear-motors', motorSizing: 'schematic-only', casingInside, stages,
+    removedDiscSurfaces: ['compressor-shroud-1', 'compressor-rotor-1-backplate',
+      'compressor-return-diaphragm', 'compressor-shroud-2', 'compressor-rotor-2-backplate'],
+    returnDiaphragmSupportCount: 0 };
 }

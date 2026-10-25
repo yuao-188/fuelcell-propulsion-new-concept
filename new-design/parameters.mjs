@@ -6,7 +6,7 @@ export const parameters = {
   motor: { front: 245, rear: 438, radius: 150 },
   // Latest user sketch reallocates this shared bay: shorter intake, longer compressor.
   motorHousing: { front: 210, rear: 480, outer: 172, inner: 165 },
-  intakeLiner: { front: 210, rear: 480, inner: 152, outer: 156 },
+  intakeLiner: { front: 210, rear: 480, inner: 152, outer: 156, contractionStart: 440, radialContraction: 16 },
   compressor: { front: 480, rear: 660, outlet: 690, outer: 172, inner: 165 },
   stacks: [
     { front: 690, rear: 972, inner: 128, outer: 236.701, cellInner: 138, cellOuter: 233.7, modules: 3, firstSeam: 30, cells: 279 },

@@ -1,7 +1,7 @@
 {
   "schema": 4,
   "units": "mm",
-  "dimensionSource": "user-confirmed 700 mm third stage, open aft inner casing and outer-rim hydrogen inlets, 2026-10-25",
+  "dimensionSource": "user-confirmed removal of five compressor disc surfaces and inward-curved open intake liner; prior 700 mm third stage retained, 2026-10-25",
   "performanceScope": "geometry only; prior thermal/power results are not recalculated",
   "pumpPlacement": "stage 3 central cavity",
   "envelopes": {
@@ -23,9 +23,9 @@
     "return": 11,
     "cathode": 11
   },
-  "parts": 102,
-  "solidChecks": 1097,
-  "broadPhasePairs": 5151,
+  "parts": 99,
+  "solidChecks": 1077,
+  "broadPhasePairs": 4851,
   "collisions": [],
   "fluidChecks": {
     "gasSeparation": {
@@ -1281,6 +1281,8 @@
   "physicalCells": 3813,
   "layoutOverrides": {
     "intakeInnerEnds": "both open",
+    "intakeLinerRadialContraction": 16,
+    "compressorDiscSurfacesRemoved": 5,
     "mainInnerShellFront": 210,
     "mainInnerShellRear": 1387,
     "innerShellStopsAtThirdStageFront": true,
@@ -1297,6 +1299,23 @@
     "fanStatorCount": 18,
     "statorFront": 235,
     "statorRear": 285,
+    "intakeLiner": {
+      "contractionStart": 440,
+      "rear": 480,
+      "radialContraction": 16,
+      "forwardInnerDiameter": 304,
+      "forwardOuterDiameter": 312,
+      "rearInnerDiameter": 272,
+      "rearOuterDiameter": 280,
+      "wall": 4,
+      "minimumMotorEnvelopeClearance": 1.954220441823054,
+      "axialGapAfterMotor": 2,
+      "curve": "cubic Hermite; zero slope at contraction start and open rear lip",
+      "frontOpen": true,
+      "rearOpen": true,
+      "angularSegments": 128,
+      "contractionSamples": 32
+    },
     "compressorStages": 2,
     "compressorBladeCount": 12,
     "neckStart": 675,
@@ -1825,7 +1844,15 @@
         "diffuserEnd": 616.5,
         "diffuserInner": 119.2
       }
-    ]
+    ],
+    "removedDiscSurfaces": [
+      "compressor-shroud-1",
+      "compressor-rotor-1-backplate",
+      "compressor-return-diaphragm",
+      "compressor-shroud-2",
+      "compressor-rotor-2-backplate"
+    ],
+    "returnDiaphragmSupportCount": 0
   },
   "shellGeometry": {
     "innerCurve": "monotone cubic Hermite; level stator support, early expansion, third-stage front-rim endface contact",
@@ -2332,11 +2359,11 @@
   "errors": [],
   "compressorGeometry": {
     "status": "passed",
-    "scope": "Front machinery geometry only; no aerodynamic performance or motor power validation",
+    "scope": "Open rotor/stator structural arrangement with five disc surfaces removed; not a closed two-stage pressure passage",
     "source": "exported GLB",
-    "modelModifiedAt": "2026-10-25T11:12:59.586Z",
+    "modelModifiedAt": "2026-10-25T14:07:25.813Z",
     "units": "mm",
-    "frontParts": 24,
+    "frontParts": 21,
     "componentCounts": {
       "fan": 1,
       "fan-spinner": 1,
@@ -2349,12 +2376,9 @@
       "intake-fasteners": 16,
       "intake-inner-shell": 1,
       "compressor-rotor-1": 1,
-      "compressor-shroud-1": 1,
       "compressor-diffuser-1": 18,
       "compressor-rotor-2": 1,
-      "compressor-shroud-2": 1,
       "compressor-diffuser-2": 18,
-      "compressor-return-diaphragm": 1,
       "compressor-return-channel": 18,
       "compressor-motor-1": 1,
       "compressor-motor-2": 1,
@@ -2365,8 +2389,8 @@
     },
     "solidIntersections": {
       "toleranceMm3": 0.02,
-      "candidates": 53,
-      "maximumVolumeMm3": 0.000425773725712275,
+      "candidates": 45,
+      "maximumVolumeMm3": 0.0006903630560049772,
       "collisions": []
     },
     "fanStators": {
@@ -2641,6 +2665,32 @@
       "axialSeparationBetweenRotorsMm": 27,
       "motorSizing": "geometric placeholders; no 16 kW packaging or operating performance claim"
     },
+    "compressorBladeSections": [
+      {
+        "stage": 1,
+        "radiusMm": 75,
+        "separatedBlades": 12,
+        "metadataBlades": 12
+      },
+      {
+        "stage": 1,
+        "radiusMm": 120,
+        "separatedBlades": 12,
+        "metadataBlades": 12
+      },
+      {
+        "stage": 2,
+        "radiusMm": 60,
+        "separatedBlades": 12,
+        "metadataBlades": 12
+      },
+      {
+        "stage": 2,
+        "radiusMm": 100,
+        "separatedBlades": 12,
+        "metadataBlades": 12
+      }
+    ],
     "outletNeck": {
       "frontMm": 675,
       "rearMm": 690,
@@ -2652,32 +2702,45 @@
       "obstructions": []
     },
     "inletToOutlet": {
+      "interpretation": "A clear structural path through the open rotor and stator arrangement; no sealed pressure-stage claim",
       "probeRadiusMm": 0.5,
-      "segments": 120,
+      "segments": 121,
       "toleranceMm3": 0.001,
       "maximumObstructionVolumeMm3": 0,
       "obstructions": []
     },
-    "formerBypass": [
+    "removedDiscSurfaces": [
       {
-        "stage": 1,
-        "radiusFromAxisMm": 155,
-        "probeRadiusMm": 1,
-        "shroudIntersectionMm3": 12.594570780319936,
-        "blocked": true
+        "id": "compressor-shroud-1",
+        "absentPartId": true,
+        "witnessVolumeMm3": 0.05852709660482877,
+        "obstructions": []
       },
       {
-        "stage": 2,
-        "radiusFromAxisMm": 125,
-        "probeRadiusMm": 1,
-        "shroudIntersectionMm3": 18.42401272949734,
-        "blocked": true
+        "id": "compressor-backplate-1",
+        "absentPartId": true,
+        "witnessVolumeMm3": 218863.99823825248,
+        "obstructions": []
+      },
+      {
+        "id": "compressor-shroud-2",
+        "absentPartId": true,
+        "witnessVolumeMm3": 0.058527096604831755,
+        "obstructions": []
+      },
+      {
+        "id": "compressor-backplate-2",
+        "absentPartId": true,
+        "witnessVolumeMm3": 133237.84471403,
+        "obstructions": []
+      },
+      {
+        "id": "compressor-return-diaphragm",
+        "absentPartId": true,
+        "witnessVolumeMm3": 5096.891297136963,
+        "obstructions": []
       }
     ],
-    "returnDiaphragm": {
-      "centreBlocked": true,
-      "intersectionVolumeMm3": 5.267438694435441
-    },
     "blueSleeve": {
       "specifiedBoreDiameterMm": 330,
       "measuredInnerVertexDiameterMm": 329.9999855862564,
@@ -2687,18 +2750,305 @@
       "rearMm": 480
     },
     "intakeInnerShell": {
-      "specifiedInnerDiameterMm": 304,
-      "specifiedOuterDiameterMm": 312,
-      "measuredInnerVertexDiameterMm": 303.999990065039,
-      "measuredOuterVertexDiameterMm": 312.0000131721039,
-      "motorRadialClearanceMm": 2,
+      "forwardInnerDiameterMm": 304,
+      "forwardOuterDiameterMm": 312,
+      "rearInnerDiameterMm": 272,
+      "rearOuterDiameterMm": 280,
+      "contractionStartMm": 440,
+      "radialContractionMm": 16,
+      "curve": "sampled smooth cubic contraction, independently checked for monotonicity and eased end slopes",
+      "firstSlopeRelativeToAverage": 0.09179393256863477,
+      "lastSlopeRelativeToAverage": 0.09179541597148955,
+      "stations": [
+        {
+          "x": 210,
+          "specifiedInnerRadiusMm": 152,
+          "specifiedOuterRadiusMm": 156,
+          "measuredInnerRadiusMm": 151.9999950325195,
+          "measuredOuterRadiusMm": 156.00000658605194,
+          "measuredVertices": 256
+        },
+        {
+          "x": 440,
+          "specifiedInnerRadiusMm": 152,
+          "specifiedOuterRadiusMm": 156,
+          "measuredInnerRadiusMm": 151.9999950325195,
+          "measuredOuterRadiusMm": 156.00000658605194,
+          "measuredVertices": 256
+        },
+        {
+          "x": 441.25,
+          "specifiedInnerRadiusMm": 151.9541015625,
+          "specifiedOuterRadiusMm": 155.9541015625,
+          "measuredInnerRadiusMm": 151.954093885645,
+          "measuredOuterRadiusMm": 155.95410961976762,
+          "measuredVertices": 256
+        },
+        {
+          "x": 442.5,
+          "specifiedInnerRadiusMm": 151.8203125,
+          "specifiedOuterRadiusMm": 155.8203125,
+          "measuredInnerRadiusMm": 151.8203044602923,
+          "measuredOuterRadiusMm": 155.82031868564002,
+          "measuredVertices": 256
+        },
+        {
+          "x": 443.75,
+          "specifiedInnerRadiusMm": 151.6044921875,
+          "specifiedOuterRadiusMm": 155.6044921875,
+          "measuredInnerRadiusMm": 151.60448534974464,
+          "measuredOuterRadiusMm": 155.6044980106252,
+          "measuredVertices": 256
+        },
+        {
+          "x": 445,
+          "specifiedInnerRadiusMm": 151.3125,
+          "specifiedOuterRadiusMm": 155.3125,
+          "measuredInnerRadiusMm": 151.31249281419048,
+          "measuredOuterRadiusMm": 155.3125068874552,
+          "measuredVertices": 256
+        },
+        {
+          "x": 446.25,
+          "specifiedInnerRadiusMm": 150.9501953125,
+          "specifiedOuterRadiusMm": 154.9501953125,
+          "measuredInnerRadiusMm": 150.9501926300754,
+          "measuredOuterRadiusMm": 154.9502005928913,
+          "measuredVertices": 256
+        },
+        {
+          "x": 447.5,
+          "specifiedInnerRadiusMm": 150.5234375,
+          "specifiedOuterRadiusMm": 154.5234375,
+          "measuredInnerRadiusMm": 150.52343024627982,
+          "measuredOuterRadiusMm": 154.52344347671408,
+          "measuredVertices": 256
+        },
+        {
+          "x": 448.75,
+          "specifiedInnerRadiusMm": 150.0380859375,
+          "specifiedOuterRadiusMm": 154.0380859375,
+          "measuredInnerRadiusMm": 150.03807925140234,
+          "measuredOuterRadiusMm": 154.03809264784053,
+          "measuredVertices": 256
+        },
+        {
+          "x": 450,
+          "specifiedInnerRadiusMm": 149.5,
+          "specifiedOuterRadiusMm": 153.5,
+          "measuredInnerRadiusMm": 149.49999367484907,
+          "measuredOuterRadiusMm": 153.50000671727864,
+          "measuredVertices": 256
+        },
+        {
+          "x": 451.25,
+          "specifiedInnerRadiusMm": 148.9150390625,
+          "specifiedOuterRadiusMm": 152.9150390625,
+          "measuredInnerRadiusMm": 148.91503365753803,
+          "measuredOuterRadiusMm": 152.9150432686652,
+          "measuredVertices": 256
+        },
+        {
+          "x": 452.5,
+          "specifiedInnerRadiusMm": 148.2890625,
+          "specifiedOuterRadiusMm": 152.2890625,
+          "measuredInnerRadiusMm": 148.28905584816908,
+          "measuredOuterRadiusMm": 152.2890690097636,
+          "measuredVertices": 256
+        },
+        {
+          "x": 453.75,
+          "specifiedInnerRadiusMm": 147.6279296875,
+          "specifiedOuterRadiusMm": 151.6279296875,
+          "measuredInnerRadiusMm": 147.62792455876354,
+          "measuredOuterRadiusMm": 151.62793522338092,
+          "measuredVertices": 256
+        },
+        {
+          "x": 455,
+          "specifiedInnerRadiusMm": 146.9375,
+          "specifiedOuterRadiusMm": 150.9375,
+          "measuredInnerRadiusMm": 146.93749418263866,
+          "measuredOuterRadiusMm": 150.93750664268728,
+          "measuredVertices": 256
+        },
+        {
+          "x": 456.25,
+          "specifiedInnerRadiusMm": 146.2236328125,
+          "specifiedOuterRadiusMm": 150.2236328125,
+          "measuredInnerRadiusMm": 146.22362611597043,
+          "measuredOuterRadiusMm": 150.2236361308299,
+          "measuredVertices": 256
+        },
+        {
+          "x": 457.5,
+          "specifiedInnerRadiusMm": 145.4921875,
+          "specifiedOuterRadiusMm": 149.4921875,
+          "measuredInnerRadiusMm": 145.4921801173301,
+          "measuredOuterRadiusMm": 149.49219362306886,
+          "measuredVertices": 256
+        },
+        {
+          "x": 458.75,
+          "specifiedInnerRadiusMm": 144.7490234375,
+          "specifiedOuterRadiusMm": 148.7490234375,
+          "measuredInnerRadiusMm": 144.7490170854933,
+          "measuredOuterRadiusMm": 148.74902943645503,
+          "measuredVertices": 256
+        },
+        {
+          "x": 460,
+          "specifiedInnerRadiusMm": 144,
+          "specifiedOuterRadiusMm": 148,
+          "measuredInnerRadiusMm": 143.999992390453,
+          "measuredOuterRadiusMm": 148.0000060775145,
+          "measuredVertices": 256
+        },
+        {
+          "x": 461.25,
+          "specifiedInnerRadiusMm": 143.2509765625,
+          "specifiedOuterRadiusMm": 147.2509765625,
+          "measuredInnerRadiusMm": 143.2509709187755,
+          "measuredOuterRadiusMm": 147.25098148573375,
+          "measuredVertices": 256
+        },
+        {
+          "x": 462.5,
+          "specifiedInnerRadiusMm": 142.5078125,
+          "specifiedOuterRadiusMm": 146.5078125,
+          "measuredInnerRadiusMm": 142.50780658753365,
+          "measuredOuterRadiusMm": 146.5078196646155,
+          "measuredVertices": 256
+        },
+        {
+          "x": 463.75,
+          "specifiedInnerRadiusMm": 141.7763671875,
+          "specifiedOuterRadiusMm": 145.7763671875,
+          "measuredInnerRadiusMm": 141.7763629686627,
+          "measuredOuterRadiusMm": 145.77637456437768,
+          "measuredVertices": 256
+        },
+        {
+          "x": 465,
+          "specifiedInnerRadiusMm": 141.0625,
+          "specifiedOuterRadiusMm": 145.0625,
+          "measuredInnerRadiusMm": 141.0624940968293,
+          "measuredOuterRadiusMm": 145.06250572805592,
+          "measuredVertices": 256
+        },
+        {
+          "x": 466.25,
+          "specifiedInnerRadiusMm": 140.3720703125,
+          "specifiedOuterRadiusMm": 144.3720703125,
+          "measuredInnerRadiusMm": 140.37206640497,
+          "measuredOuterRadiusMm": 144.3720760212281,
+          "measuredVertices": 256
+        },
+        {
+          "x": 467.5,
+          "specifiedInnerRadiusMm": 139.7109375,
+          "specifiedOuterRadiusMm": 143.7109375,
+          "measuredInnerRadiusMm": 139.7109330133281,
+          "measuredOuterRadiusMm": 143.71094355080967,
+          "measuredVertices": 256
+        },
+        {
+          "x": 468.75,
+          "specifiedInnerRadiusMm": 139.0849609375,
+          "specifiedOuterRadiusMm": 143.0849609375,
+          "measuredInnerRadiusMm": 139.08495336235882,
+          "measuredOuterRadiusMm": 143.08496747879062,
+          "measuredVertices": 256
+        },
+        {
+          "x": 470,
+          "specifiedInnerRadiusMm": 138.5,
+          "specifiedOuterRadiusMm": 142.5,
+          "measuredInnerRadiusMm": 138.49999805658746,
+          "measuredOuterRadiusMm": 142.500006741188,
+          "measuredVertices": 256
+        },
+        {
+          "x": 471.25,
+          "specifiedInnerRadiusMm": 137.9619140625,
+          "specifiedOuterRadiusMm": 141.9619140625,
+          "measuredInnerRadiusMm": 137.96190794699848,
+          "measuredOuterRadiusMm": 141.96192092256422,
+          "measuredVertices": 256
+        },
+        {
+          "x": 472.5,
+          "specifiedInnerRadiusMm": 137.4765625,
+          "specifiedOuterRadiusMm": 141.4765625,
+          "measuredInnerRadiusMm": 137.47655540444535,
+          "measuredOuterRadiusMm": 141.47656912184766,
+          "measuredVertices": 256
+        },
+        {
+          "x": 473.75,
+          "specifiedInnerRadiusMm": 137.0498046875,
+          "specifiedOuterRadiusMm": 141.0498046875,
+          "measuredInnerRadiusMm": 137.04980076479515,
+          "measuredOuterRadiusMm": 141.04981110969368,
+          "measuredVertices": 256
+        },
+        {
+          "x": 475,
+          "specifiedInnerRadiusMm": 136.6875,
+          "specifiedOuterRadiusMm": 140.6875,
+          "measuredInnerRadiusMm": 136.68749308250884,
+          "measuredOuterRadiusMm": 140.68750454820002,
+          "measuredVertices": 256
+        },
+        {
+          "x": 476.25,
+          "specifiedInnerRadiusMm": 136.3955078125,
+          "specifiedOuterRadiusMm": 140.3955078125,
+          "measuredInnerRadiusMm": 136.39550542512282,
+          "measuredOuterRadiusMm": 140.3955153955154,
+          "measuredVertices": 256
+        },
+        {
+          "x": 477.5,
+          "specifiedInnerRadiusMm": 136.1796875,
+          "specifiedOuterRadiusMm": 140.1796875,
+          "measuredInnerRadiusMm": 136.1796834536024,
+          "measuredOuterRadiusMm": 140.17969372026303,
+          "measuredVertices": 256
+        },
+        {
+          "x": 478.75,
+          "specifiedInnerRadiusMm": 136.0458984375,
+          "specifiedOuterRadiusMm": 140.0458984375,
+          "measuredInnerRadiusMm": 136.04589082808621,
+          "measuredOuterRadiusMm": 140.04590393463252,
+          "measuredVertices": 256
+        },
+        {
+          "x": 480,
+          "specifiedInnerRadiusMm": 136,
+          "specifiedOuterRadiusMm": 140,
+          "measuredInnerRadiusMm": 135.9999946741318,
+          "measuredOuterRadiusMm": 140.00000622664678,
+          "measuredVertices": 256
+        }
+      ],
+      "motorRadialClearanceMm": 1.954220441823054,
+      "motorEnvelopeExpansionMm": 0.8,
+      "motorEnvelopeObstructionMm3": 0,
+      "axialGapAfterMotorMm": 2,
+      "straightBoreObstructionMm3": 0,
+      "rearOpeningObstructionMm3": 0,
       "frontMm": 210,
       "rearMm": 480,
       "openBoreObstructionMm3": 0
     },
     "intakeAnnulus": {
       "radialGapMm": 9,
+      "radialGapReference": "minimum nominal gap in the forward constant-radius section",
+      "rearRadialGapMm": 25,
       "nominalAreaMm2": 9076.061176220912,
+      "rearNominalAreaMm2": 23954.643983622173,
       "flowProbeRadiusFromAxisMm": 160.5,
       "maximumObstructionVolumeMm3": 0,
       "obstructions": []
@@ -2706,7 +3056,7 @@
     "failures": []
   },
   "exportedCellGeometry": {
-    "modelBytes": 77408524,
+    "modelBytes": 77653240,
     "modules": [
       {
         "id": "stack-1-1",

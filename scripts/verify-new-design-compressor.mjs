@@ -10,6 +10,7 @@ import { Matrix4, Vector3 } from 'three';
 import { parameters as P, colors as C } from '../new-design/parameters.mjs';
 import { buildDetailedMachinery, fanBladeSections } from './detailed-machinery.mjs';
 import { getInnerShellLayout } from './inner-shell-layout.mjs';
+import { getIntakeLinerLayout } from './intake-liner-layout.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 const modelPath = resolve(root, 'new-design/public/model.glb');
@@ -20,14 +21,14 @@ const machineIds = [
   'fan', 'fan-spinner', 'fan-stators', 'main-motor', 'motor-front-cap', 'motor-rear-cap',
   'motor-shaft-collar', 'motor-housing', 'compressor-motor-1', 'compressor-motor-2',
   'compressor-rotor-1', 'compressor-rotor-2', 'compressor-casing',
-  'compressor-shroud-1', 'compressor-shroud-2', 'compressor-return-channel',
-  'compressor-diffuser-1', 'compressor-diffuser-2', 'compressor-return-diaphragm',
+  'compressor-return-channel', 'compressor-diffuser-1', 'compressor-diffuser-2',
   'intake-inner-shell', 'intake-fasteners', 'compressor-front-flange', 'compressor-rear-flange', 'compressor-fasteners',
 ];
 const expectedComponents = { 'fan-stators': 18, 'intake-fasteners': 16, 'compressor-fasteners': 24,
   'compressor-diffuser-1': 18, 'compressor-diffuser-2': 18, 'compressor-return-channel': 18 };
 const shellIds = ['outer-shell', 'inner-shell'];
-const retiredMachineIds = ['compressor-drive', 'compressor-shroud'];
+const retiredMachineIds = ['compressor-drive', 'compressor-shroud',
+  'compressor-shroud-1', 'compressor-shroud-2', 'compressor-return-diaphragm'];
 
 try {
   assert.ok(P.intakeLiner, 'Double-wall intake parameters are required');
@@ -62,7 +63,7 @@ try {
   };
   const parts = [], shells = [];
   const register = (id, solid, extras = {}) => {
-    assert.ok(!retiredMachineIds.includes(id), `${id}: obsolete single-stage part remains`);
+    assert.ok(!retiredMachineIds.includes(id), `${id}: removed compressor part remains`);
     assert.equal(solid.status(), 'NoError', `${id}: invalid solid`);
     assert.ok(solid.volume() > 0, `${id}: empty solid`);
     const components = solid.decompose(), componentCount = components.length;
@@ -91,7 +92,7 @@ try {
     const document = await new NodeIO().read(modelPath);
     for (const node of document.getRoot().listNodes()) {
       const id = node.getExtras().id;
-      assert.ok(!retiredMachineIds.includes(id), `${id}: obsolete single-stage part remains in GLB`);
+      assert.ok(!retiredMachineIds.includes(id), `${id}: removed compressor part remains in GLB`);
       if (!machineIds.includes(id) && !shellIds.includes(id)) continue;
       const primitives = node.getMesh()?.listPrimitives() ?? [];
       assert.equal(primitives.length, 1, `${id}: expected one exported primitive`);
@@ -121,7 +122,7 @@ try {
   const failures = [];
   const result = {
     status: 'passed',
-    scope: 'Front machinery geometry only; no aerodynamic performance or motor power validation',
+    scope: 'Open rotor/stator structural arrangement with five disc surfaces removed; not a closed two-stage pressure passage',
     source: local ? 'local modelling helper' : 'exported GLB',
     ...(local ? {} : { modelModifiedAt: (await stat(modelPath)).mtime.toISOString() }),
     units: P.units,
@@ -249,6 +250,21 @@ try {
   const K = P.compressor, axialScale = (K.outlet - K.front) / 210;
   const ax = nominal => K.front + (nominal - 480) * axialScale;
   const rr = nominal => nominal * K.inner / 165;
+  result.compressorBladeSections = compressorRotors.flatMap((rotor, i) => {
+    return (i === 0 ? [75, 120] : [60, 100]).map(nominalRadius => {
+      const radius = rr(nominalRadius), front = rotor.bounds.min[0] - .1, rear = rotor.bounds.max[0] + .1;
+      const outside = probeCylinder([front, 0, 0], [rear, 0, 0], radius + .15, 128);
+      const inside = probeCylinder([front - .1, 0, 0], [rear + .1, 0, 0], radius - .15, 128);
+      const ring = outside.subtract(inside), cut = rotor.solid.intersect(ring), blades = cut.decompose();
+      const result = { stage: i + 1, radiusMm: radius, separatedBlades: blades.length,
+        metadataBlades: rotor.extras.bladeCount };
+      blades.forEach(blade => blade.delete()); cut.delete(); ring.delete(); outside.delete(); inside.delete();
+      return result;
+    });
+  });
+  if (result.compressorBladeSections.some(section => section.separatedBlades !== 12 || section.metadataBlades !== 12)) {
+    failures.push('Each open compressor rotor must retain twelve independent blades outside its hub');
+  }
   const entryAngle = Math.PI / 12, exitAngle = entryAngle - .52;
   const neckStart = K.outlet - (K.outletNeckLength ?? (K.outlet - K.rear) * .5);
   const outletProbe = probeCylinder([neckStart + .1, 0, 0], [K.outlet - .1, 0, 0], P.air.inner - .1, 128);
@@ -290,6 +306,10 @@ try {
   const returnEntryAngle = -7 * Math.PI / 180, returnOuterAngle = returnEntryAngle + .18;
   path.push(
     polar(ax(539.725), rr(158), exitAngle), polar(ax(551), rr(158), exitAngle),
+    // Turn in the open interstage space before the return vanes begin. Their
+    // outer edges now reach the casing, so an azimuthal turn inside the vane
+    // row would cross a real stationary blade.
+    polar(ax(551), rr(158), returnOuterAngle),
     polar(ax(559), rr(158), returnOuterAngle), polar(ax(565), rr(153), returnOuterAngle),
   );
   for (let i = 32; i >= 0; i--) {
@@ -307,6 +327,7 @@ try {
   const passage = M.union(path.slice(1).map((point, i) => probeCylinder(path[i], point, .5)));
   const obstructionVolumes = parts.map(part => ({ id: part.id, volumeMm3: intersectionVolume(passage, part.solid) }));
   result.inletToOutlet = {
+    interpretation: 'A clear structural path through the open rotor and stator arrangement; no sealed pressure-stage claim',
     probeRadiusMm: .5, segments: path.length - 1, toleranceMm3: .001,
     maximumObstructionVolumeMm3: Math.max(...obstructionVolumes.map(item => item.volumeMm3)),
     obstructions: obstructionVolumes.filter(item => item.volumeMm3 > .001),
@@ -326,23 +347,34 @@ try {
   }
   if (result.inletToOutlet.obstructions.length) failures.push('Inlet-to-outlet probe is obstructed');
 
-  // Only each stage's cover is tested as the blocker, so casing convergence
-  // cannot produce a false pass for a missing separator.
-  result.formerBypass = [
-    { stage: 1, front: 480, rear: 540, radius: 155 },
-    { stage: 2, front: 578, rear: 606, radius: 125 },
-  ].map(({ stage, front, rear, radius }) => {
-    const probe = probeCylinder([ax(front), rr(radius), 0], [ax(rear), rr(radius), 0], 1);
-    const volumeMm3 = intersectionVolume(probe, getPart(`compressor-shroud-${stage}`).solid);
+  // Witness volumes occupy material formerly belonging to each of the five
+  // removed discs. They must now be empty, while the independent radial blade
+  // sections above still find all twelve blades at both stages.
+  const removalChecks = [];
+  const recordRemoval = (id, probe) => {
+    const obstructions = parts.map(part => ({ id: part.id, volumeMm3: intersectionVolume(probe, part.solid) }))
+      .filter(item => item.volumeMm3 > .001);
+    removalChecks.push({ id, absentPartId: !parts.some(part => part.id === id),
+      witnessVolumeMm3: probe.volume(), obstructions });
     probe.delete();
-    return { stage, radiusFromAxisMm: rr(radius), probeRadiusMm: 1, shroudIntersectionMm3: volumeMm3, blocked: volumeMm3 > 1 };
-  });
-  if (result.formerBypass.some(probe => !probe.blocked)) failures.push('A compressor stage has an open outer bypass');
-  const centreBypass = probeCylinder([ax(550), 0, 0], [ax(575), 0, 0], .75);
-  const diaphragmBlockage = intersectionVolume(centreBypass, getPart('compressor-return-diaphragm').solid);
-  result.returnDiaphragm = { centreBlocked: diaphragmBlockage > 1, intersectionVolumeMm3: diaphragmBlockage };
-  if (!result.returnDiaphragm.centreBlocked) failures.push('Return diaphragm centre is open despite the separate short shafts');
-  centreBypass.delete();
+  };
+  for (const S of [
+    { stage: 1, plate: 544, back: 549, inner: 39, outer: 143.8, heightIn: 22, heightOut: 9.5, witness: 80 },
+    { stage: 2, plate: 611, back: 616, inner: 33.5, outer: 114.8, heightIn: 27, heightOut: 11, witness: 65 },
+  ]) {
+    const u = (S.witness - S.inner) / (S.outer - S.inner);
+    const coverFace = ax(S.plate - S.heightIn + (S.heightIn - S.heightOut) * u) - Math.max(.65, P.clearance);
+    const x = coverFace - 1.5 * axialScale;
+    recordRemoval(`compressor-shroud-${S.stage}`, probeCylinder(polar(x - .15 * axialScale, rr(S.witness), entryAngle),
+      polar(x + .15 * axialScale, rr(S.witness), entryAngle), .25));
+    const outside = probeCylinder([ax(S.plate + .5), 0, 0], [ax(S.back - .5), 0, 0], rr(S.outer - 3), 128);
+    const inside = probeCylinder([ax(S.plate + .4), 0, 0], [ax(S.back - .4), 0, 0], rr(S.inner + 10), 128);
+    recordRemoval(`compressor-backplate-${S.stage}`, outside.subtract(inside));
+    outside.delete(); inside.delete();
+  }
+  recordRemoval('compressor-return-diaphragm', probeCylinder([ax(551.7), 0, 0], [ax(554.3), 0, 0], rr(25), 64));
+  result.removedDiscSurfaces = removalChecks;
+  if (removalChecks.some(check => !check.absentPartId || check.obstructions.length)) failures.push('A removed compressor disc still occupies its witness volume');
 
   const housing = getPart('motor-housing');
   const boreProbe = probeCylinder([P.motorHousing.front - .5, 0, 0], [P.motorHousing.rear + .5, 0, 0], P.motorHousing.inner - .1, 128);
@@ -361,36 +393,71 @@ try {
     || Math.abs(housing.bounds.min[0] - P.motorHousing.front) > .001
     || Math.abs(housing.bounds.max[0] - P.motorHousing.rear) > .001) failures.push('Blue sleeve bore or open ends do not match parameters');
 
-  const liner = getPart('intake-inner-shell');
-  const linerBore = probeCylinder([I.front - .5, 0, 0], [I.rear + .5, 0, 0], I.inner - .1, 128);
+  const liner = getPart('intake-inner-shell'), linerLayout = getIntakeLinerLayout(P);
+  const rearInner = I.inner - I.radialContraction, rearOuter = I.outer - I.radialContraction;
+  const linerBore = probeCylinder([I.front - .5, 0, 0], [I.rear + .5, 0, 0], rearInner - .1, 128);
   const linerBoreObstruction = intersectionVolume(linerBore, liner.solid);
   const linerMesh = liner.solid.getMesh();
-  let linerInner = Infinity, linerOuter = 0;
-  for (let i = 0; i < linerMesh.vertProperties.length; i += linerMesh.numProp) {
-    const radius = Math.hypot(linerMesh.vertProperties[i + 1], linerMesh.vertProperties[i + 2]);
-    linerInner = Math.min(linerInner, radius);
-    linerOuter = Math.max(linerOuter, radius);
-  }
+  const linerStations = linerLayout.outside.map(([x, specifiedOuter]) => {
+    let inner = Infinity, outer = 0, vertices = 0;
+    for (let i = 0; i < linerMesh.vertProperties.length; i += linerMesh.numProp) {
+      if (Math.abs(linerMesh.vertProperties[i] - x) > .001) continue;
+      const radius = Math.hypot(linerMesh.vertProperties[i + 1], linerMesh.vertProperties[i + 2]);
+      inner = Math.min(inner, radius); outer = Math.max(outer, radius); vertices++;
+    }
+    return { x, specifiedInnerRadiusMm: specifiedOuter - linerLayout.wall, specifiedOuterRadiusMm: specifiedOuter,
+      measuredInnerRadiusMm: inner, measuredOuterRadiusMm: outer, measuredVertices: vertices };
+  });
+  const motorEnvelope = probeCylinder([P.motor.front - .1, 0, 0], [P.motor.rear + .1, 0, 0], P.motor.radius + P.clearance, 128);
+  const motorEnvelopeObstruction = intersectionVolume(motorEnvelope, liner.solid);
+  const straightBore = probeCylinder([I.front - .1, 0, 0], [I.contractionStart, 0, 0], I.inner - .1, 128);
+  const straightBoreObstruction = intersectionVolume(straightBore, liner.solid);
+  const rearOpening = probeCylinder([I.rear - .5, 0, 0], [I.rear + .5, 0, 0], rearInner - .1, 128);
+  const rearOpeningObstruction = intersectionVolume(rearOpening, liner.solid);
+  const curvedStations = linerStations.filter(station => station.x >= I.contractionStart);
+  const averageSlope = I.radialContraction / (I.rear - I.contractionStart);
+  const slopes = curvedStations.slice(1).map((station, i) => (curvedStations[i].measuredOuterRadiusMm - station.measuredOuterRadiusMm)
+    / (station.x - curvedStations[i].x));
   const annularProbe = probeCylinder([I.front - .1, 0, 0], [I.rear + .1, 0, 0], P.motorHousing.inner - .1, 128)
     .subtract(probeCylinder([I.front - .2, 0, 0], [I.rear + .2, 0, 0], I.outer + .1, 128));
   const annularObstructions = parts.map(part => ({ id: part.id, volumeMm3: intersectionVolume(annularProbe, part.solid) }));
   result.intakeInnerShell = {
-    specifiedInnerDiameterMm: I.inner * 2, specifiedOuterDiameterMm: I.outer * 2,
-    measuredInnerVertexDiameterMm: linerInner * 2, measuredOuterVertexDiameterMm: linerOuter * 2,
-    motorRadialClearanceMm: I.inner - P.motor.radius,
+    forwardInnerDiameterMm: I.inner * 2, forwardOuterDiameterMm: I.outer * 2,
+    rearInnerDiameterMm: rearInner * 2, rearOuterDiameterMm: rearOuter * 2,
+    contractionStartMm: I.contractionStart, radialContractionMm: I.radialContraction,
+    curve: 'sampled smooth cubic contraction, independently checked for monotonicity and eased end slopes',
+    firstSlopeRelativeToAverage: slopes[0] / averageSlope, lastSlopeRelativeToAverage: slopes.at(-1) / averageSlope,
+    stations: linerStations,
+    motorRadialClearanceMm: linerLayout.minimumMotorEnvelopeClearance,
+    motorEnvelopeExpansionMm: P.clearance, motorEnvelopeObstructionMm3: motorEnvelopeObstruction,
+    axialGapAfterMotorMm: I.contractionStart - P.motor.rear,
+    straightBoreObstructionMm3: straightBoreObstruction, rearOpeningObstructionMm3: rearOpeningObstruction,
     frontMm: liner.bounds.min[0], rearMm: liner.bounds.max[0], openBoreObstructionMm3: linerBoreObstruction,
   };
   result.intakeAnnulus = {
     radialGapMm: P.motorHousing.inner - I.outer,
+    radialGapReference: 'minimum nominal gap in the forward constant-radius section',
+    rearRadialGapMm: P.motorHousing.inner - rearOuter,
     nominalAreaMm2: Math.PI * (P.motorHousing.inner ** 2 - I.outer ** 2),
+    rearNominalAreaMm2: Math.PI * (P.motorHousing.inner ** 2 - rearOuter ** 2),
     flowProbeRadiusFromAxisMm: annulusRadius,
     maximumObstructionVolumeMm3: Math.max(...annularObstructions.map(item => item.volumeMm3)),
     obstructions: annularObstructions.filter(item => item.volumeMm3 > .001),
   };
-  if (Math.abs(linerInner - I.inner) > .001 || Math.abs(linerOuter - I.outer) > .001
+  if (linerStations.some(station => !station.measuredVertices
+    || Math.abs(station.measuredInnerRadiusMm - station.specifiedInnerRadiusMm) > .001
+    || Math.abs(station.measuredOuterRadiusMm - station.specifiedOuterRadiusMm) > .001)
     || Math.abs(liner.bounds.min[0] - I.front) > .001 || Math.abs(liner.bounds.max[0] - I.rear) > .001
-    || linerBoreObstruction > .001) failures.push('Inner liner dimensions or open ends do not match parameters');
+    || linerBoreObstruction > .001 || straightBoreObstruction > .001 || rearOpeningObstruction > .001) {
+    failures.push('Inner liner straight section, curved tail or open ends do not match parameters');
+  }
+  if (slopes.some(slope => !Number.isFinite(slope) || slope <= 0)
+    || slopes[0] / averageSlope > .1 || slopes.at(-1) / averageSlope > .1
+    || Math.max(...slopes) / averageSlope < 1.2) failures.push('Liner contraction lacks a continuous eased inward curve');
+  if (motorEnvelopeObstruction > .001 || linerLayout.minimumMotorEnvelopeClearance < P.clearance
+    || I.contractionStart - P.motor.rear < P.clearance) failures.push('Contracting liner obstructs the main motor envelope');
   if (result.intakeAnnulus.obstructions.length) failures.push('Double-wall intake annulus is obstructed');
+  boreProbe.delete(); linerBore.delete(); motorEnvelope.delete(); straightBore.delete(); rearOpening.delete(); annularProbe.delete(); passage.delete();
 
   result.status = failures.length ? 'failed' : 'passed';
   result.failures = failures;

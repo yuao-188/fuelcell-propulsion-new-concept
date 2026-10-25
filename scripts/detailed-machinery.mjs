@@ -1,4 +1,5 @@
 import { buildTwoStageCompressor } from './two-stage-compressor.mjs';
+import { getIntakeLinerLayout } from './intake-liner-layout.mjs';
 
 /** Physical chord stations, with the angle measured from the engine axis. */
 export function fanBladeSections(F) {
@@ -261,17 +262,22 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
   add('intake-fasteners', '引气外壳口沿沉头紧固件', 'intakeOuter', darkSteel, union(intakeScrews),
     { ...metal, clip: true });
 
-  // The motor bay remains open at both ends. Its independent liner creates a
-  // real annular intake passage with the outer sleeve, without a solid tail cap.
+  // The motor bay remains open at both ends. After the unchanged motor envelope,
+  // the liner contracts with a continuous tangent into a smaller open rear lip.
+  // This widens the annular intake passage without introducing any closing disk.
   const I = P.intakeLiner;
+  let intakeLiner;
   if (I) {
-    const liner = hollowLathe([[I.front, I.outer], [I.rear, I.outer]], [[I.front, I.inner], [I.rear, I.inner]]);
-    add('intake-inner-shell', '引气内壳 · 两端开口电机套筒', 'intakeInner', C.intakeInner ?? '#355565', liner,
-      { metallic: .7, roughness: .32, finish: 'satin-blue-metal', clip: true });
+    const layout = getIntakeLinerLayout(P);
+    const liner = hollowLathe(layout.outside, layout.inside);
+    intakeLiner = layout.verification;
+    add('intake-inner-shell', '引气内壳 · 圆滑内收开口尾缘', 'intakeInner', C.intakeInner ?? '#355565', liner,
+      { metallic: .7, roughness: .32, finish: 'satin-blue-metal', clip: true,
+        rearOpen: true, radialContraction: I.radialContraction });
   }
 
   const compressor = buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCylinder, solidLathe, hollowLathe, add });
   void revolved;
   return { fanFront, fanRear, mainFanRadius: F.radius, fanBladeCount,
-    fanStatorCount: 18, statorFront, statorRear, ...compressor };
+    fanStatorCount: 18, statorFront, statorRear, intakeLiner, ...compressor };
 }

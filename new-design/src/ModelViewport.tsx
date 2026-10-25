@@ -40,11 +40,11 @@ export default function ModelViewport(props: Props) {
     callouts.setAttribute('class','compressor-callouts');callouts.setAttribute('aria-hidden','true');
     element.appendChild(callouts);
     const anchors:[string,number[],number,boolean][]=[
-      ['一级离心叶轮',[541,95,-35],.38,false],
-      ['一级扩压静叶',[541,155,-20],.52,false],
-      ['级间回流静叶',[565,105,-30],.66,false],
-      ['二级离心叶轮',[606,75,-35],.38,true],
-      ['二级扩压静叶',[608,126,-20],.52,true],
+      ['一级离心叶轮',[536.638,98.452,-17.526],.38,false],
+      ['一级扩压静叶',[541,151.548,-32.53],.52,false],
+      ['级间回流静叶',[565,101.904,-25.311],.66,false],
+      ['二级离心叶轮',[601.584,74.313,-10.131],.38,true],
+      ['二级扩压静叶',[608,122.831,-28.079],.52,true],
       ['出口 → 空气主管',[681,18,0],.66,true],
     ];
     const calloutItems=anchors.map(([label,point,row,rightSide])=>{
@@ -148,7 +148,7 @@ export default function ModelViewport(props: Props) {
       cap.onAfterRender=()=>renderer.clearStencil();
       scene.add(stencil,cap);sections.push({source:mesh,stencil,cap});
     }
-    const modelUrl=new URL('model.glb?v=20261025-open-core-outer-hydrogen-1',document.baseURI);
+    const modelUrl=new URL('model.glb?v=20261025-open-discs-curved-intake-2',document.baseURI);
     const modelRequest=new AbortController();
     const loadFailed=()=>{if(!cancelled)setStatus('模型加载失败，请刷新页面重试。');};
     // Read the binary directly. FileLoader's rewrapped progress stream can
@@ -198,7 +198,7 @@ export default function ModelViewport(props: Props) {
         meshes.forEach(mesh=>{
           const id=String(mesh.userData.id??'');
           if(isolated) {
-            mesh.visible=id.startsWith('compressor-') && !(rotors && (mesh.userData.group==='compressorCase' || id.startsWith('compressor-shroud-') || id==='compressor-return-diaphragm'));
+            mesh.visible=id.startsWith('compressor-') && !(rotors && mesh.userData.group==='compressorCase');
           } else mesh.visible=visible[mesh.userData.group]??true;
         });priorVisibility=visibility;dirty=true;
       }
