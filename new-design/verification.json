@@ -1,7 +1,7 @@
 {
   "schema": 4,
   "units": "mm",
-  "dimensionSource": "user-confirmed removal of five compressor disc surfaces and inward-curved open intake liner; prior 700 mm third stage retained, 2026-10-25",
+  "dimensionSource": "user-confirmed 18-blade compressor rotors with two matching backplates and continuous hub roots; return vanes removed; prior dimensions retained, 2026-10-25",
   "performanceScope": "geometry only; prior thermal/power results are not recalculated",
   "pumpPlacement": "stage 3 central cavity",
   "envelopes": {
@@ -23,9 +23,9 @@
     "return": 11,
     "cathode": 11
   },
-  "parts": 99,
-  "solidChecks": 1077,
-  "broadPhasePairs": 4851,
+  "parts": 98,
+  "solidChecks": 1070,
+  "broadPhasePairs": 4753,
   "collisions": [],
   "fluidChecks": {
     "gasSeparation": {
@@ -1282,7 +1282,9 @@
   "layoutOverrides": {
     "intakeInnerEnds": "both open",
     "intakeLinerRadialContraction": 16,
-    "compressorDiscSurfacesRemoved": 5,
+    "compressorDiscSurfacesRemoved": 3,
+    "compressorBackplates": 2,
+    "compressorReturnVanes": 0,
     "mainInnerShellFront": 210,
     "mainInnerShellRear": 1387,
     "innerShellStopsAtThirdStageFront": true,
@@ -1317,7 +1319,7 @@
       "contractionSamples": 32
     },
     "compressorStages": 2,
-    "compressorBladeCount": 12,
+    "compressorBladeCount": 18,
     "neckStart": 675,
     "driveArchitecture": "independent-front-and-rear-motors",
     "motorSizing": "schematic-only",
@@ -1812,7 +1814,7 @@
         "number": 1,
         "plate": 544,
         "back": 549,
-        "radius": 145,
+        "radius": 143.8,
         "eye": 41,
         "bladeInner": 39,
         "bladeOuter": 143.8,
@@ -1830,7 +1832,7 @@
         "number": 2,
         "plate": 611,
         "back": 616,
-        "radius": 116,
+        "radius": 114.8,
         "eye": 35.6,
         "bladeInner": 33.5,
         "bladeOuter": 114.8,
@@ -1847,11 +1849,26 @@
     ],
     "removedDiscSurfaces": [
       "compressor-shroud-1",
-      "compressor-rotor-1-backplate",
       "compressor-return-diaphragm",
-      "compressor-shroud-2",
-      "compressor-rotor-2-backplate"
+      "compressor-shroud-2"
     ],
+    "restoredBackplates": [
+      {
+        "stage": 1,
+        "front": 544,
+        "rear": 549,
+        "radius": 143.8,
+        "segments": 512
+      },
+      {
+        "stage": 2,
+        "front": 611,
+        "rear": 616,
+        "radius": 114.8,
+        "segments": 512
+      }
+    ],
+    "returnVaneCount": 0,
     "returnDiaphragmSupportCount": 0
   },
   "shellGeometry": {
@@ -2359,11 +2376,11 @@
   "errors": [],
   "compressorGeometry": {
     "status": "passed",
-    "scope": "Open rotor/stator structural arrangement with five disc surfaces removed; not a closed two-stage pressure passage",
+    "scope": "Two backed eighteen-blade rotors; static covers and interstage return assembly removed; structural geometry only",
     "source": "exported GLB",
-    "modelModifiedAt": "2026-10-25T14:07:25.813Z",
+    "modelModifiedAt": "2026-10-25T14:37:39.822Z",
     "units": "mm",
-    "frontParts": 21,
+    "frontParts": 20,
     "componentCounts": {
       "fan": 1,
       "fan-spinner": 1,
@@ -2379,7 +2396,6 @@
       "compressor-diffuser-1": 18,
       "compressor-rotor-2": 1,
       "compressor-diffuser-2": 18,
-      "compressor-return-channel": 18,
       "compressor-motor-1": 1,
       "compressor-motor-2": 1,
       "compressor-front-flange": 1,
@@ -2389,8 +2405,8 @@
     },
     "solidIntersections": {
       "toleranceMm3": 0.02,
-      "candidates": 45,
-      "maximumVolumeMm3": 0.0006903630560049772,
+      "candidates": 42,
+      "maximumVolumeMm3": 0.000425773725712275,
       "collisions": []
     },
     "fanStators": {
@@ -2669,26 +2685,74 @@
       {
         "stage": 1,
         "radiusMm": 75,
-        "separatedBlades": 12,
-        "metadataBlades": 12
+        "separatedBlades": 18,
+        "metadataBlades": 18
       },
       {
         "stage": 1,
         "radiusMm": 120,
-        "separatedBlades": 12,
-        "metadataBlades": 12
+        "separatedBlades": 18,
+        "metadataBlades": 18
       },
       {
         "stage": 2,
         "radiusMm": 60,
-        "separatedBlades": 12,
-        "metadataBlades": 12
+        "separatedBlades": 18,
+        "metadataBlades": 18
       },
       {
         "stage": 2,
         "radiusMm": 100,
-        "separatedBlades": 12,
-        "metadataBlades": 12
+        "separatedBlades": 18,
+        "metadataBlades": 18
+      }
+    ],
+    "restoredBackplates": [
+      {
+        "stage": 1,
+        "frontMm": 544,
+        "rearMm": 549,
+        "specifiedRadiusMm": 143.8,
+        "measuredRearVertexRadiusMm": 143.80000687293781,
+        "missingMaterialMm3": 0,
+        "nominalDiffuserRadialGapMm": 4.399999999999977,
+        "verifiedRunningGapMm": 0.8,
+        "diffuserObstructionMm3": 0,
+        "casingObstructionMm3": 0
+      },
+      {
+        "stage": 2,
+        "frontMm": 611,
+        "rearMm": 616,
+        "specifiedRadiusMm": 114.8,
+        "measuredRearVertexRadiusMm": 114.80000383625237,
+        "missingMaterialMm3": 0,
+        "nominalDiffuserRadialGapMm": 4.400000000000006,
+        "verifiedRunningGapMm": 0.8,
+        "diffuserObstructionMm3": 0,
+        "casingObstructionMm3": 0
+      }
+    ],
+    "compressorBladeAttachments": [
+      {
+        "stage": 1,
+        "rootFrontMm": 522,
+        "rootRearMm": 544,
+        "continuousRootProbeSegments": 216,
+        "backplateBridgeProbes": 162,
+        "rootMissingMaterialMm3": 0,
+        "bladeBottomMissingMaterialMm3": 0,
+        "rotorConnectedComponents": 1
+      },
+      {
+        "stage": 2,
+        "rootFrontMm": 584,
+        "rootRearMm": 611,
+        "continuousRootProbeSegments": 216,
+        "backplateBridgeProbes": 162,
+        "rootMissingMaterialMm3": 0,
+        "bladeBottomMissingMaterialMm3": 0,
+        "rotorConnectedComponents": 1
       }
     ],
     "outletNeck": {
@@ -2704,7 +2768,7 @@
     "inletToOutlet": {
       "interpretation": "A clear structural path through the open rotor and stator arrangement; no sealed pressure-stage claim",
       "probeRadiusMm": 0.5,
-      "segments": 121,
+      "segments": 87,
       "toleranceMm3": 0.001,
       "maximumObstructionVolumeMm3": 0,
       "obstructions": []
@@ -2713,25 +2777,13 @@
       {
         "id": "compressor-shroud-1",
         "absentPartId": true,
-        "witnessVolumeMm3": 0.05852709660482877,
-        "obstructions": []
-      },
-      {
-        "id": "compressor-backplate-1",
-        "absentPartId": true,
-        "witnessVolumeMm3": 218863.99823825248,
+        "witnessVolumeMm3": 0.05852709660483077,
         "obstructions": []
       },
       {
         "id": "compressor-shroud-2",
         "absentPartId": true,
-        "witnessVolumeMm3": 0.058527096604831755,
-        "obstructions": []
-      },
-      {
-        "id": "compressor-backplate-2",
-        "absentPartId": true,
-        "witnessVolumeMm3": 133237.84471403,
+        "witnessVolumeMm3": 0.0585270966048304,
         "obstructions": []
       },
       {
@@ -2741,6 +2793,12 @@
         "obstructions": []
       }
     ],
+    "removedReturnVanes": {
+      "absentPartId": true,
+      "annularWitnessFrontMm": 560,
+      "annularWitnessRearMm": 570,
+      "obstructions": []
+    },
     "blueSleeve": {
       "specifiedBoreDiameterMm": 330,
       "measuredInnerVertexDiameterMm": 329.9999855862564,
@@ -3056,7 +3114,7 @@
     "failures": []
   },
   "exportedCellGeometry": {
-    "modelBytes": 77653240,
+    "modelBytes": 77751668,
     "modules": [
       {
         "id": "stack-1-1",

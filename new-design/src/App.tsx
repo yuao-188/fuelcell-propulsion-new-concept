@@ -22,9 +22,8 @@ const initialVisibility: Visibility = {
   wiring: true,
 };
 
-function LayerToggle({ label, detail, color, checked, onChange }: {
+function LayerToggle({ label, color, checked, onChange }: {
   label: string;
-  detail?: string;
   color: string;
   checked: boolean;
   onChange: () => void;
@@ -41,7 +40,6 @@ function LayerToggle({ label, detail, color, checked, onChange }: {
       <span className={`layer-swatch ${color}`} aria-hidden="true" />
       <span className="layer-copy">
         <span className="layer-label">{label}</span>
-        {detail && <span className="layer-detail">{detail}</span>}
       </span>
       <span className="toggle-track" aria-hidden="true"><span /></span>
     </button>
@@ -88,8 +86,7 @@ export default function App() {
         <div className="brand">
           <div className="brand-mark" aria-hidden="true"><Box size={24} strokeWidth={1.5} /></div>
           <div>
-            <p className="brand-kicker">燃料电池电推进 · 独立方案</p>
-            <h1>模块化推进构型</h1>
+            <h1>氢能燃料电池发动机</h1>
           </div>
         </div>
         <div className="header-note"><span aria-hidden="true" />几何模型 · 结构与管路布局</div>
@@ -98,7 +95,7 @@ export default function App() {
       <main className="design-workspace">
         <section className="viewer-card" aria-label="推进构型三维模型">
           <div className="viewer-heading">
-            <div className="viewer-caption"><span className="caption-dot" />{cameraView === 'compressor' ? '两级独立电驱离心压气机' : '整体构型'}</div>
+            <div className="viewer-caption"><span className="caption-dot" />{cameraView === 'compressor' ? '离心式压气机' : '整体构型'}</div>
             <div className="viewer-mode">{cameraView === 'compressor' && compressorView === 'rotors' ? '叶轮与静叶' : viewMode === 'cutaway' ? '剖切视图' : '完整视图'}</div>
           </div>
 
@@ -129,8 +126,6 @@ export default function App() {
                 <button type="button" className={compressorView === 'rotors' ? 'is-active' : ''}
                   aria-pressed={compressorView === 'rotors'} onClick={() => setCompressorView('rotors')}>叶轮与静叶</button>
               </div>
-              <p>{compressorView === 'passage' ? '两级叶片、扩压静叶、回流静叶与独立电机；五处盘面已移除' : '银色：叶片、轮毂与短轴　深银色：扩压静叶、回流静叶　金色：独立电机'}</p>
-              <span>{compressorView === 'passage' ? '拖动滑块查看内部间隙与开口' : '外机匣已隐藏，叶片与短轴保持完整，可拖动旋转'}</span>
             </div>}
           </div>
 
@@ -201,7 +196,7 @@ export default function App() {
                   step={1}
                   value={sectionDepth}
                   aria-valuetext={`${sectionDepth}% 剖切深度`}
-                  aria-describedby="section-depth-limits section-depth-scope"
+                  aria-describedby="section-depth-limits"
                   style={{ '--section-progress': `${sectionDepth}%` } as CSSProperties}
                   onChange={event => setSectionDepth(Number(event.currentTarget.value))}
                 />
@@ -216,7 +211,6 @@ export default function App() {
                     </button>
                   ))}
                 </div>
-                <p className="depth-scope" id="section-depth-scope">{cameraView === 'compressor' ? '沿压气机径向剖切，查看各级叶间通道与回流结构' : '剖切壳体、电堆与管路；完整模式查看全部连接'}</p>
               </div>
             )}
           </section>
@@ -225,57 +219,26 @@ export default function App() {
             <h3 id="structure-label">结构部件</h3>
             <div className="layer-list">
               <LayerToggle label="外壳" color="swatch-outer" checked={visibility.outerShell} onChange={() => toggleLayer('outerShell')} />
-              <LayerToggle label="整机内壳" detail="提前渐扩 · 止于三级前端外缘" color="swatch-inner" checked={visibility.innerShell} onChange={() => toggleLayer('innerShell')} />
-              <LayerToggle label="引气外筒" detail="内外筒之间形成环形引气道" color="swatch-intake" checked={visibility.intake} onChange={() => toggleLayer('intake')} />
-              <LayerToggle label="引气内筒" detail="尾端圆弧内收 · 前后均开口" color="swatch-intake-inner" checked={visibility.intakeInner} onChange={() => toggleLayer('intakeInner')} />
-              <LayerToggle label="黄色压气机外壳" detail="双级独立电驱 · 级间回流静叶" color="swatch-compressor" checked={visibility.compressorCase} onChange={() => toggleLayer('compressorCase')} />
-              <LayerToggle label="电堆模块" detail="环向片组 · 冷却通道前进后出" color="swatch-stack" checked={visibility.stacks} onChange={() => toggleLayer('stacks')} />
+              <LayerToggle label="整机内壳" color="swatch-inner" checked={visibility.innerShell} onChange={() => toggleLayer('innerShell')} />
+              <LayerToggle label="引气外筒" color="swatch-intake" checked={visibility.intake} onChange={() => toggleLayer('intake')} />
+              <LayerToggle label="引气内筒" color="swatch-intake-inner" checked={visibility.intakeInner} onChange={() => toggleLayer('intakeInner')} />
+              <LayerToggle label="黄色压气机外壳" color="swatch-compressor" checked={visibility.compressorCase} onChange={() => toggleLayer('compressorCase')} />
+              <LayerToggle label="电堆模块" color="swatch-stack" checked={visibility.stacks} onChange={() => toggleLayer('stacks')} />
             </div>
           </section>
 
           <section className="control-section pipe-section" aria-labelledby="pipe-label">
-            <h3 id="pipe-label">管路系统<span className="section-note">独立显隐</span></h3>
+            <h3 id="pipe-label">管路系统</h3>
             <div className="layer-list">
               <LayerToggle label="空气管路" color="swatch-air" checked={visibility.air} onChange={() => toggleLayer('air')} />
               <LayerToggle label="供氢管路" color="swatch-hydrogen" checked={visibility.hydrogen} onChange={() => toggleLayer('hydrogen')} />
               <LayerToggle label="回氢管路" color="swatch-return" checked={visibility.return} onChange={() => toggleLayer('return')} />
-              <LayerToggle label="阴极尾气与排水" detail="尾气汇集 · 气水分离与排水" color="swatch-inner" checked={visibility.cathodeWater} onChange={() => toggleLayer('cathodeWater')} />
-              <LayerToggle label="阳极气水分离器" detail="回氢泵前除水" color="swatch-return" checked={visibility.anodeSeparator} onChange={() => toggleLayer('anodeSeparator')} />
+              <LayerToggle label="阴极尾气与排水" color="swatch-inner" checked={visibility.cathodeWater} onChange={() => toggleLayer('cathodeWater')} />
+              <LayerToggle label="阳极气水分离器" color="swatch-return" checked={visibility.anodeSeparator} onChange={() => toggleLayer('anodeSeparator')} />
               <LayerToggle label="电气线束" color="swatch-stack" checked={visibility.wiring} onChange={() => toggleLayer('wiring')} />
             </div>
           </section>
 
-          <section className="module-section" aria-labelledby="module-label">
-            <div className="module-heading"><h3 id="module-label">模块分组</h3><span>共 <strong>11</strong> 个模块</span></div>
-            <div className="module-groups">
-              {[3, 4, 4].map((count, index) => (
-                <div className="module-group" key={index}>
-                  <span className="group-number">{count}</span>
-                  <span className="group-label">第 {index + 1} 组</span>
-                </div>
-              ))}
-            </div>
-            <details className="dimension-report">
-              <summary>当前几何尺寸 <span>/ mm</span></summary>
-              <table>
-                <caption>电堆装配环：内径 / 外径 × 轴向长</caption>
-                <tbody>
-                  <tr><th scope="row">整机长</th><td>2012</td></tr>
-                  <tr><th scope="row">风扇段内径</th><td>Φ1000</td></tr>
-                  <tr><th scope="row">主电机</th><td>Φ300 × 193</td></tr>
-                  <tr><th scope="row">第一级</th><td>Φ256 / Φ473.402 × 282</td></tr>
-                  <tr><th scope="row">第二级</th><td>Φ468 / Φ627.002 × 375</td></tr>
-                  <tr><th scope="row">第三级</th><td>Φ468 / Φ700 × 375</td></tr>
-                  <tr><th scope="row">一级片组</th><td>Φ276 / Φ467.4</td></tr>
-                  <tr><th scope="row">二级片组</th><td>Φ488 / Φ621</td></tr>
-                  <tr><th scope="row">三级片组</th><td>Φ488 / Φ693.998</td></tr>
-                  <tr><th scope="row">每模块片数</th><td>279 / 372 / 372</td></tr>
-                  <tr><th scope="row">实体片总数</th><td>3813</td></tr>
-                </tbody>
-              </table>
-            </details>
-            <p className="scale-note">电池片沿圆周排列，片间冷却通道贯通轴向<br />本页展示几何与管路布局，机电装配细节为示意</p>
-          </section>
         </aside>
       </main>
     </div>

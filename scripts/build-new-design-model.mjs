@@ -109,13 +109,13 @@ const shells=buildDetailedShells({M,CS,P,union,cylinder,revolved,polar,add});
 const wiring=buildWiring({M,P,C,union,cylinder,tubePath,roundPath,polar,add});
 
 console.log(`Built ${parts.length} solid components. Checking exact intersections...`);
-const report={schema:4,units:P.units,dimensionSource:'user-confirmed removal of five compressor disc surfaces and inward-curved open intake liner; prior 700 mm third stage retained, 2026-10-25',
+const report={schema:4,units:P.units,dimensionSource:'user-confirmed 18-blade compressor rotors with two matching backplates and continuous hub roots; return vanes removed; prior dimensions retained, 2026-10-25',
   performanceScope:'geometry only; prior thermal/power results are not recalculated',
   pumpPlacement:'stage 3 central cavity',envelopes:{length:os.rear-os.front,ductBore:2*(os.radius-os.wall),nozzleBore:2*(os.outletRadius-os.wall),motorDiameter:2*P.motor.radius,motorLength:P.motor.rear-P.motor.front,stackLength:P.stacks.at(-1).rear-P.stacks[0].front},
   modules:P.stacks.map(s=>s.modules),portCounts:Object.fromEntries(['air','hydrogen','return','cathode'].map(fluid=>[fluid,ports.filter(p=>p.fluid===fluid).length])),
   parts:parts.length,solidChecks:0,broadPhasePairs:0,collisions:[],fluidChecks:{},ports,stackChecks,
   physicalCells:stackChecks.reduce((sum,s)=>sum+s.totalPhysicalCells,0),
-  layoutOverrides:{intakeInnerEnds:'both open',intakeLinerRadialContraction:P.intakeLiner.radialContraction,compressorDiscSurfacesRemoved:5,mainInnerShellFront:ins.front,mainInnerShellRear:P.stacks[2].front,innerShellStopsAtThirdStageFront:true,innerAftCone:false,outerWaistRadius:os.waistRadius,thirdStageOuterDiameter:2*P.stacks[2].outer,hydrogenInlet:'each module outer cylindrical surface'},
+  layoutOverrides:{intakeInnerEnds:'both open',intakeLinerRadialContraction:P.intakeLiner.radialContraction,compressorDiscSurfacesRemoved:3,compressorBackplates:2,compressorReturnVanes:0,mainInnerShellFront:ins.front,mainInnerShellRear:P.stacks[2].front,innerShellStopsAtThirdStageFront:true,innerAftCone:false,outerWaistRadius:os.waistRadius,thirdStageOuterDiameter:2*P.stacks[2].outer,hydrogenInlet:'each module outer cylindrical surface'},
   machinery,shellGeometry:shells.verification,waterManagement:water.verification,wiring:wiring?.verification,plumbing:fluids.checks};
 const errors=[];
 const bounds=parts.map(p=>p.solid.boundingBox());

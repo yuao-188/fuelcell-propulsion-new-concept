@@ -85,7 +85,7 @@ h1 { font-size: 21px; font-weight: 600; line-height: 1.4; letter-spacing: 0.5px;
 .detail-toolbar button:hover { color: #345f68; background: #f0f5f6; }
 .detail-toolbar button.is-active { color: #345f68; background: #e8f0f1; font-weight: 500; }
 .viewer-hint { display: flex; align-items: center; gap: 5px; color: #8d9aa1; font-size: 10px; white-space: nowrap; }
-.viewer-scene > .compressor-inspector { position: absolute; top: 64px; left: 24px; right: 24px; width: auto; height: auto; max-width: 620px; padding: 11px 14px; border: 1px solid #d8e2e7; border-radius: 10px; background: #fffffff0; box-shadow: 0 4px 18px #253c4908; }
+.viewer-scene > .compressor-inspector { position: absolute; top: 64px; left: 24px; right: auto; width: auto; height: auto; padding: 7px; border: 1px solid #d8e2e7; border-radius: 10px; background: #fffffff0; box-shadow: 0 4px 18px #253c4908; }
 .compressor-modes { display: flex; gap: 5px; }
 .compressor-modes button { padding: 7px 12px; border-radius: 6px; color: #667b85; background: #f0f4f5; font-size: 12px; }
 .compressor-modes button.is-active { color: #17546a; background: #dcebf0; }

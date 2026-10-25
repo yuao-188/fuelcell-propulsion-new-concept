@@ -42,10 +42,10 @@ export default function ModelViewport(props: Props) {
     const anchors:[string,number[],number,boolean][]=[
       ['一级离心叶轮',[536.638,98.452,-17.526],.38,false],
       ['一级扩压静叶',[541,151.548,-32.53],.52,false],
-      ['级间回流静叶',[565,101.904,-25.311],.66,false],
+      ['一级背盘',[546.5,100,-18],.66,false],
       ['二级离心叶轮',[601.584,74.313,-10.131],.38,true],
       ['二级扩压静叶',[608,122.831,-28.079],.52,true],
-      ['出口 → 空气主管',[681,18,0],.66,true],
+      ['二级背盘',[613.5,80,-15],.66,true],
     ];
     const calloutItems=anchors.map(([label,point,row,rightSide])=>{
       const group=document.createElementNS(svgNS,'g'), line=document.createElementNS(svgNS,'polyline');
@@ -148,7 +148,7 @@ export default function ModelViewport(props: Props) {
       cap.onAfterRender=()=>renderer.clearStencil();
       scene.add(stencil,cap);sections.push({source:mesh,stencil,cap});
     }
-    const modelUrl=new URL('model.glb?v=20261025-open-discs-curved-intake-2',document.baseURI);
+    const modelUrl=new URL('model.glb?v=20261025-supported-18-blade-rotors',document.baseURI);
     const modelRequest=new AbortController();
     const loadFailed=()=>{if(!cancelled)setStatus('模型加载失败，请刷新页面重试。');};
     // Read the binary directly. FileLoader's rewrapped progress stream can
@@ -218,8 +218,7 @@ export default function ModelViewport(props: Props) {
             const projected=label.point.clone().project(camera),x=(projected.x+1)*w/2,y=(1-projected.y)*h/2;
             const edge=label.rightSide?w-18:18,baseline=label.row*h;
             const end=label.rightSide?w-130:130;
-            const outletHidden=rotors&&label.text.textContent==='出口 → 空气主管';
-            label.group.style.display=(outletHidden||projected.z>1||projected.z< -1||cut&&label.point.z>clipping.constant)?'none':'';
+            label.group.style.display=(projected.z>1||projected.z< -1||cut&&label.point.z>clipping.constant)?'none':'';
             label.line.setAttribute('points',`${x},${y} ${end},${baseline+5} ${edge},${baseline+5}`);
             label.dot.setAttribute('cx',String(x));label.dot.setAttribute('cy',String(y));
             label.text.setAttribute('x',String(edge));label.text.setAttribute('y',String(baseline));
