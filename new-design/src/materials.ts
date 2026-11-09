@@ -45,6 +45,25 @@ function surfaceFinish(source: THREE.MeshStandardMaterial, data: SurfaceData): F
   const id = data.id ?? '', group = data.group ?? '';
   const base: Finish = { color: source.color.clone(), metalness: .78, roughness: .34,
     grain: 'brushed', scale: 180, variation: .17, relief: .035, reflection: 1.05 };
+  // Explicit assembly finishes take precedence over broad legacy ID rules.
+  // Keep each exported part's colour, including the copper winding section.
+  const assemblyFinishes:Record<string,Partial<Finish>>={
+    'motor-stator-housing': {metalness:.68,roughness:.41,grain:'blasted',scale:100,variation:.07,relief:.01,reflection:1.0},
+    'motor-machined-endcaps': {metalness:.92,roughness:.25,scale:90,variation:.06,relief:.008,reflection:1.15},
+    'motor-laminated-steel': {metalness:.65,roughness:.51,grain:'blasted',scale:60,variation:.06,relief:.008,reflection:.85},
+    'motor-copper-windings': {metalness:.92,roughness:.29,scale:45,variation:.06,relief:.006,reflection:1.12},
+    'motor-rotor-steel': {metalness:.90,roughness:.28,scale:70,variation:.06,relief:.008,reflection:1.12},
+    'motor-insulated-terminals': {metalness:.02,roughness:.68,grain:'blasted',scale:60,variation:.04,relief:.004,reflection:.55},
+    'casing-satin': {metalness:.78,roughness:.43,scale:240,variation:.045,relief:.006,reflection:.95},
+    'machined-aluminium': {metalness:.94,roughness:.24,scale:90,variation:.06,relief:.007,reflection:1.18},
+    'access-panel': {metalness:.80,roughness:.40,scale:190,variation:.05,relief:.007,reflection:.98},
+    'dark-gasket': {metalness:.01,roughness:.75,grain:'blasted',scale:70,variation:.035,relief:.004,reflection:.45},
+    'service-conduit': {metalness:.82,roughness:.38,scale:75,variation:.07,relief:.009,reflection:1.0},
+    'electrical-housing': {metalness:.75,roughness:.37,grain:'blasted',scale:110,variation:.08,relief:.01,reflection:1.0},
+    'connector-polymer': {metalness:.02,roughness:.63,grain:'blasted',scale:75,variation:.04,relief:.004,reflection:.55},
+    'machined-fastener': {metalness:.94,roughness:.26,scale:65,variation:.045,relief:.006,reflection:1.12},
+  };
+  if(data.finish&&assemblyFinishes[data.finish])return {...base,...assemblyFinishes[data.finish]};
   // Plate spacing comes entirely from the radial solids and open axial slots.
   if (isGraphitePlate(data)) return { ...base, color: '#414b50', metalness: .16, roughness: .56,
     grain: 'blasted', scale: 95, variation: .08, relief: .012, reflection: .7 };
@@ -67,7 +86,7 @@ function surfaceFinish(source: THREE.MeshStandardMaterial, data: SurfaceData): F
     grain: 'blasted', scale: 100, variation: .12, relief: .015 };
   if (group === 'compressorCase') return { ...base, color: '#b49a62', metalness: .82, roughness: .31,
     grain: 'blasted', scale: 145, variation: .16, relief: .025, reflection: 1.1 };
-  if (group === 'outerShell') return { ...base, color: id.includes('seam') ? '#b9c3ca' : '#96a4ae',
+  if (group === 'outerShell') return { ...base, color: source.color.clone(),
     metalness: .91, roughness: id.includes('seam') ? .26 : .37, scale: 240, variation: .2, relief: .038, reflection: 1.12 };
   if (group === 'innerShell') return { ...base, color: '#82939f', metalness: .85, roughness: .43,
     grain: 'blasted', scale: 175, variation: .19, relief: .03, reflection: 1.0 };
@@ -155,9 +174,11 @@ ${shader.fragmentShader}`;
   };
   const section = (source: THREE.MeshStandardMaterial, data: SurfaceData) => {
     const finish = surfaceFinish(source, data);
+    const graphite=isGraphitePlate(data),insulated=finish.metalness<.1;
     const material = new THREE.MeshPhysicalMaterial({
-      color: source.color, metalness: isGraphitePlate(data) ? .1 : Math.min(source.metalness, .65),
-      roughness: isGraphitePlate(data) ? .64 : .46, envMapIntensity: .9, side: THREE.DoubleSide,
+      color: finish.color, metalness: graphite ? .1 : Math.min(finish.metalness, .72),
+      roughness: graphite ? .64 : insulated ? finish.roughness : Math.max(.3,Math.min(.62,finish.roughness+.06)),
+      envMapIntensity: insulated ? .55 : .9, side: THREE.DoubleSide,
       stencilWrite: true, stencilRef: 0, stencilFunc: THREE.NotEqualStencilFunc,
       stencilFail: THREE.ReplaceStencilOp, stencilZFail: THREE.ReplaceStencilOp, stencilZPass: THREE.ReplaceStencilOp,
     });

@@ -1,6 +1,6 @@
 {
-  "schema": 6,
-  "revision": "20261109-long-intakes",
+  "schema": 7,
+  "revision": "20261109-machinery-detail",
   "units": "mm",
   "dimensionSource": "user tables and explicit clarifications 2026-11-09",
   "scope": "geometric structure and articulated demonstration; no new thermal or pressure calculation",
@@ -2115,9 +2115,9 @@
     ],
     "articulation": "independent aperture and two-axis deflection; shared browser/validation solver"
   },
-  "parts": 72,
-  "broadPhasePairs": 2556,
-  "exactPairs": 591,
+  "parts": 96,
+  "broadPhasePairs": 4560,
+  "exactPairs": 1083,
   "collisions": [],
   "fluidChecks": {
     "cathodeCircuit": {

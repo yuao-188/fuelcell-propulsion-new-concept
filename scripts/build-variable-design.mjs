@@ -34,7 +34,7 @@ for(const s of P.stacks){
 }
 add('wiring-harness','沿机匣敷设线束与三级分支','wiring','#35454e',union(wirePieces),{clip:true,metallic:.06,roughness:.6});
 
-const report={schema:6,revision:'20261109-long-intakes',units:'mm',
+const report={schema:7,revision:'20261109-machinery-detail',units:'mm',
   dimensionSource:'user tables and explicit clarifications 2026-11-09',
   scope:'geometric structure and articulated demonstration; no new thermal or pressure calculation',
   length:P.outerShell.rear,physicalCells:stacks.reduce((n,s)=>n+s.totalPhysicalCells,0),

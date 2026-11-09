@@ -131,32 +131,96 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
   // These are packaging placeholders, not validated power-rated motor models.
   const motors = [{ number: 1, front: ax(484), rear: ax(510), support: ax(492) },
     { number: 2, front: ax(624), rear: ax(649), support: ax(634) }];
+  const driveSector=(x0,x1,ri,ro,a,b)=>{
+    const points=[],steps=8;
+    for(let j=0;j<=steps;j++){const t=lerp(a,b,j/steps);points.push([-ro*Math.sin(t),ro*Math.cos(t)]);}
+    for(let j=steps;j>=0;j--){const t=lerp(a,b,j/steps);points.push([-ri*Math.sin(t),ri*Math.cos(t)]);}
+    return new CS([points]).extrude(x1-x0).rotate([0,90,0]).translate([x0,0,0]);
+  };
   for (const D of motors) {
     const motorRadius = rr(33), bore = shaftRadius + .9;
-    const body = axisCylinder(D.front, D.rear, motorRadius, 96).subtract(axisCylinder(
-      D.front - .1, D.number === 1 ? D.rear + .1 : ax(639.5), bore, 64));
-    const pieces = [body];
-    // The separate drive is identifiable by its finned barrel, two end lands,
-    // recessed fixing heads and the shaft bore; it is not a plain support disk.
-    for (const x of [D.front+1.0*axialScale,D.rear-2.8*axialScale]) {
-      pieces.push(axisCylinder(x,x+1.8*axialScale,motorRadius+rr(1.4),80)
-        .subtract(axisCylinder(x-.1,x+1.8*axialScale+.1,bore,64)));
-    }
+    const capDepth=3*axialScale,bodyFront=D.front+capDepth,bodyRear=D.rear-capDepth;
+    const at=(x,r,t)=>[x,r*Math.cos(t),r*Math.sin(t)];
+    const body = axisCylinder(bodyFront,bodyRear,motorRadius,96)
+      .subtract(axisCylinder(bodyFront-.1,bodyRear+.1,rr(30.7),96));
+    const pieces = [body],caps=[],capCuts=[];
+    // Hollow dark barrel, fine axial ribs and its existing three supports.
     for(let fin=0;fin<16;fin++) {
       const t=fin*tau/16;
-      const a=[D.front+4*axialScale,(motorRadius+.1)*Math.cos(t),(motorRadius+.1)*Math.sin(t)];
-      const b=[D.rear-4*axialScale,a[1],a[2]];
-      pieces.push(cylinder(a,b,rr(.9),rr(.9),12));
+      pieces.push(cylinder(at(bodyFront+1.5,motorRadius+.2,t),at(bodyRear-1.5,motorRadius+.2,t),rr(.7),rr(.7),12));
     }
-    if (D.number === 2) pieces.push(solidLathe([[D.rear, motorRadius], [ax(662), .25]]));
+    if(D.number===2)pieces.push(solidLathe([[D.rear+.025,motorRadius],[ax(662),.25]])
+      .subtract(solidLathe([[D.rear-.1,rr(30.5)],[ax(662)-1.8,.1]])));
     for (let i = 0; i < 3; i++) {
-        const angle = i * tau / 3;
-        const p = r => [D.support, r * Math.cos(angle), r * Math.sin(angle)];
-        pieces.push(cylinder(p(motorRadius - .5), p(K.inner + 1), rr(2.4), rr(2.4), 32).intersect(caseFree));
+      const angle = i * tau / 3;
+      const p = r => [D.support, r * Math.cos(angle), r * Math.sin(angle)];
+      pieces.push(cylinder(p(motorRadius - .5), p(K.inner + 1), rr(2.4), rr(2.4), 32).intersect(caseFree));
       }
-    add(`compressor-motor-${D.number}`, `第${D.number}级独立驱动电机 · 筋条与双端盖`, 'front', '#bf9651',
-      union(pieces), { ...metal, clip: true, stationary: true, stage: D.number, motorSizing: 'schematic-only',
-        supportCount: 3, supportAxialCentreMm: D.support, inletGuideVaneCount: 0 });
+    // Silver end caps carry real shaft bores, recessed bearing races and eight
+    // integral screw heads with hex sockets. Their complete axial envelope stays
+    // at the existing motor stations; no extra flow-blocking outer disk is added.
+    for(const isFront of [true,false]){
+      const lo=isFront?D.front:bodyRear,hi=isFront?bodyFront:D.rear;
+      caps.push(axisCylinder(lo,hi,motorRadius+rr(1.4),96)
+        .subtract(axisCylinder(lo-.1,hi+.1,bore,64)));
+      const face=isFront?lo:hi,d=isFront?1:-1;
+      const a=Math.min(face-.02*d,face+.42*d),b=Math.max(face-.02*d,face+.42*d);
+      capCuts.push(axisCylinder(a,b,rr(18.1),96).subtract(axisCylinder(a-.1,b+.1,rr(17.3),96)));
+      for(let j=0;j<8;j++){
+        const theta=(j+.5)*tau/8,p=x=>at(x,rr(27.6),theta);
+        const ca=Math.min(face-.02*d,face+.25*d),cb=Math.max(face-.02*d,face+.25*d);
+        capCuts.push(cylinder(p(ca),p(cb),rr(1.35),rr(1.35),24)
+          .subtract(cylinder(p(ca-.1),p(cb+.1),rr(1.08),rr(1.08),24)));
+        const sa=Math.min(face-.03*d,face+.65*d),sb=Math.max(face-.03*d,face+.65*d);
+        capCuts.push(cylinder(p(sa),p(sb),rr(.48),rr(.48),6));
+      }
+    }
+    const turnFront=bodyFront+1.25,turnRear=bodyRear-1.25,steelFront=turnFront+1.4,steelRear=turnRear-1.4;
+    const statorPieces=[axisCylinder(steelFront,steelRear,rr(30.4),96)
+      .subtract(axisCylinder(steelFront-.1,steelRear+.1,rr(27.2),96))];
+    const copper=[];
+    const coilTube=(points,r)=>{
+      const segments=[];
+      for(let j=1;j<points.length;j++)segments.push(cylinder(points[j-1],points[j],r,r,12));
+      for(const point of points.slice(1,-1))segments.push(M.sphere(r,12).translate(point));
+      return union(segments);
+    };
+    for(let j=0;j<12;j++){
+      const theta=j*tau/12,a=theta-8*Math.PI/180,b=theta+8*Math.PI/180;
+      statorPieces.push(driveSector(steelFront,steelRear,rr(20.8),rr(27.3),theta-4*Math.PI/180,theta+4*Math.PI/180));
+      const loop=[at(turnFront,rr(24),a),at(turnRear,rr(24),a)];
+      for(let k=1;k<=6;k++)loop.push(at(turnRear,rr(24),lerp(a,b,k/6)));
+      loop.push(at(turnFront,rr(24),b));
+      for(let k=1;k<=6;k++)loop.push(at(turnFront,rr(24),lerp(b,a,k/6)));
+      copper.push(coilTube(loop,rr(.85)));
+    }
+    const rotor=axisCylinder(bodyFront+.6,bodyRear-.6,rr(18.8),96)
+      .subtract(axisCylinder(bodyFront+.5,bodyRear-.5,shaftRadius,64));
+    // A small curved terminal seat and two short insulated leads stay tucked
+    // against the barrel, clear of its three radial mounts and end caps.
+    const terminalX=bodyFront+4,terminalAngle=Math.PI/3;
+    const foot=driveSector(terminalX-3,terminalX+3,rr(32.8),rr(35.4),terminalAngle-.105,terminalAngle+.105);
+    const terminals=[foot],terminalBores=[];
+    for(const sign of [-1,1]){
+      const t=terminalAngle+sign*.045,p=x=>at(x,rr(34.5),t);
+      terminalBores.push(cylinder(p(terminalX-1),p(terminalX+3.1),rr(.72),rr(.72),20));
+      terminals.push(cylinder(p(terminalX+2),p(bodyRear-1),rr(.55),rr(.55),16));
+      terminals.push(cylinder(p(bodyRear-2),p(bodyRear-.2),rr(.9),rr(.9),20));
+    }
+    const terminalBody=foot.subtract(union(terminalBores));
+    const terminalSolid=union([terminalBody,...terminals.slice(1)]);
+    add(`compressor-motor-${D.number}`,`第${D.number}级独立电机 · 中空定子壳与散热筋`,'front','#394b58',
+      union(pieces).subtract(foot),{...metal,clip:true,stationary:true,stage:D.number,motorSizing:'schematic-only',
+        finish:'motor-stator-housing',supportCount:3,supportAxialCentreMm:D.support,inletGuideVaneCount:0});
+    const details=[
+      ['endcaps','银灰端盖、轴承座与内六角紧固件','#cbd6df',union(caps).subtract(union(capCuts)),'motor-machined-endcaps'],
+      ['stator','叠片定子轭与齿','#59616a',union(statorPieces),'motor-laminated-steel'],
+      ['windings','十二组铜色绕组','#b96d3e',union(copper),'motor-copper-windings'],
+      ['rotor','中央转子环与短轴配合套','#9caebb',rotor,'motor-rotor-steel'],
+      ['terminals','接线座与双短线束','#263039',terminalSolid,'motor-insulated-terminals'],
+    ];
+    for(const [suffix,label,color,solid,finish]of details)add(`compressor-drive-${D.number}-${suffix}`,
+      `第${D.number}级电机 · ${label}`,'front',color,solid,{...metal,clip:true,stage:D.number,finish,motorSizing:'schematic-only'});
   }
 
   const flangeDepth = 3 * axialScale, flangeGap = .04;

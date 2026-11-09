@@ -115,11 +115,16 @@ export default function ModelViewport(props: Props) {
     const meshes:THREE.Mesh[]=[];
     const variableMeshes = new Map<number, Map<string, THREE.Mesh>>();
     const priorIntake = new Map<number, string>();
+    // Start from the confirmed core envelope, then replace it with the loaded
+    // assembly bounds so raised flanges, lugs and service pipes stay in frame.
+    const modelBounds=new THREE.Box3(
+      new THREE.Vector3(Math.min(P.outerShell.front,P.fan.spinnerFront),-P.outerShell.radius,-P.outerShell.radius),
+      new THREE.Vector3(P.outerShell.rear,P.outerShell.radius,P.outerShell.radius));
     const clipping=new THREE.Plane(new THREE.Vector3(0,0,-1),0);
     const sections:{source:THREE.Mesh; stencil:THREE.Group; cap:THREE.Mesh}[]=[];
     const sectionLength=P.outerShell.rear-P.outerShell.front+220;
     const sectionCenter=(P.outerShell.front+P.outerShell.rear)/2;
-    const capGeometry=new THREE.PlaneGeometry(sectionLength,P.outerShell.radius*2+160);
+    let capGeometry=new THREE.PlaneGeometry(sectionLength,P.outerShell.radius*2+160);
     let priorReset=-1,priorCamera='',priorMode='',priorDepth=-1,priorVisibility='';
     const inletFraming=(stage:number)=>{
       const inlet=getIntakeKinematics(P,stage,{opening:1,pitchDeg:0,yawDeg:0});
@@ -132,7 +137,7 @@ export default function ModelViewport(props: Props) {
       const intakeStage=view==='intake2'?2:view==='intake3'?3:0;
       const direction=view==='side'?new THREE.Vector3(0,0,1):view==='front'?new THREE.Vector3(-1,0,0):view==='fan'?new THREE.Vector3(-1,.17,.5).normalize():view==='compressor'?(latest.current.compressorView==='rotors'?new THREE.Vector3(-1,.25,1.6).normalize():new THREE.Vector3(-.08,.08,1).normalize()):intakeStage?new THREE.Vector3(-.34,.25,1).normalize():view==='machinery'?new THREE.Vector3(.2,.18,1).normalize():view==='cells'?new THREE.Vector3(-1,.28,.9).normalize():view==='water'?new THREE.Vector3(.25,.2,1).normalize():new THREE.Vector3(-.52,.30,1).normalize();
       const first=P.stacks[0],last=P.stacks[P.stacks.length-1],r=last.outer+35;
-      let box=view==='fan'?[[Math.min(-10,P.fan.spinnerFront-10),P.fan.rear+20],[-P.fan.radius-15,P.fan.radius+15],[-P.fan.radius-15,P.fan.radius+15]]:view==='compressor'?[[P.compressor.front-15,P.compressor.outlet+15],[-185,230],[-180,180]]:view==='machinery'?[[P.motorHousing.front-5,P.compressor.outlet+15],[-190,190],[-190,190]]:view==='stacks'?[[first.front-20,last.rear+20],[-r,r],[-r,r]]:view==='cells'?[[first.front+15,first.front+230],[first.inner-10,first.outer+15],[-100,35]]:view==='water'?[[last.rear+5,P.outerShell.rear-15],[-120,120],[-120,120]]:[[Math.min(-12,P.fan.spinnerFront-10),P.outerShell.rear+18],[-P.outerShell.radius-20,P.outerShell.radius+20],[-P.outerShell.radius-20,P.outerShell.radius+20]];
+      let box=view==='fan'?[[Math.min(-10,P.fan.spinnerFront-10),P.fan.rear+20],[-P.fan.radius-15,P.fan.radius+15],[-P.fan.radius-15,P.fan.radius+15]]:view==='compressor'?[[P.compressor.front-15,P.compressor.outlet+15],[-185,230],[-180,180]]:view==='machinery'?[[P.motorHousing.front-5,P.compressor.outlet+15],[-190,190],[-190,190]]:view==='stacks'?[[first.front-20,last.rear+20],[-r,r],[-r,r]]:view==='cells'?[[first.front+15,first.front+230],[first.inner-10,first.outer+15],[-100,35]]:view==='water'?[[last.rear+5,P.outerShell.rear-15],[-120,120],[-120,120]]:[[modelBounds.min.x-18,modelBounds.max.x+18],[modelBounds.min.y-20,modelBounds.max.y+20],[modelBounds.min.z-20,modelBounds.max.z+20]];
       if(intakeStage) {
         // Include the complete inlet from the preceding stack's midpoint to
         // this stack: articulated lip, long duct and downstream attachment.
@@ -208,7 +213,7 @@ export default function ModelViewport(props: Props) {
     // They prove each control changes the rendered buffers independently.
     const qaWindow=window as unknown as { __newDesignQA?: { snapshot: () => unknown } };
     const qaAccess={snapshot:()=>({
-      version:'20261109-long-intakes',loaded:Boolean(root),
+      version:'20261109-machinery-detail',loaded:Boolean(root),
       physicalCells:meshes.reduce((sum,mesh)=>sum+Number(mesh.userData.physicalCells||0),0),
       groups:meshes.reduce((result,mesh)=>{const group=String(mesh.userData.group);result[group]=(result[group]||0)+1;return result;},{} as Record<string,number>),
       intakes:Object.fromEntries([2,3].map(stage=>{
@@ -227,7 +232,7 @@ export default function ModelViewport(props: Props) {
       })),
     })};
     if(new URLSearchParams(location.search).get('qa')==='1')qaWindow.__newDesignQA=qaAccess;
-    const modelUrl=new URL('model.glb?v=20261109-long-intakes',document.baseURI);
+    const modelUrl=new URL('model.glb?v=20261109-machinery-detail',document.baseURI);
     const modelRequest=new AbortController();
     const loadFailed=()=>{if(!cancelled)setStatus('模型加载失败，请刷新页面重试。');};
     // Read the binary directly. FileLoader's rewrapped progress stream can
@@ -254,6 +259,16 @@ export default function ModelViewport(props: Props) {
       });
       root.updateMatrixWorld(true);
       updateIntake(2,latest.current.intake2);updateIntake(3,latest.current.intake3);
+      modelBounds.setFromObject(root);
+      const assemblySize=modelBounds.getSize(new THREE.Vector3()),assemblyCenter=modelBounds.getCenter(new THREE.Vector3());
+      const oldCapGeometry=capGeometry;
+      capGeometry=new THREE.PlaneGeometry(assemblySize.x+160,assemblySize.y+160);
+      for(const {cap} of sections) {
+        cap.geometry=capGeometry;cap.position.x=assemblyCenter.x;cap.position.y=assemblyCenter.y;
+      }
+      oldCapGeometry.dispose();
+      floor.position.set(assemblyCenter.x,modelBounds.min.y-12,0);
+      grid.position.set(assemblyCenter.x,modelBounds.min.y-14,0);
       setStatus('');priorMode='';priorDepth=-1;priorVisibility='';fit();
       },loadFailed);
     }).catch(loadFailed);
@@ -272,7 +287,8 @@ export default function ModelViewport(props: Props) {
       const cut=p.viewMode==='cutaway'&&!rotors;
       if(priorReset!==p.resetKey||priorCamera!==cameraKey){fit();priorReset=p.resetKey;priorCamera=cameraKey;}
       if(priorMode!==modeKey||priorDepth!==p.sectionDepth){
-        clipping.constant=(isolated?180:intakeStage?inletFraming(intakeStage).radius:P.outerShell.radius+25)*(1-2*p.sectionDepth/100);
+        const assemblyClipRadius=Math.max(Math.abs(modelBounds.min.z),Math.abs(modelBounds.max.z))+2;
+        clipping.constant=(isolated?180:intakeStage?inletFraming(intakeStage).radius:assemblyClipRadius)*(1-2*p.sectionDepth/100);
         for(const {source,cap} of sections){
           const material=source.material as THREE.MeshStandardMaterial;
           if(priorMode!==modeKey){material.clippingPlanes=cut?[clipping]:[];material.needsUpdate=true;}

@@ -10,7 +10,7 @@ import {meshComponents} from './mesh-components.mjs';
 const root=resolve(import.meta.dirname,'..'),ctx=await createKernel(),{api,M,P,cylinder,union,polar}=ctx;
 const path=resolve(root,'new-design/public/model.glb'),reportPath=resolve(root,'new-design/verification.json');
 const doc=await new NodeIO().read(path),report=JSON.parse(await readFile(reportPath,'utf8'));
-assert.equal(report.revision,'20261109-long-intakes');
+assert.equal(report.revision,'20261109-machinery-detail');
 const parts=[];
 for(const node of doc.getRoot().listNodes()){
   const data=node.getExtras(),primitive=node.getMesh()?.listPrimitives()[0];if(!primitive)continue;
