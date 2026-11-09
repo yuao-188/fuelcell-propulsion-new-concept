@@ -1,28 +1,55 @@
+/** A fair monotone contraction: only the inlet and outlet lands are level.
+ * The one intermediate radius clears the second rotor/diffuser envelope; its
+ * nonzero Hermite tangent avoids the former succession of bulbous shoulders.
+ */
+export function getCompressorCasingProfile(P) {
+  const K=P.compressor,scale=(K.outlet-K.front)/210;
+  const ax=x=>K.front+(x-480)*scale,rr=r=>r*K.inner/165;
+  const neckStart=K.outlet-(K.outletNeckLength??(K.outlet-K.rear)*.5);
+  const knots=[[K.front,K.inner],[ax(555),K.inner],[ax(622),rr(135)],
+    [neckStart,P.air.inner],[K.outlet,P.air.inner]];
+  if(knots.some((p,i)=>i&&(p[0]<=knots[i-1][0]||p[1]>knots[i-1][1])))
+    throw new Error('Compressor casing needs ordered axial stations and decreasing radii');
+  const h=knots.slice(1).map((p,i)=>p[0]-knots[i][0]);
+  const slopes=knots.slice(1).map((p,i)=>(p[1]-knots[i][1])/h[i]);
+  const tangents=knots.map((_,i)=>{
+    if(i===0||i===knots.length-1||slopes[i-1]*slopes[i]<=0)return 0;
+    const w1=2*h[i]+h[i-1],w2=h[i]+2*h[i-1];
+    return (w1+w2)/(w1/slopes[i-1]+w2/slopes[i]);
+  });
+  const innerAt=x=>{
+    if(x<=K.front)return K.inner;
+    if(x>=K.outlet)return P.air.inner;
+    const i=Math.max(1,knots.findIndex(p=>p[0]>=x)),a=knots[i-1],b=knots[i];
+    const t=(x-a[0])/(b[0]-a[0]),t2=t*t,t3=t2*t,length=b[0]-a[0];
+    return (2*t3-3*t2+1)*a[1]+(t3-2*t2+t)*length*tangents[i-1]
+      +(-2*t3+3*t2)*b[1]+(t3-t2)*length*tangents[i];
+  };
+  const wallAt=r=>(P.air.outer-P.air.inner)+(K.outer-K.inner-(P.air.outer-P.air.inner))
+    *Math.max(0,Math.min(1,(r-P.air.inner)/(K.inner-P.air.inner)));
+  const inside=[knots[0]];
+  for(let i=1;i<knots.length;i++){
+    const samples=Math.max(8,Math.ceil((knots[i][0]-knots[i-1][0])/1.25));
+    for(let j=1;j<=samples;j++){
+      const x=knots[i-1][0]+(knots[i][0]-knots[i-1][0])*j/samples;
+      inside.push([x,innerAt(x)]);
+    }
+  }
+  const outside=inside.map(([x,r])=>[x,r+wallAt(r)]);
+  return {neckStart,knots,tangents,innerAt,inside,outside};
+}
+
 /** Two independently driven centrifugal stages. All drive sizes are schematic. */
 export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCylinder, solidLathe, hollowLathe, add }) {
   const tau = Math.PI * 2, lerp = (a, b, t) => a + (b - a) * t;
-  const clamp = (x, a, b) => Math.max(a, Math.min(b, x)), smooth = t => t * t * (3 - 2 * t);
+  const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
   const metal = { metallic: .83, roughness: .27, finish: 'machined' };
   const steel = '#dce6ed', darkSteel = '#526673', paleSteel = '#b2bec6', vaneSteel = '#718794';
   const K = P.compressor, axialScale = (K.outlet - K.front) / 210;
   const ax = nominal => K.front + (nominal - 480) * axialScale;
   const rr = nominal => nominal * K.inner / 165;
-  const neckStart = K.outlet - (K.outletNeckLength ?? (K.outlet - K.rear) * .5);
-  const knots = [[K.front, K.inner], [ax(555), K.inner], [ax(590), rr(145)],
-    [ax(622), rr(135)], [ax(650), rr(65)], [neckStart, P.air.inner], [K.outlet, P.air.inner]];
-  const innerAt = x => {
-    if (x >= K.outlet) return P.air.inner;
-    const i = Math.max(1, knots.findIndex(p => p[0] >= x));
-    const a = knots[i - 1], b = knots[i];
-    return lerp(a[1], b[1], smooth(clamp((x - a[0]) / (b[0] - a[0]), 0, 1)));
-  };
-  const casingInside = [knots[0]];
-  for (let i = 1; i < knots.length; i++) for (let j = 1; j <= 20; j++) {
-    const x = lerp(knots[i - 1][0], knots[i][0], j / 20);
-    casingInside.push([x, innerAt(x)]);
-  }
-  const casingOutside = casingInside.map(([x, r]) => [x, r + lerp(P.air.outer - P.air.inner,
-    K.outer - K.inner, clamp((r - P.air.inner) / (K.inner - P.air.inner), 0, 1))]);
+  const casingProfile=getCompressorCasingProfile(P);
+  const {neckStart,innerAt,inside:casingInside,outside:casingOutside}=casingProfile;
   const caseLumen = solidLathe(casingInside);
   const caseFree = solidLathe(casingInside.map(([x, r]) => [x, r - .08]));
   const casingWall = hollowLathe(casingOutside, casingInside);
@@ -166,6 +193,8 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
   add('compressor-fasteners', '压气机装配法兰沉头紧固件', 'compressorCase', darkSteel,
     union(compressorScrews), { ...metal, clip: true });
   return { compressorStages: 2, compressorBladeCount: bladeCount, neckStart,
+    casingCurve:'monotone C1 Hermite; continuous contraction, level inlet and outlet only',
+    casingControlPoints:casingProfile.knots,casingTangents:casingProfile.tangents,
     driveArchitecture: 'independent-front-and-rear-motors', motorSizing: 'schematic-only', casingInside, stages,
     removedDiscSurfaces: ['compressor-shroud-1', 'compressor-return-diaphragm', 'compressor-shroud-2'],
     restoredBackplates: stages.map(S => ({ stage: S.number, front: S.plate, rear: S.back,

@@ -2,8 +2,10 @@
  * Shared, dependency-free variable-intake geometry solver (millimetres).
  * X is the engine axis. The downstream attachment stays fixed. Twenty-four
  * independent wall petals and twenty-four underlapping seal petals articulate
- * between that attachment and the displaced inlet lip. A fixed-diameter drive
- * ring translates/tilts; the six telescoping actuators follow its actual pose.
+ * over a short forward section. A fixed thin-wall duct continues from their
+ * hinge station to the downstream stack. Thus the inlet can reach the previous
+ * stack midpoint without multiplying the deflection sweep by the whole length.
+ * A fixed-diameter drive ring translates/tilts; six telescoping actuators follow.
  * These are mechanism/display dimensions, not a nozzle performance model.
  */
 const TAU = Math.PI * 2;
@@ -157,6 +159,7 @@ function bounds(mesh) {
 }
 
 const STYLES={
+  duct:{name:'中点引气套筒与加劲环',color:'#8398a5',metallic:.84,roughness:.29},
   flange:{name:'固定法兰与作动器支承环',color:'#647985',metallic:.82,roughness:.3},
   petals:{name:'可变截面主瓣片',color:'#a6b5bf',metallic:.88,roughness:.27},
   seals:{name:'瓣间搭接密封片',color:'#526977',metallic:.8,roughness:.38},
@@ -173,12 +176,24 @@ const STYLES={
 export function getIntakeKinematics(P, stageNumber, state={}) {
   if(stageNumber!==2 && stageNumber!==3) throw new Error('Variable intake stage must be 2 or 3');
   const s=P.stacks[stageNumber-1],previous=P.stacks[stageNumber-2];
+  const cfg=P.variableIntake??{};
   const opening=clamp(state.opening??.55,0,1);
   const pitchDeg=clamp(state.pitchDeg??0,-5,5),yawDeg=clamp(state.yawDeg??0,-5,5);
-  const length=90,rootX=s.front-9,rootRadius=s.outer+5;
-  const leadingRadius=previous.outer+20+40*opening;
+  // The complete hood reaches the preceding stage midpoint. Only its front
+  // 90 mm articulates; the rest is a stationary duct. An explicit legacy anchor
+  // remains available for old snapshots without baking coordinates into UI.
+  const length=clamp(cfg.activeLength??cfg.length??90,60,110);
+  const attachmentFront=s.front-9,attachmentRear=s.front-1;
+  const midpoint=(previous.front+previous.rear)/2;
+  const midpointAnchor=cfg.frontAnchor!=='stage-front';
+  const leadingCenterX=midpointAnchor?midpoint:attachmentFront-length;
+  const rootX=leadingCenterX+length,rootRadius=s.outer+5;
+  const rootRear=Math.min(rootX+8,attachmentRear);
+  if(rootX>attachmentFront+.001)throw new Error('Variable intake active section exceeds its downstream attachment');
+  const minimumOffset=cfg.minimumRadialOffset??20,maximumOffset=cfg.maximumRadialOffset??60;
+  const leadingRadius=previous.outer+minimumOffset+(maximumOffset-minimumOffset)*opening;
   const lipFrame=basis([1,Math.tan(rad(pitchDeg)),Math.tan(rad(yawDeg))]);
-  const lipCenter=[rootX-length,length*Math.tan(rad(pitchDeg)),length*Math.tan(rad(yawDeg))];
+  const lipCenter=[leadingCenterX,length*Math.tan(rad(pitchDeg)),length*Math.tan(rad(yawDeg))];
   const ringX=rootX-43-15*opening;
   const t=(rootX-ringX)/length;
   const ringCenter=[ringX,lipCenter[1]*t,lipCenter[2]*t];
@@ -186,7 +201,9 @@ export function getIntakeKinematics(P, stageNumber, state={}) {
   return {stage:stageNumber,opening,pitchDeg,yawDeg,rootX,rootRadius,length,leadingRadius,lipCenter,lipFrame,
     ringCenter,ringFrame,driveRingRadius:previous.outer+73,anchorRingRadius:previous.outer+83,
     petals:24,seals:24,actuators:6,wallThickness:1.2,sealThickness:1.05,
-    rootFront:rootX,rootRear:s.front-1,previousOuter:previous.outer,
+    rootFront:rootX,rootRear,attachmentFront,attachmentRear,
+    ductStart:rootRear,ductEnd:attachmentFront,totalLength:attachmentRear-leadingCenterX,
+    previousMidpoint:midpoint,previousOuter:previous.outer,
     conservativeEnvelopeRadius:previous.outer+113};
 }
 
@@ -216,8 +233,36 @@ export function getIntakeGeometry(P, stageNumber, state={}) {
   for(let j=0;j<24;j++) {
     const a=j*TAU/24,half=rad(6.5);
     append('petals',wallPatch((u,v,w)=>shellPoint(u,a-half+2*half*v,w?0:1.2),8,6),`主瓣片${j+1}`);
+    // Short formed lip strips follow each petal independently. They retain
+    // visible seams during aperture changes instead of a fictitious elastic
+    // one-piece ring, and do not move the nominal leading station upstream.
+    append('petals',wallPatch((u,v,w)=>shellPoint(u*3.2/k.length,a-half+2*half*v,
+      -(w?1.08+.28*Math.sin(Math.PI*u):.08)),4,6),`前缘卷边${j+1}`);
     const sealAngle=a+Math.PI/24,sealHalf=rad(2.1);
     append('seals',wallPatch((u,v,w)=>shellPoint(u,sealAngle-sealHalf+2*sealHalf*v,w?2.05:3.1),8,3),`密封片${j+1}`);
+  }
+
+  // A stationary sleeve bridges the extended axial reach. Its wall and bore
+  // are continuous; the three slim external bands are separate closed solids.
+  // All are behind the articulated section, so changing aperture leaves the
+  // final stack connection and the isolated interstage exhaust route intact.
+  if(k.ductEnd>k.ductStart+.5) {
+    append('duct',annularTube([k.ductStart,0,0],[k.ductEnd,0,0],rr,rr-1.2,192),'固定薄壁引气套筒');
+    append('duct',annularTube([k.attachmentFront,0,0],[k.attachmentRear,0,0],rr+3.5,rr-1.2,192),'末端连接法兰');
+    const span=k.ductEnd-k.ductStart;
+    for(const [bandIndex,t] of [.2,.55,.86].entries()) {
+      const x=k.ductStart+span*t;
+      append('duct',annularTube([x-1.4,0,0],[x+1.4,0,0],rr+1.6,rr+.08,192),`环向加劲带${bandIndex+1}`);
+      for(let j=0;j<12;j++) {
+        const a=(j+.5)*TAU/12,n=[0,Math.cos(a),Math.sin(a)];
+        const p=point(x,rr+1.72,a);
+        append('fasteners',solidCylinder(p,add(p,mul(n,.8)),1.15,6),`加劲带${bandIndex+1}紧固件${j+1}`);
+      }
+    }
+    for(let j=0;j<24;j++) {
+      const p=point(k.attachmentRear,rr+1.3,j*TAU/24);
+      append('fasteners',solidCylinder(p,add(p,[.65,0,0]),1.25,6),`末端法兰螺栓${j+1}`);
+    }
   }
 
   // Fixed downstream flange and outer actuator-support ring. Radial spokes
@@ -237,7 +282,7 @@ export function getIntakeGeometry(P, stageNumber, state={}) {
   for(let j=0;j<24;j++) {
     const a=j*TAU/24,tangent=[0,-Math.sin(a),Math.cos(a)];
     const c=point(rx-2.6,rr+8,a);
-    const footA=shellPoint(1-1.8/90,a,-.15),footB=shellPoint(1-.35/90,a,-.15);
+    const footA=shellPoint(1-1.8/k.length,a,-.15),footB=shellPoint(1-.35/k.length,a,-.15);
     append('hinges',rootedEye(c,a,footA,footB),`带连接臂铰耳${j+1}`);
     append('pins',solidCylinder(add(c,mul(tangent,-3.6)),add(c,mul(tangent,3.6)),1.2,20),`铰销${j+1}`);
     const boltPoint=point(k.rootRear,rr+7.2,a+rad(3));

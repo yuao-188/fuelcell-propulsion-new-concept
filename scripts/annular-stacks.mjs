@@ -74,10 +74,20 @@ export function buildAnnularStacks(ctx, { stackCutters = [], linerCutters } = {}
       buckets[index].push({piece,volume:piece.volume,box});
     }
     const nominalPlateVolume=L.thickness*(L.outerFlat-L.inner)*(s.rear-s.front),kept=[],offcuts=[];
+    // The rear-face feed now needs a longer 6.6-mm-wide local edge rail. At
+    // its centre plane the measured seating loss is about 4.8%, while each
+    // sheet remains one full-length body. Keep this bounded, visible in the
+    // report and separate from the stage's much smaller average seating loss.
+    const minimumPermittedPlateRetention=.95,deepLocalSeats=[];
+    let minimumIndividualPlateRetention=1,minimumRetentionPlate=-1;
     for(const [index,items]of buckets.entries()){
       items.sort((a,b)=>b.volume-a.volume);const main=items[0];
-      if(!main||main.volume<nominalPlateVolume*.97||Math.abs(main.box.min[0]-s.front)>.0001||Math.abs(main.box.max[0]-s.rear)>.0001)
-        throw new Error(`Stage ${stage}, plate ${index}: missing or damaged full-length main plate`);
+      const retention=main?.volume/nominalPlateVolume;
+      if(!main||retention<minimumPermittedPlateRetention||Math.abs(main.box.min[0]-s.front)>.0001||Math.abs(main.box.max[0]-s.rear)>.0001)
+        throw new Error(`Stage ${stage}, plate ${index}: missing or damaged full-length main plate; ${JSON.stringify({retained:main?.volume/nominalPlateVolume,volume:main?.volume,nominal:nominalPlateVolume,bounds:main?.box,expectedAxial:[s.front,s.rear],pieces:items.length})}`);
+      if(retention<minimumIndividualPlateRetention){minimumIndividualPlateRetention=retention;minimumRetentionPlate=index;}
+      if(retention<.97)deepLocalSeats.push({plate:index,retainedFraction:retention,
+        retainedVolume:main.volume,axialBounds:[main.box.min[0],main.box.max[0]]});
       kept.push(main.piece);
       for(const item of items.slice(1)){
         if(item.volume>nominalPlateVolume*.004)throw new Error(`Stage ${stage}: substantial plate fragment cannot be discarded`);
@@ -108,6 +118,7 @@ export function buildAnnularStacks(ctx, { stackCutters = [], linerCutters } = {}
       localSeating:'four 2-mm-wide corner ties and local pressure-channel pockets',
       nominalUncutPlateVolume:nominalPlateVolume,
       verifiedConnectedPlateCount:kept.length,cornerSeatRelief:.025,
+      minimumPermittedPlateRetention,minimumIndividualPlateRetention,minimumRetentionPlate,deepLocalSeats,
       removedMachiningOffcuts:offcuts,removedOffcutVolume:offcuts.reduce((sum,p)=>sum+Math.max(0,p.volume),0),
       outerCoolingSeal:{wallThickness:.3,outerDiameter:s.outer*2,plateSeatingZone:.325,axialEndFaces:'open'},
       plateMaterialRetainedFraction:plates.volume()/rawVolume });

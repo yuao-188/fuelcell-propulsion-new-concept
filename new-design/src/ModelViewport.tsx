@@ -8,7 +8,7 @@ import { createEngineeringMaterials } from './materials';
 // @ts-expect-error The repository shares an untyped ES module with its builder.
 import { parameters as P } from '../parameters.mjs';
 // @ts-expect-error The same deterministic solver is used in the GLB builder.
-import { getIntakeGeometry } from '../intake-kinematics.mjs';
+import { getIntakeGeometry, getIntakeKinematics } from '../intake-kinematics.mjs';
 
 export type CameraView = 'perspective' | 'side' | 'front' | 'fan' | 'machinery' | 'compressor' | 'stacks' | 'cells' | 'water' | 'intake2' | 'intake3';
 export type IntakePose = { opening: number; pitchDeg: number; yawDeg: number };
@@ -121,6 +121,12 @@ export default function ModelViewport(props: Props) {
     const sectionCenter=(P.outerShell.front+P.outerShell.rear)/2;
     const capGeometry=new THREE.PlaneGeometry(sectionLength,P.outerShell.radius*2+160);
     let priorReset=-1,priorCamera='',priorMode='',priorDepth=-1,priorVisibility='';
+    const inletFraming=(stage:number)=>{
+      const inlet=getIntakeKinematics(P,stage,{opening:1,pitchDeg:0,yawDeg:0});
+      const S=P.stacks[stage-1];
+      return {front:inlet.lipCenter[0]-35,rear:S.front+100,
+        radius:Math.max(S.outer+30,inlet.conservativeEnvelopeRadius)+12};
+    };
     function fit() {
       const view=latest.current.cameraView;
       const intakeStage=view==='intake2'?2:view==='intake3'?3:0;
@@ -128,8 +134,10 @@ export default function ModelViewport(props: Props) {
       const first=P.stacks[0],last=P.stacks[P.stacks.length-1],r=last.outer+35;
       let box=view==='fan'?[[Math.min(-10,P.fan.spinnerFront-10),P.fan.rear+20],[-P.fan.radius-15,P.fan.radius+15],[-P.fan.radius-15,P.fan.radius+15]]:view==='compressor'?[[P.compressor.front-15,P.compressor.outlet+15],[-185,230],[-180,180]]:view==='machinery'?[[P.motorHousing.front-5,P.compressor.outlet+15],[-190,190],[-190,190]]:view==='stacks'?[[first.front-20,last.rear+20],[-r,r],[-r,r]]:view==='cells'?[[first.front+15,first.front+230],[first.inner-10,first.outer+15],[-100,35]]:view==='water'?[[last.rear+5,P.outerShell.rear-15],[-120,120],[-120,120]]:[[Math.min(-12,P.fan.spinnerFront-10),P.outerShell.rear+18],[-P.outerShell.radius-20,P.outerShell.radius+20],[-P.outerShell.radius-20,P.outerShell.radius+20]];
       if(intakeStage) {
-        const S=P.stacks[intakeStage-1],radius=S.outer+70;
-        box=[[S.front-150,S.front+135],[-radius,radius],[-radius,radius]];
+        // Include the complete inlet from the preceding stack's midpoint to
+        // this stack: articulated lip, long duct and downstream attachment.
+        const inlet=inletFraming(intakeStage);
+        box=[[inlet.front,inlet.rear],[-inlet.radius,inlet.radius],[-inlet.radius,inlet.radius]];
       }
       if(view==='water') {
         const waterBounds=new THREE.Box3();
@@ -200,7 +208,7 @@ export default function ModelViewport(props: Props) {
     // They prove each control changes the rendered buffers independently.
     const qaWindow=window as unknown as { __newDesignQA?: { snapshot: () => unknown } };
     const qaAccess={snapshot:()=>({
-      version:'20261109-variable-intakes',loaded:Boolean(root),
+      version:'20261109-long-intakes',loaded:Boolean(root),
       physicalCells:meshes.reduce((sum,mesh)=>sum+Number(mesh.userData.physicalCells||0),0),
       groups:meshes.reduce((result,mesh)=>{const group=String(mesh.userData.group);result[group]=(result[group]||0)+1;return result;},{} as Record<string,number>),
       intakes:Object.fromEntries([2,3].map(stage=>{
@@ -219,7 +227,7 @@ export default function ModelViewport(props: Props) {
       })),
     })};
     if(new URLSearchParams(location.search).get('qa')==='1')qaWindow.__newDesignQA=qaAccess;
-    const modelUrl=new URL('model.glb?v=20261109-variable-intakes',document.baseURI);
+    const modelUrl=new URL('model.glb?v=20261109-long-intakes',document.baseURI);
     const modelRequest=new AbortController();
     const loadFailed=()=>{if(!cancelled)setStatus('模型加载失败，请刷新页面重试。');};
     // Read the binary directly. FileLoader's rewrapped progress stream can
@@ -264,7 +272,7 @@ export default function ModelViewport(props: Props) {
       const cut=p.viewMode==='cutaway'&&!rotors;
       if(priorReset!==p.resetKey||priorCamera!==cameraKey){fit();priorReset=p.resetKey;priorCamera=cameraKey;}
       if(priorMode!==modeKey||priorDepth!==p.sectionDepth){
-        clipping.constant=(isolated?180:intakeStage?P.stacks[intakeStage-1].outer+70:P.outerShell.radius+25)*(1-2*p.sectionDepth/100);
+        clipping.constant=(isolated?180:intakeStage?inletFraming(intakeStage).radius:P.outerShell.radius+25)*(1-2*p.sectionDepth/100);
         for(const {source,cap} of sections){
           const material=source.material as THREE.MeshStandardMaterial;
           if(priorMode!==modeKey){material.clippingPlanes=cut?[clipping]:[];material.needsUpdate=true;}

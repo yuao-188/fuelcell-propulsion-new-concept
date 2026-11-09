@@ -10,7 +10,7 @@ import {meshComponents} from './mesh-components.mjs';
 const root=resolve(import.meta.dirname,'..'),ctx=await createKernel(),{api,M,P,cylinder,union,polar}=ctx;
 const path=resolve(root,'new-design/public/model.glb'),reportPath=resolve(root,'new-design/verification.json');
 const doc=await new NodeIO().read(path),report=JSON.parse(await readFile(reportPath,'utf8'));
-assert.equal(report.revision,'20261109-variable-intakes');
+assert.equal(report.revision,'20261109-long-intakes');
 const parts=[];
 for(const node of doc.getRoot().listNodes()){
   const data=node.getExtras(),primitive=node.getMesh()?.listPrimitives()[0];if(!primitive)continue;
@@ -57,7 +57,8 @@ for(const [id,count] of [['fan',16],['fan-stators',18],['compressor-rotor-1',18]
 for(const id of ['compressor-motor-1','compressor-motor-2'])assert(parts.find(p=>p.id===id));
 
 const staticParts=parts.filter(p=>!p.data.variableStage);
-// The two mechanisms cannot meet each other: >400 mm axial separation, <140 mm span.
+// Their activity is confined to the separate 90-mm upstream petal sections;
+// the long aft sleeves remain fixed in the corresponding interstage bays.
 // Sample extremes, combined two-axis extremes and intermediate apertures.
 const angles=[[-5,-5],[-5,5],[5,-5],[5,5],[0,0]];
 for(const stage of [2,3])for(const opening of [0,.25,.55,.75,1])for(const [pitchDeg,yawDeg] of angles){

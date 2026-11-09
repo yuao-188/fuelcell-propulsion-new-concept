@@ -27,14 +27,14 @@ for(const stage of [2,3])for(const g of getIntakeGeometry(P,stage,pose)){
       metallic:g.metallic??.85,roughness:g.roughness??.3});
 }
 // A single restrained external harness: split from the pressure lines in angle.
-const trunkRadius=390,wireAngle=315,wirePieces=[tubePath([polar(695,trunkRadius,wireAngle),polar(2170,trunkRadius,wireAngle)],2.2)];
+const trunkRadius=390,wireAngle=315,wirePieces=[tubePath([polar(695,trunkRadius,wireAngle),polar(P.pump.rear,trunkRadius,wireAngle)],2.2)];
 for(const s of P.stacks){
-  const x=s.front+(s.rear-s.front)*.6;
+  const x=s.front+(s.rear-s.front)*.2;
   wirePieces.push(tubePath([polar(x,trunkRadius,wireAngle),polar(x,s.outer+1.2,wireAngle)],1.4));
 }
 add('wiring-harness','沿机匣敷设线束与三级分支','wiring','#35454e',union(wirePieces),{clip:true,metallic:.06,roughness:.6});
 
-const report={schema:5,revision:'20261109-variable-intakes',units:'mm',
+const report={schema:6,revision:'20261109-long-intakes',units:'mm',
   dimensionSource:'user tables and explicit clarifications 2026-11-09',
   scope:'geometric structure and articulated demonstration; no new thermal or pressure calculation',
   length:P.outerShell.rear,physicalCells:stacks.reduce((n,s)=>n+s.totalPhysicalCells,0),
@@ -43,7 +43,7 @@ const report={schema:5,revision:'20261109-variable-intakes',units:'mm',
   variableIntakes:{stages:[2,3],petalsPerStage:24,pose,deflectionRangeDeg:[-5,5],
     articulation:'independent aperture and two-axis deflection; shared browser/validation solver'},
   parts:parts.length,broadPhasePairs:0,exactPairs:0,collisions:[],fluidChecks:{},errors:[]};
-assert.equal(report.physicalCells,1357);assert.equal(report.length,2264);
+assert.equal(report.physicalCells,1357);assert.equal(report.length,2424);
 for(const n of Object.values(report.portCounts))assert.equal(n,3);
 const box=parts.map(p=>p.solid.boundingBox());
 const overlap=(a,b)=>[0,1,2].every(k=>a.max[k]>b.min[k]+1e-5&&b.max[k]>a.min[k]+1e-5);

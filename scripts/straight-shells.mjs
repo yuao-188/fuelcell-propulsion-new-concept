@@ -17,7 +17,7 @@ export function buildStraightShells(ctx, linerCutters = []) {
     envelope.intersect(axial(os.rear-5,os.rear,os.radius+2))]);
   const cuts=[axial(os.front-.01,os.front+8.04,os.radius+2),axial(os.rear-5.04,os.rear+.01,os.radius+2)];
   const fasteners=[];
-  for(const x of [30,650,1400,2024]) {
+  for(const x of [30,650,1400,os.shoulder-40]) {
     cuts.push(revolved([[x-.45,radiusAt(x)+.05],[x+.45,radiusAt(x)+.05]],.8));
     for(let j=0;j<12;j++) {
       const theta=15+j*30,r=radiusAt(x+10),a=polar(x+10,r-2.6,theta),b=polar(x+10,r-.12,theta);
@@ -52,7 +52,7 @@ export function buildStraightShells(ctx, linerCutters = []) {
     cavities.push({front:end,rear:b.rear,innerRadius:radius1-wall});
   }
   const last=P.stacks.at(-1), finalProfile=[];
-  for(let j=0;j<=40;j++) { const t=j/40; finalProfile.push([last.rear+(2195-last.rear)*t,last.outer+wall+(140-last.outer-wall)*smooth(t)]); }
+  for(let j=0;j<=40;j++) { const t=j/40; finalProfile.push([last.rear+P.interstage.tailGuideLength*t,last.outer+wall+(140-last.outer-wall)*smooth(t)]); }
   let final=revolved(finalProfile,wall);
   if(penetrationCut)final=final.subtract(penetrationCut);
   add('final-exhaust-guide','末级冷却排气收集尾罩','interstageGuide','#73858e',final,{clip:true,stage:3,metallic:.79,roughness:.3});
