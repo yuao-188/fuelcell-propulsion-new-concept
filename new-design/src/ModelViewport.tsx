@@ -3,15 +3,26 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { createEngineeringMaterials } from './materials';
+// Shared with the offline solid builder; these JavaScript modules are the
+// single source for dimensions and moving inlet surfaces.
+// @ts-expect-error The repository shares an untyped ES module with its builder.
+import { parameters as P } from '../parameters.mjs';
+// @ts-expect-error The same deterministic solver is used in the GLB builder.
+import { getIntakeGeometry } from '../intake-kinematics.mjs';
+
+export type CameraView = 'perspective' | 'side' | 'front' | 'fan' | 'machinery' | 'compressor' | 'stacks' | 'cells' | 'water' | 'intake2' | 'intake3';
+export type IntakePose = { opening: number; pitchDeg: number; yawDeg: number };
+type IntakeGeometry = { id: string; positions: ArrayLike<number>; indices: ArrayLike<number> };
 
 type Props = {
   viewMode: 'complete' | 'cutaway'; sectionDepth: number;
-  cameraView: 'perspective' | 'side' | 'front' | 'fan' | 'machinery' | 'compressor' | 'stacks' | 'cells' | 'water';
+  cameraView: CameraView;
   compressorView: 'passage' | 'rotors';
-  showOuterShell: boolean; showInnerShell: boolean; showStacks: boolean;
+  showOuterShell: boolean; showVariableIntake: boolean; showInterstageGuide: boolean; showStacks: boolean;
   showIntake: boolean; showIntakeInner: boolean; showCompressorCase: boolean;
   showAir: boolean; showHydrogen: boolean; showReturn: boolean;
   showCathodeWater: boolean; showAnodeSeparator: boolean; showWiring: boolean; resetKey: number;
+  intake2: IntakePose; intake3: IntakePose;
 };
 
 export default function ModelViewport(props: Props) {
@@ -39,13 +50,16 @@ export default function ModelViewport(props: Props) {
     const callouts=document.createElementNS(svgNS,'svg');
     callouts.setAttribute('class','compressor-callouts');callouts.setAttribute('aria-hidden','true');
     element.appendChild(callouts);
+    const compressorX=(x:number)=>P.compressor.front+(x-480)*(P.compressor.outlet-P.compressor.front)/210;
     const anchors:[string,number[],number,boolean][]=[
-      ['一级离心叶轮',[536.638,99.8717715,-14.3679942],.38,false],
-      ['一级扩压静叶',[559.5,151.548,-32.53],.52,false],
-      ['一级背盘',[546.5,100,-18],.66,false],
-      ['二级离心叶轮',[601.584,76.428834,-8.627901],.38,true],
-      ['二级扩压静叶',[624,122.831,-28.079],.52,true],
-      ['二级背盘',[613.5,80,-15],.66,true],
+      ['一级驱动电机',[compressorX(497),24,-16],.24,false],
+      ['一级离心叶轮',[compressorX(536.638),99.8717715,-14.3679942],.40,false],
+      ['一级扩压静叶',[compressorX(559.5),151.548,-32.53],.56,false],
+      ['一级背盘',[compressorX(546.5),100,-18],.72,false],
+      ['二级驱动电机',[compressorX(636.5),24,-16],.24,true],
+      ['二级离心叶轮',[compressorX(601.584),76.428834,-8.627901],.40,true],
+      ['二级扩压静叶',[compressorX(624),122.831,-28.079],.56,true],
+      ['二级背盘',[compressorX(613.5),80,-15],.72,true],
     ];
     const calloutItems=anchors.map(([label,point,row,rightSide])=>{
       const group=document.createElementNS(svgNS,'g'), line=document.createElementNS(svgNS,'polyline');
@@ -99,14 +113,24 @@ export default function ModelViewport(props: Props) {
     let root:THREE.Group|undefined,cancelled=false,frame=0,dirty=true;
     controls.addEventListener('change',()=>{dirty=true;});
     const meshes:THREE.Mesh[]=[];
+    const variableMeshes = new Map<number, Map<string, THREE.Mesh>>();
+    const priorIntake = new Map<number, string>();
     const clipping=new THREE.Plane(new THREE.Vector3(0,0,-1),0);
     const sections:{source:THREE.Mesh; stencil:THREE.Group; cap:THREE.Mesh}[]=[];
-    const capGeometry=new THREE.PlaneGeometry(2200,1200);
+    const sectionLength=P.outerShell.rear-P.outerShell.front+220;
+    const sectionCenter=(P.outerShell.front+P.outerShell.rear)/2;
+    const capGeometry=new THREE.PlaneGeometry(sectionLength,P.outerShell.radius*2+160);
     let priorReset=-1,priorCamera='',priorMode='',priorDepth=-1,priorVisibility='';
     function fit() {
       const view=latest.current.cameraView;
-      const direction=view==='side'?new THREE.Vector3(0,0,1):view==='front'?new THREE.Vector3(-1,0,0):view==='fan'?new THREE.Vector3(-1,.17,.5).normalize():view==='compressor'?(latest.current.compressorView==='rotors'?new THREE.Vector3(-1,.25,1.6).normalize():new THREE.Vector3(-.08,.08,1).normalize()):view==='machinery'?new THREE.Vector3(.2,.18,1).normalize():view==='cells'?new THREE.Vector3(-1,.28,.9).normalize():view==='water'?new THREE.Vector3(.25,.2,1).normalize():new THREE.Vector3(-.52,.30,1).normalize();
-      let box=view==='fan'?[[-10,220],[-505,505],[-505,505]]:view==='compressor'?[[465,705],[-185,230],[-180,180]]:view==='machinery'?[[205,705],[-180,180],[-180,180]]:view==='stacks'?[[680,1780],[-365,365],[-365,365]]:view==='cells'?[[680,910],[90,240],[-140,35]]:view==='water'?[[1480,1900],[-180,100],[-120,220]]:[[-12,2030],[-525,525],[-525,525]];
+      const intakeStage=view==='intake2'?2:view==='intake3'?3:0;
+      const direction=view==='side'?new THREE.Vector3(0,0,1):view==='front'?new THREE.Vector3(-1,0,0):view==='fan'?new THREE.Vector3(-1,.17,.5).normalize():view==='compressor'?(latest.current.compressorView==='rotors'?new THREE.Vector3(-1,.25,1.6).normalize():new THREE.Vector3(-.08,.08,1).normalize()):intakeStage?new THREE.Vector3(-.34,.25,1).normalize():view==='machinery'?new THREE.Vector3(.2,.18,1).normalize():view==='cells'?new THREE.Vector3(-1,.28,.9).normalize():view==='water'?new THREE.Vector3(.25,.2,1).normalize():new THREE.Vector3(-.52,.30,1).normalize();
+      const first=P.stacks[0],last=P.stacks[P.stacks.length-1],r=last.outer+35;
+      let box=view==='fan'?[[Math.min(-10,P.fan.spinnerFront-10),P.fan.rear+20],[-P.fan.radius-15,P.fan.radius+15],[-P.fan.radius-15,P.fan.radius+15]]:view==='compressor'?[[P.compressor.front-15,P.compressor.outlet+15],[-185,230],[-180,180]]:view==='machinery'?[[P.motorHousing.front-5,P.compressor.outlet+15],[-190,190],[-190,190]]:view==='stacks'?[[first.front-20,last.rear+20],[-r,r],[-r,r]]:view==='cells'?[[first.front+15,first.front+230],[first.inner-10,first.outer+15],[-100,35]]:view==='water'?[[last.rear+5,P.outerShell.rear-15],[-120,120],[-120,120]]:[[Math.min(-12,P.fan.spinnerFront-10),P.outerShell.rear+18],[-P.outerShell.radius-20,P.outerShell.radius+20],[-P.outerShell.radius-20,P.outerShell.radius+20]];
+      if(intakeStage) {
+        const S=P.stacks[intakeStage-1],radius=S.outer+70;
+        box=[[S.front-150,S.front+135],[-radius,radius],[-radius,radius]];
+      }
       if(view==='water') {
         const waterBounds=new THREE.Box3();
         meshes.filter(mesh=>['cathodeSeparator','anodeSeparator'].includes(mesh.userData.group))
@@ -133,7 +157,7 @@ export default function ModelViewport(props: Props) {
     });
     function addSection(mesh:THREE.Mesh,index:number) {
       // Winding stencils use actual closed solids, preserving pipe and ring bores.
-      const stencil=new THREE.Group();
+      const stencil=new THREE.Group();stencil.matrixAutoUpdate=false;
       const base=new THREE.MeshBasicMaterial({depthWrite:false,depthTest:false,colorWrite:false,stencilWrite:true,stencilFunc:THREE.AlwaysStencilFunc,clippingPlanes:[clipping]});
       // Material.clone() clones Plane instances as well. Both stencil passes
       // must use the live plane or moving the slider leaves a stale zero slice.
@@ -144,11 +168,58 @@ export default function ModelViewport(props: Props) {
       [back,front].forEach((material,i)=>{const m=new THREE.Mesh(mesh.geometry,material);m.renderOrder=index*4+i+1;stencil.add(m);});base.dispose();
       const source=mesh.material as THREE.MeshStandardMaterial;
       const material=finishes.section(source,mesh.userData);
-      const cap=new THREE.Mesh(capGeometry,material);cap.position.set(1006,0,0);cap.renderOrder=index*4+3;
+      const cap=new THREE.Mesh(capGeometry,material);cap.position.set(sectionCenter,0,0);cap.renderOrder=index*4+3;
       cap.onAfterRender=()=>renderer.clearStencil();
       scene.add(stencil,cap);sections.push({source:mesh,stencil,cap});
     }
-    const modelUrl=new URL('model.glb?v=20261026-stage2-tip-long-spinner',document.baseURI);
+    function updateIntake(stage:number,pose:IntakePose) {
+      const stageMeshes=variableMeshes.get(stage);
+      if(!stageMeshes?.size)return;
+      const key=`${pose.opening}/${pose.pitchDeg}/${pose.yawDeg}`;
+      if(priorIntake.get(stage)===key)return;
+      const shape=getIntakeGeometry(P,stage,pose) as IntakeGeometry[];
+      for(const part of shape) {
+        const source=stageMeshes.get(part.id);
+        if(!source)continue;
+        // Preserve the same closed-surface topology as the offline builder.
+        // Replacing geometry also replaces BOTH winding-stencil geometries;
+        // otherwise the material cap would remain at the previous inlet pose.
+        const geometry=new THREE.BufferGeometry();
+        geometry.setAttribute('position',new THREE.Float32BufferAttribute(Array.from(part.positions),3));
+        geometry.setIndex(Array.from(part.indices));
+        geometry.computeVertexNormals();geometry.computeBoundingBox();geometry.computeBoundingSphere();
+        const previous=source.geometry;source.geometry=geometry;
+        for(const section of sections)if(section.source===source) {
+          section.stencil.children.forEach(child=>{(child as THREE.Mesh).geometry=geometry;});
+        }
+        previous.dispose();
+      }
+      priorIntake.set(stage,key);dirty=true;
+    }
+    // Read-only numerical snapshots are enabled only for the local QA URL.
+    // They prove each control changes the rendered buffers independently.
+    const qaWindow=window as unknown as { __newDesignQA?: { snapshot: () => unknown } };
+    const qaAccess={snapshot:()=>({
+      version:'20261109-variable-intakes',loaded:Boolean(root),
+      physicalCells:meshes.reduce((sum,mesh)=>sum+Number(mesh.userData.physicalCells||0),0),
+      groups:meshes.reduce((result,mesh)=>{const group=String(mesh.userData.group);result[group]=(result[group]||0)+1;return result;},{} as Record<string,number>),
+      intakes:Object.fromEntries([2,3].map(stage=>{
+        const parts=[...(variableMeshes.get(stage)?.values()??[])].map(mesh=>{
+          const position=mesh.geometry.getAttribute('position') as THREE.BufferAttribute;
+          const words=new Uint32Array(position.array.buffer,position.array.byteOffset,position.array.byteLength/4);
+          let hash=2166136261;
+          for(const word of words)hash=Math.imul(hash^word,16777619)>>>0;
+          const section=sections.find(candidate=>candidate.source===mesh);
+          const bounds=mesh.geometry.boundingBox!;
+          return {id:mesh.userData.id,vertices:position.count,hash:hash.toString(16),
+            bounds:[bounds.min.toArray(),bounds.max.toArray()],
+            stencilMatches:Boolean(section)&&section!.stencil.children.every(child=>(child as THREE.Mesh).geometry===mesh.geometry)};
+        });
+        return [stage,{appliedPose:priorIntake.get(stage),parts}];
+      })),
+    })};
+    if(new URLSearchParams(location.search).get('qa')==='1')qaWindow.__newDesignQA=qaAccess;
+    const modelUrl=new URL('model.glb?v=20261109-variable-intakes',document.baseURI);
     const modelRequest=new AbortController();
     const loadFailed=()=>{if(!cancelled)setStatus('模型加载失败，请刷新页面重试。');};
     // Read the binary directly. FileLoader's rewrapped progress stream can
@@ -163,11 +234,18 @@ export default function ModelViewport(props: Props) {
       root=gltf.scene;scene.add(root);
       root.traverse(item=>{
         if(!(item instanceof THREE.Mesh))return;
-        meshes.push(item);item.renderOrder=1000;item.castShadow=true;item.receiveShadow=true;
+        meshes.push(item);item.renderOrder=100000;item.castShadow=true;item.receiveShadow=true;
         const source=item.material as THREE.MeshStandardMaterial;
         item.material=finishes.create(source,item.userData);
         if(item.userData.clip)addSection(item,sections.length);
+        const variableStage=Number(item.userData.variableStage);
+        if(variableStage===2||variableStage===3) {
+          if(!variableMeshes.has(variableStage))variableMeshes.set(variableStage,new Map());
+          variableMeshes.get(variableStage)!.set(String(item.userData.id),item);
+        }
       });
+      root.updateMatrixWorld(true);
+      updateIntake(2,latest.current.intake2);updateIntake(3,latest.current.intake3);
       setStatus('');priorMode='';priorDepth=-1;priorVisibility='';fit();
       },loadFailed);
     }).catch(loadFailed);
@@ -178,13 +256,15 @@ export default function ModelViewport(props: Props) {
     const observer=new ResizeObserver(resize);observer.observe(element);resize();
     const render=()=>{
       frame=requestAnimationFrame(render);const p=latest.current;
+      updateIntake(2,p.intake2);updateIntake(3,p.intake3);
       const cameraKey=`${p.cameraView}:${p.compressorView}`;
       const isolated=p.cameraView==='compressor', rotors=isolated&&p.compressorView==='rotors';
-      const modeKey=`${p.viewMode}:${isolated}:${rotors}`;
+      const intakeStage=p.cameraView==='intake2'?2:p.cameraView==='intake3'?3:0;
+      const modeKey=`${p.viewMode}:${isolated}:${rotors}:${intakeStage}`;
       const cut=p.viewMode==='cutaway'&&!rotors;
       if(priorReset!==p.resetKey||priorCamera!==cameraKey){fit();priorReset=p.resetKey;priorCamera=cameraKey;}
       if(priorMode!==modeKey||priorDepth!==p.sectionDepth){
-        clipping.constant=(isolated?180:530)*(1-2*p.sectionDepth/100);
+        clipping.constant=(isolated?180:intakeStage?P.stacks[intakeStage-1].outer+70:P.outerShell.radius+25)*(1-2*p.sectionDepth/100);
         for(const {source,cap} of sections){
           const material=source.material as THREE.MeshStandardMaterial;
           if(priorMode!==modeKey){material.clippingPlanes=cut?[clipping]:[];material.needsUpdate=true;}
@@ -192,22 +272,29 @@ export default function ModelViewport(props: Props) {
         }
         priorMode=modeKey;priorDepth=p.sectionDepth;dirty=true;
       }
-      const visibility=[isolated,rotors,p.showOuterShell,p.showInnerShell,p.showStacks,p.showAir,p.showHydrogen,p.showReturn,p.showIntake,p.showIntakeInner,p.showCompressorCase,p.showCathodeWater,p.showAnodeSeparator,p.showWiring].join();
+      const visibility=[isolated,rotors,intakeStage,p.showOuterShell,p.showVariableIntake,p.showInterstageGuide,p.showStacks,p.showAir,p.showHydrogen,p.showReturn,p.showIntake,p.showIntakeInner,p.showCompressorCase,p.showCathodeWater,p.showAnodeSeparator,p.showWiring].join();
       if(priorVisibility!==visibility){
-        const visible:Record<string,boolean>={outerShell:p.showOuterShell,innerShell:p.showInnerShell,intakeOuter:p.showIntake,intakeInner:p.showIntakeInner,compressorCase:p.showCompressorCase,stacks:p.showStacks,air:p.showAir,hydrogen:p.showHydrogen,return:p.showReturn,anodeInternal:p.showHydrogen||p.showReturn,cathodeExhaust:p.showCathodeWater,cathodeSeparator:p.showCathodeWater,cathodeDrain:p.showCathodeWater,anodeSeparator:p.showAnodeSeparator,anodeDrain:p.showAnodeSeparator,wiring:p.showWiring};
+        const visible:Record<string,boolean>={outerShell:p.showOuterShell,variableIntake:p.showVariableIntake,interstageGuide:p.showInterstageGuide,intakeOuter:p.showIntake,intakeInner:p.showIntakeInner,compressorCase:p.showCompressorCase,stacks:p.showStacks,air:p.showAir,hydrogen:p.showHydrogen,return:p.showReturn,anodeInternal:p.showHydrogen||p.showReturn,cathodeExhaust:p.showCathodeWater,cathodeSeparator:p.showCathodeWater,cathodeDrain:p.showCathodeWater,anodeSeparator:p.showAnodeSeparator,anodeDrain:p.showAnodeSeparator,wiring:p.showWiring};
         meshes.forEach(mesh=>{
           const id=String(mesh.userData.id??'');
           if(isolated) {
             mesh.visible=id.startsWith('compressor-') && !(rotors && mesh.userData.group==='compressorCase');
+          } else if(intakeStage) {
+            const group=String(mesh.userData.group),stage=Number(mesh.userData.stage);
+            mesh.visible=(group==='variableIntake'&&Number(mesh.userData.variableStage)===intakeStage&&p.showVariableIntake)
+              ||(group==='stacks'&&(stage===intakeStage||stage===intakeStage-1)&&p.showStacks)
+              ||(group==='interstageGuide'&&stage===intakeStage&&id!=='final-exhaust-guide'&&p.showInterstageGuide);
           } else mesh.visible=visible[mesh.userData.group]??true;
         });priorVisibility=visibility;dirty=true;
       }
       for(const {source,stencil,cap} of sections){
         if(!source.geometry.boundingBox)source.geometry.computeBoundingBox();
-        const bounds=source.geometry.boundingBox!;
+        source.updateWorldMatrix(true,false);
+        stencil.matrix.copy(source.matrixWorld);stencil.matrixWorldNeedsUpdate=true;
+        const bounds=source.geometry.boundingBox!.clone().applyMatrix4(source.matrixWorld);
         stencil.visible=cap.visible=source.visible&&cut&&clipping.constant>bounds.min.z&&clipping.constant<bounds.max.z;
       }
-      controls.update();grid.visible=floor.visible=p.cameraView!=='front'&&!isolated;
+      controls.update();grid.visible=floor.visible=p.cameraView!=='front'&&!isolated&&!intakeStage;
       if(dirty){
         renderer.render(scene,camera);
         callouts.style.display=isolated?'block':'none';
@@ -229,6 +316,7 @@ export default function ModelViewport(props: Props) {
       }
     };render();
     return()=>{
+      if(qaWindow.__newDesignQA===qaAccess)delete qaWindow.__newDesignQA;
       cancelled=true;modelRequest.abort();cancelAnimationFrame(frame);observer.disconnect();controls.dispose();
       if(root)disposeObject(root);
       sections.forEach(({stencil,cap})=>{stencil.children.forEach(o=>((o as THREE.Mesh).material as THREE.Material).dispose());(cap.material as THREE.Material).dispose();});

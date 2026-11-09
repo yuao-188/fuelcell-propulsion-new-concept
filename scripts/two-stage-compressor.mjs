@@ -109,13 +109,25 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
     const body = axisCylinder(D.front, D.rear, motorRadius, 96).subtract(axisCylinder(
       D.front - .1, D.number === 1 ? D.rear + .1 : ax(639.5), bore, 64));
     const pieces = [body];
+    // The separate drive is identifiable by its finned barrel, two end lands,
+    // recessed fixing heads and the shaft bore; it is not a plain support disk.
+    for (const x of [D.front+1.0*axialScale,D.rear-2.8*axialScale]) {
+      pieces.push(axisCylinder(x,x+1.8*axialScale,motorRadius+rr(1.4),80)
+        .subtract(axisCylinder(x-.1,x+1.8*axialScale+.1,bore,64)));
+    }
+    for(let fin=0;fin<16;fin++) {
+      const t=fin*tau/16;
+      const a=[D.front+4*axialScale,(motorRadius+.1)*Math.cos(t),(motorRadius+.1)*Math.sin(t)];
+      const b=[D.rear-4*axialScale,a[1],a[2]];
+      pieces.push(cylinder(a,b,rr(.9),rr(.9),12));
+    }
     if (D.number === 2) pieces.push(solidLathe([[D.rear, motorRadius], [ax(662), .25]]));
     for (let i = 0; i < 3; i++) {
         const angle = i * tau / 3;
         const p = r => [D.support, r * Math.cos(angle), r * Math.sin(angle)];
         pieces.push(cylinder(p(motorRadius - .5), p(K.inner + 1), rr(2.4), rr(2.4), 32).intersect(caseFree));
       }
-    add(`compressor-motor-${D.number}`, `第${D.number}级独立电机固定壳与支座`, 'front', darkSteel,
+    add(`compressor-motor-${D.number}`, `第${D.number}级独立驱动电机 · 筋条与双端盖`, 'front', '#bf9651',
       union(pieces), { ...metal, clip: true, stationary: true, stage: D.number, motorSizing: 'schematic-only',
         supportCount: 3, supportAxialCentreMm: D.support, inletGuideVaneCount: 0 });
   }

@@ -1,15 +1,16 @@
 import { useState, type CSSProperties } from 'react';
 import { Box, Layers, MousePointer2, RotateCcw, SlidersHorizontal } from 'lucide-react';
-import ModelViewport from './ModelViewport';
+import ModelViewport, { type CameraView, type IntakePose } from './ModelViewport';
 import './styles.css';
 
-type VisibilityKey = 'outerShell' | 'innerShell' | 'intake' | 'intakeInner' | 'compressorCase' | 'stacks' | 'air' | 'hydrogen' | 'return' | 'cathodeWater' | 'anodeSeparator' | 'wiring';
+type VisibilityKey = 'outerShell' | 'variableIntake' | 'interstageGuide' | 'intake' | 'intakeInner' | 'compressorCase' | 'stacks' | 'air' | 'hydrogen' | 'return' | 'cathodeWater' | 'anodeSeparator' | 'wiring';
 type Visibility = Record<VisibilityKey, boolean>;
-type CameraView = 'perspective' | 'side' | 'front' | 'fan' | 'machinery' | 'compressor' | 'stacks' | 'cells' | 'water';
+const neutralIntake: IntakePose = { opening: .55, pitchDeg: 0, yawDeg: 0 };
 
 const initialVisibility: Visibility = {
   outerShell: true,
-  innerShell: true,
+  variableIntake: true,
+  interstageGuide: true,
   intake: true,
   intakeInner: true,
   compressorCase: true,
@@ -21,6 +22,38 @@ const initialVisibility: Visibility = {
   anodeSeparator: true,
   wiring: true,
 };
+
+function IntakeControl({ stage, pose, onChange, onInspect }: {
+  stage: 2 | 3; pose: IntakePose;
+  onChange: (pose: IntakePose) => void; onInspect: () => void;
+}) {
+  const name = stage === 2 ? '二级进气罩' : '三级进气罩';
+  const sliders: { key: keyof IntakePose; label: string; value: number; min: number; max: number; step: number; unit: string }[] = [
+    { key: 'opening', label: '开度', value: Math.round(pose.opening * 100), min: 0, max: 100, step: 1, unit: '%' },
+    { key: 'pitchDeg', label: '上下偏转', value: pose.pitchDeg, min: -5, max: 5, step: .25, unit: '°' },
+    { key: 'yawDeg', label: '左右偏转', value: pose.yawDeg, min: -5, max: 5, step: .25, unit: '°' },
+  ];
+  return <div className="intake-control" data-stage={stage}>
+    <div className="intake-control-heading">
+      <button type="button" className="intake-inspect" onClick={onInspect} aria-label={`查看${name}`}>{name}</button>
+      <button type="button" className="intake-reset" onClick={() => onChange({ ...neutralIntake })} aria-label={`复位${name}`}>
+        <RotateCcw size={12} /><span>复位</span>
+      </button>
+    </div>
+    {sliders.map(slider => {
+      const id = `intake-${stage}-${slider.key}`;
+      const progress = (slider.value - slider.min) / (slider.max - slider.min) * 100;
+      const text = slider.key === 'opening' ? String(slider.value) : `${slider.value > 0 ? '+' : ''}${slider.value}`;
+      return <div className="intake-slider-row" key={slider.key}>
+        <div className="depth-heading"><label htmlFor={id}>{slider.label}</label><output htmlFor={id}>{text}<span>{slider.unit}</span></output></div>
+        <input id={id} className="depth-slider" type="range" min={slider.min} max={slider.max} step={slider.step}
+          aria-label={`${name}${slider.label}`} aria-valuetext={`${text}${slider.unit}`} value={slider.value}
+          style={{ '--section-progress': `${progress}%` } as CSSProperties}
+          onChange={event => onChange({ ...pose, [slider.key]: Number(event.currentTarget.value) / (slider.key === 'opening' ? 100 : 1) })} />
+      </div>;
+    })}
+  </div>;
+}
 
 function LayerToggle({ label, color, checked, onChange }: {
   label: string;
@@ -52,6 +85,8 @@ export default function App() {
   const [cameraView, setCameraView] = useState<CameraView>('perspective');
   const [compressorView, setCompressorView] = useState<'passage' | 'rotors'>('passage');
   const [visibility, setVisibility] = useState<Visibility>(initialVisibility);
+  const [intake2, setIntake2] = useState<IntakePose>({ ...neutralIntake });
+  const [intake3, setIntake3] = useState<IntakePose>({ ...neutralIntake });
   const [resetKey, setResetKey] = useState(0);
 
   const toggleLayer = (layer: VisibilityKey) => {
@@ -76,6 +111,10 @@ export default function App() {
       setSectionDepth(50);
       setCompressorView('passage');
     }
+    if (view === 'intake2' || view === 'intake3') {
+      setViewMode('complete');
+      setVisibility(current => ({ ...current, variableIntake: true }));
+    }
     // Reapply a preset even after the user has manually orbited away from it.
     setResetKey(current => current + 1);
   };
@@ -95,7 +134,7 @@ export default function App() {
       <main className="design-workspace">
         <section className="viewer-card" aria-label="推进构型三维模型">
           <div className="viewer-heading">
-            <div className="viewer-caption"><span className="caption-dot" />{cameraView === 'compressor' ? '离心式压气机' : '整体构型'}</div>
+            <div className="viewer-caption"><span className="caption-dot" />{cameraView === 'compressor' ? '离心式压气机' : cameraView === 'intake2' ? '二级可变进气罩' : cameraView === 'intake3' ? '三级可变进气罩' : '整体构型'}</div>
             <div className="viewer-mode">{cameraView === 'compressor' && compressorView === 'rotors' ? '叶轮与静叶' : viewMode === 'cutaway' ? '剖切视图' : '完整视图'}</div>
           </div>
 
@@ -106,7 +145,8 @@ export default function App() {
               cameraView={cameraView}
               compressorView={compressorView}
               showOuterShell={visibility.outerShell}
-              showInnerShell={visibility.innerShell}
+              showVariableIntake={visibility.variableIntake}
+              showInterstageGuide={visibility.interstageGuide}
               showIntake={visibility.intake}
               showIntakeInner={visibility.intakeInner}
               showCompressorCase={visibility.compressorCase}
@@ -117,6 +157,8 @@ export default function App() {
               showCathodeWater={visibility.cathodeWater}
               showAnodeSeparator={visibility.anodeSeparator}
               showWiring={visibility.wiring}
+              intake2={intake2}
+              intake3={intake3}
               resetKey={resetKey}
             />
             {cameraView === 'compressor' && <div className="compressor-inspector">
@@ -151,6 +193,10 @@ export default function App() {
                   aria-pressed={cameraView === 'machinery'} onClick={() => selectCamera('machinery')}>前端总成</button>
                 <button type="button" className={cameraView === 'compressor' ? 'is-active' : ''}
                   aria-pressed={cameraView === 'compressor'} onClick={() => selectCamera('compressor')}>压气机通道</button>
+                <button type="button" className={cameraView === 'intake2' ? 'is-active' : ''}
+                  aria-pressed={cameraView === 'intake2'} onClick={() => selectCamera('intake2')}>二级进气罩</button>
+                <button type="button" className={cameraView === 'intake3' ? 'is-active' : ''}
+                  aria-pressed={cameraView === 'intake3'} onClick={() => selectCamera('intake3')}>三级进气罩</button>
                 <button type="button" className={cameraView === 'stacks' ? 'is-active' : ''}
                   aria-pressed={cameraView === 'stacks'} onClick={() => selectCamera('stacks')}>电堆</button>
                 <button type="button" className={cameraView === 'cells' ? 'is-active' : ''}
@@ -215,11 +261,20 @@ export default function App() {
             )}
           </section>
 
+          <section className="control-section intake-section" aria-labelledby="intake-label">
+            <h3 id="intake-label">可变进气罩</h3>
+            <div className="intake-control-grid">
+              <IntakeControl stage={2} pose={intake2} onChange={setIntake2} onInspect={() => selectCamera('intake2')} />
+              <IntakeControl stage={3} pose={intake3} onChange={setIntake3} onInspect={() => selectCamera('intake3')} />
+            </div>
+          </section>
+
           <section className="control-section structure-section" aria-labelledby="structure-label">
             <h3 id="structure-label">结构部件</h3>
             <div className="layer-list">
               <LayerToggle label="外壳" color="swatch-outer" checked={visibility.outerShell} onChange={() => toggleLayer('outerShell')} />
-              <LayerToggle label="整机内壳" color="swatch-inner" checked={visibility.innerShell} onChange={() => toggleLayer('innerShell')} />
+              <LayerToggle label="可变进气罩" color="swatch-variable" checked={visibility.variableIntake} onChange={() => toggleLayer('variableIntake')} />
+              <LayerToggle label="级间导流罩" color="swatch-inner" checked={visibility.interstageGuide} onChange={() => toggleLayer('interstageGuide')} />
               <LayerToggle label="引气外筒" color="swatch-intake" checked={visibility.intake} onChange={() => toggleLayer('intake')} />
               <LayerToggle label="引气内筒" color="swatch-intake-inner" checked={visibility.intakeInner} onChange={() => toggleLayer('intakeInner')} />
               <LayerToggle label="黄色压气机外壳" color="swatch-compressor" checked={visibility.compressorCase} onChange={() => toggleLayer('compressorCase')} />

@@ -137,15 +137,9 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
   // Their small integral feet stop short of both shells; no blue intake wall is
   // crossed and no unapproved socket is cut into the shared casing generator.
   const statorFront = fanRear + 25, statorRear = fanRear + 75;
-  const os = P.outerShell, ins = P.innerShell;
-  const outerBore = x => {
-    const step = (os.waistStart - os.taperStart) / 64;
-    const station = Math.max(0, Math.min(63, Math.floor((x - os.taperStart) / step)));
-    const a = os.taperStart + station * step, b = a + step;
-    const radius = q => os.radius + (os.waistRadius - os.radius) * smooth((q - os.taperStart) / (os.waistStart - os.taperStart));
-    return lerp(radius(a), radius(b), (x - a) / step) - os.wall;
-  };
-  const statorRoot = ins.inletRadius + .06;
+  const os = P.outerShell;
+  const outerBore = () => os.radius - os.wall;
+  const statorRoot = P.statorSupport.radius + .06;
   const statorTip = x => outerBore(x) * Math.cos(Math.PI / 144) - .12;
   const statorVertices = [], statorTriangles = [], statorPerimeter = [];
   const statorSpans = 12, statorChords = 22;

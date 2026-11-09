@@ -1,374 +1,21 @@
 {
-  "schema": 4,
+  "schema": 5,
+  "revision": "20261109-variable-intakes",
   "units": "mm",
-  "dimensionSource": "user-confirmed 16-blade fan with 66-degree tip, aft diffusers, larger first-stage rotor with unchanged disk, stage-2 ID420/OD579.002 and 372 cells with 0.36 cooling gap, 2026-10-25; targeted spinner extension and second-stage rotor blade-radius revision, 2026-10-26",
-  "performanceScope": "geometry only; prior thermal/power results are not recalculated",
-  "pumpPlacement": "stage 3 central cavity",
-  "envelopes": {
-    "length": 2012,
-    "ductBore": 1000,
-    "nozzleBore": 572,
-    "motorDiameter": 300,
-    "motorLength": 193,
-    "stackLength": 1072
-  },
-  "modules": [
-    3,
-    4,
-    4
+  "dimensionSource": "user tables and explicit clarifications 2026-11-09",
+  "scope": "geometric structure and articulated demonstration; no new thermal or pressure calculation",
+  "length": 2264,
+  "physicalCells": 1357,
+  "moduleCounts": [
+    1,
+    1,
+    1
   ],
   "portCounts": {
-    "air": 11,
-    "hydrogen": 11,
-    "return": 11,
-    "cathode": 11
-  },
-  "parts": 98,
-  "solidChecks": 13,
-  "broadPhasePairs": 193,
-  "collisions": [],
-  "fluidChecks": {
-    "gasSeparation": {
-      "intersectionVolume": 0
-    },
-    "completeCathode": {
-      "connectedComponents": 1,
-      "obstructions": []
-    },
-    "completeAnode": {
-      "connectedComponents": 1,
-      "obstructions": []
-    },
-    "1-1-air-port": {
-      "connectedVolume": 86.37524214806534
-    },
-    "1-1-air-channel": {
-      "connectedVolume": 43.26076053322393
-    },
-    "1-1-cathode-midpoint": {
-      "connectedVolume": 5.39385722310117
-    },
-    "1-1-wet-channel": {
-      "connectedVolume": 43.26043923531832
-    },
-    "1-1-wet-port": {
-      "connectedVolume": 57.35693558935399
-    },
-    "1-1-feed-port": {
-      "connectedVolume": 2.0559866255468773
-    },
-    "1-1-feed-channel": {
-      "connectedVolume": 22.46257020104281
-    },
-    "1-1-anode-midpoint": {
-      "connectedVolume": 4.532338361078069
-    },
-    "1-1-return-channel": {
-      "connectedVolume": 22.608109344987113
-    },
-    "1-1-return-port": {
-      "connectedVolume": 9.244941907094569
-    },
-    "1-2-air-port": {
-      "connectedVolume": 86.37544350570727
-    },
-    "1-2-air-channel": {
-      "connectedVolume": 43.260803493776436
-    },
-    "1-2-cathode-midpoint": {
-      "connectedVolume": 5.393857223100999
-    },
-    "1-2-wet-channel": {
-      "connectedVolume": 43.260482039335564
-    },
-    "1-2-wet-port": {
-      "connectedVolume": 57.35690801458012
-    },
-    "1-2-feed-port": {
-      "connectedVolume": 2.055980152948323
-    },
-    "1-2-feed-channel": {
-      "connectedVolume": 22.462568058799697
-    },
-    "1-2-anode-midpoint": {
-      "connectedVolume": 4.532338361078062
-    },
-    "1-2-return-channel": {
-      "connectedVolume": 22.608108601333775
-    },
-    "1-2-return-port": {
-      "connectedVolume": 9.245063746423865
-    },
-    "1-3-air-port": {
-      "connectedVolume": 86.37544350576724
-    },
-    "1-3-air-channel": {
-      "connectedVolume": 43.2608034031464
-    },
-    "1-3-cathode-midpoint": {
-      "connectedVolume": 5.393857223100998
-    },
-    "1-3-wet-channel": {
-      "connectedVolume": 43.26048231932198
-    },
-    "1-3-wet-port": {
-      "connectedVolume": 57.35693217950571
-    },
-    "1-3-feed-port": {
-      "connectedVolume": 2.0559776858975383
-    },
-    "1-3-feed-channel": {
-      "connectedVolume": 22.462579623902233
-    },
-    "1-3-anode-midpoint": {
-      "connectedVolume": 4.532338361078033
-    },
-    "1-3-return-channel": {
-      "connectedVolume": 22.608096914976972
-    },
-    "1-3-return-port": {
-      "connectedVolume": 9.245062893602109
-    },
-    "2-1-air-port": {
-      "connectedVolume": 86.40719660363818
-    },
-    "2-1-air-channel": {
-      "connectedVolume": 43.27362656943572
-    },
-    "2-1-cathode-midpoint": {
-      "connectedVolume": 5.393857223105072
-    },
-    "2-1-wet-channel": {
-      "connectedVolume": 43.27362656500862
-    },
-    "2-1-wet-port": {
-      "connectedVolume": 57.64394565473319
-    },
-    "2-1-feed-port": {
-      "connectedVolume": 2.0559991073339283
-    },
-    "2-1-feed-channel": {
-      "connectedVolume": 22.762724698523538
-    },
-    "2-1-anode-midpoint": {
-      "connectedVolume": 4.532338361081438
-    },
-    "2-1-return-channel": {
-      "connectedVolume": 22.52612992068866
-    },
-    "2-1-return-port": {
-      "connectedVolume": 9.247767050381952
-    },
-    "2-2-air-port": {
-      "connectedVolume": 86.40719660363817
-    },
-    "2-2-air-channel": {
-      "connectedVolume": 43.27362656943584
-    },
-    "2-2-cathode-midpoint": {
-      "connectedVolume": 5.3938572231055515
-    },
-    "2-2-wet-channel": {
-      "connectedVolume": 43.27362659686361
-    },
-    "2-2-wet-port": {
-      "connectedVolume": 57.64394565473157
-    },
-    "2-2-feed-port": {
-      "connectedVolume": 2.0559991073339483
-    },
-    "2-2-feed-channel": {
-      "connectedVolume": 22.762724698522067
-    },
-    "2-2-anode-midpoint": {
-      "connectedVolume": 4.532338361081267
-    },
-    "2-2-return-channel": {
-      "connectedVolume": 22.52612992068851
-    },
-    "2-2-return-port": {
-      "connectedVolume": 9.247767050382025
-    },
-    "2-3-air-port": {
-      "connectedVolume": 86.40719736589607
-    },
-    "2-3-air-channel": {
-      "connectedVolume": 43.27362656943581
-    },
-    "2-3-cathode-midpoint": {
-      "connectedVolume": 5.393857223105048
-    },
-    "2-3-wet-channel": {
-      "connectedVolume": 43.273626492941595
-    },
-    "2-3-wet-port": {
-      "connectedVolume": 57.64394565473306
-    },
-    "2-3-feed-port": {
-      "connectedVolume": 2.0559991073339265
-    },
-    "2-3-feed-channel": {
-      "connectedVolume": 22.76272469852232
-    },
-    "2-3-anode-midpoint": {
-      "connectedVolume": 4.532338361081423
-    },
-    "2-3-return-channel": {
-      "connectedVolume": 22.52612992068896
-    },
-    "2-3-return-port": {
-      "connectedVolume": 9.2477670503818
-    },
-    "2-4-air-port": {
-      "connectedVolume": 86.40719736589587
-    },
-    "2-4-air-channel": {
-      "connectedVolume": 43.273626569435855
-    },
-    "2-4-cathode-midpoint": {
-      "connectedVolume": 5.393857223105524
-    },
-    "2-4-wet-channel": {
-      "connectedVolume": 43.27362649294127
-    },
-    "2-4-wet-port": {
-      "connectedVolume": 57.64394565473225
-    },
-    "2-4-feed-port": {
-      "connectedVolume": 2.055999107333954
-    },
-    "2-4-feed-channel": {
-      "connectedVolume": 22.762724698522366
-    },
-    "2-4-anode-midpoint": {
-      "connectedVolume": 4.532338361081325
-    },
-    "2-4-return-channel": {
-      "connectedVolume": 22.526129920688284
-    },
-    "2-4-return-port": {
-      "connectedVolume": 9.24776705038194
-    },
-    "3-1-air-port": {
-      "connectedVolume": 86.4119332301022
-    },
-    "3-1-air-channel": {
-      "connectedVolume": 43.27361689962995
-    },
-    "3-1-cathode-midpoint": {
-      "connectedVolume": 5.393857223105091
-    },
-    "3-1-wet-channel": {
-      "connectedVolume": 43.2736168118478
-    },
-    "3-1-wet-port": {
-      "connectedVolume": 57.70095521242618
-    },
-    "3-1-feed-port": {
-      "connectedVolume": 2.055950777314944
-    },
-    "3-1-feed-channel": {
-      "connectedVolume": 22.83625483093044
-    },
-    "3-1-anode-midpoint": {
-      "connectedVolume": 4.532338361081688
-    },
-    "3-1-return-channel": {
-      "connectedVolume": 22.569620527404602
-    },
-    "3-1-return-port": {
-      "connectedVolume": 9.24771168241546
-    },
-    "3-2-air-port": {
-      "connectedVolume": 86.41193224361858
-    },
-    "3-2-air-channel": {
-      "connectedVolume": 43.27361689962932
-    },
-    "3-2-cathode-midpoint": {
-      "connectedVolume": 5.393857223105176
-    },
-    "3-2-wet-channel": {
-      "connectedVolume": 43.273616894758305
-    },
-    "3-2-wet-port": {
-      "connectedVolume": 57.7009552124256
-    },
-    "3-2-feed-port": {
-      "connectedVolume": 2.055950777314852
-    },
-    "3-2-feed-channel": {
-      "connectedVolume": 22.836254830929366
-    },
-    "3-2-anode-midpoint": {
-      "connectedVolume": 4.532338361081301
-    },
-    "3-2-return-channel": {
-      "connectedVolume": 22.569620527404496
-    },
-    "3-2-return-port": {
-      "connectedVolume": 9.247711682415819
-    },
-    "3-3-air-port": {
-      "connectedVolume": 86.41193224361861
-    },
-    "3-3-air-channel": {
-      "connectedVolume": 43.27361689962999
-    },
-    "3-3-cathode-midpoint": {
-      "connectedVolume": 5.393857223105323
-    },
-    "3-3-wet-channel": {
-      "connectedVolume": 43.27361689475816
-    },
-    "3-3-wet-port": {
-      "connectedVolume": 57.700955212426145
-    },
-    "3-3-feed-port": {
-      "connectedVolume": 2.055950777314951
-    },
-    "3-3-feed-channel": {
-      "connectedVolume": 22.83625483092968
-    },
-    "3-3-anode-midpoint": {
-      "connectedVolume": 4.532338361081671
-    },
-    "3-3-return-channel": {
-      "connectedVolume": 22.5696205274039
-    },
-    "3-3-return-port": {
-      "connectedVolume": 9.247711682415956
-    },
-    "3-4-air-port": {
-      "connectedVolume": 86.41193224361817
-    },
-    "3-4-air-channel": {
-      "connectedVolume": 43.273616899629324
-    },
-    "3-4-cathode-midpoint": {
-      "connectedVolume": 5.393857223105181
-    },
-    "3-4-wet-channel": {
-      "connectedVolume": 43.27361689475815
-    },
-    "3-4-wet-port": {
-      "connectedVolume": 57.700955212427836
-    },
-    "3-4-feed-port": {
-      "connectedVolume": 2.0559507773148447
-    },
-    "3-4-feed-channel": {
-      "connectedVolume": 22.836254830929484
-    },
-    "3-4-anode-midpoint": {
-      "connectedVolume": 4.532338361081165
-    },
-    "3-4-return-channel": {
-      "connectedVolume": 22.569620527404016
-    },
-    "3-4-return-port": {
-      "connectedVolume": 9.247711682415842
-    }
+    "air": 3,
+    "hydrogen": 3,
+    "return": 3,
+    "cathode": 3
   },
   "ports": [
     {
@@ -378,17 +25,17 @@
       "stage": 1,
       "module": 1,
       "position": [
-        780.24,
-        7.83773951454306e-15,
-        128
+        890.72,
+        50,
+        0
       ],
       "direction": [
         0,
-        6.123233995736766e-17,
-        1
+        1,
+        0
       ],
-      "inner": 6.5,
-      "outer": 9
+      "inner": 3.5,
+      "outer": 5
     },
     {
       "id": "cathode-1-1",
@@ -397,17 +44,17 @@
       "stage": 1,
       "module": 1,
       "position": [
-        847.9200000000001,
-        33.128837773122655,
-        123.63850576500074
+        1003.76,
+        50,
+        0
       ],
       "direction": [
         0,
-        -0.25881904510252074,
-        -0.9659258262890683
+        -1,
+        0
       ],
-      "inner": 4.5,
-      "outer": 7
+      "inner": 3.4,
+      "outer": 5.2
     },
     {
       "id": "hydrogen-1-1",
@@ -416,17 +63,17 @@
       "stage": 1,
       "module": 1,
       "position": [
-        956,
-        196.9112628160971,
-        131.3518860815098
+        928.4,
+        -125.1579002700189,
+        125.15790027001891
       ],
       "direction": [
         0,
-        -0.831898736448503,
-        -0.5549274657965526
+        0.7071067811865475,
+        -0.7071067811865476
       ],
-      "inner": 2.2,
-      "outer": 3.8
+      "inner": 2.1,
+      "outer": 3.3
     },
     {
       "id": "return-1-1",
@@ -435,169 +82,17 @@
       "stage": 1,
       "module": 1,
       "position": [
-        690,
-        8.143901214329898e-15,
-        133
-      ],
-      "direction": [
-        -1,
-        0,
-        0
-      ],
-      "inner": 2.2,
-      "outer": 3.8
-    },
-    {
-      "id": "air-1-2",
-      "fluid": "air",
-      "medium": "air",
-      "stage": 1,
-      "module": 2,
-      "position": [
-        780.24,
-        -110.8512516844082,
-        -63.99999999999992
+        805,
+        -125.15790027001894,
+        -125.1579002700189
       ],
       "direction": [
         0,
-        -0.866025403784439,
-        -0.4999999999999994
+        -0.7071067811865477,
+        -0.7071067811865475
       ],
-      "inner": 6.5,
-      "outer": 9
-    },
-    {
-      "id": "cathode-1-2",
-      "fluid": "cathode",
-      "medium": "cathode",
-      "stage": 1,
-      "module": 2,
-      "position": [
-        847.9200000000001,
-        -123.63850576500077,
-        -33.12883777312255
-      ],
-      "direction": [
-        0,
-        0.9659258262890684,
-        0.25881904510252035
-      ],
-      "inner": 4.5,
-      "outer": 7
-    },
-    {
-      "id": "hydrogen-1-2",
-      "fluid": "hydrogen",
-      "medium": "hydrogen",
-      "stage": 1,
-      "module": 2,
-      "position": [
-        956,
-        -212.20970158963564,
-        104.85421284925938
-      ],
-      "direction": [
-        0,
-        0.8965306508617862,
-        -0.4429817062423031
-      ],
-      "inner": 2.2,
-      "outer": 3.8
-    },
-    {
-      "id": "return-1-2",
-      "fluid": "return",
-      "medium": "return",
-      "stage": 1,
-      "module": 2,
-      "position": [
-        690,
-        -115.1813787033304,
-        -66.49999999999991
-      ],
-      "direction": [
-        -1,
-        0,
-        0
-      ],
-      "inner": 2.2,
-      "outer": 3.8
-    },
-    {
-      "id": "air-1-3",
-      "fluid": "air",
-      "medium": "air",
-      "stage": 1,
-      "module": 3,
-      "position": [
-        780.24,
-        110.85125168440811,
-        -64.00000000000006
-      ],
-      "direction": [
-        0,
-        0.8660254037844379,
-        -0.5000000000000012
-      ],
-      "inner": 6.5,
-      "outer": 9
-    },
-    {
-      "id": "cathode-1-3",
-      "fluid": "cathode",
-      "medium": "cathode",
-      "stage": 1,
-      "module": 3,
-      "position": [
-        847.9200000000001,
-        90.50966799187799,
-        -90.50966799187819
-      ],
-      "direction": [
-        0,
-        -0.7071067811865468,
-        0.7071067811865483
-      ],
-      "inner": 4.5,
-      "outer": 7
-    },
-    {
-      "id": "hydrogen-1-3",
-      "fluid": "hydrogen",
-      "medium": "hydrogen",
-      "stage": 1,
-      "module": 3,
-      "position": [
-        956,
-        15.298438773538322,
-        -236.20609893076914
-      ],
-      "direction": [
-        0,
-        -0.06463191441328225,
-        0.9979091720388555
-      ],
-      "inner": 2.2,
-      "outer": 3.8
-    },
-    {
-      "id": "return-1-3",
-      "fluid": "return",
-      "medium": "return",
-      "stage": 1,
-      "module": 3,
-      "position": [
-        690,
-        115.18137870333031,
-        -66.50000000000006
-      ],
-      "direction": [
-        -1,
-        0,
-        0
-      ],
-      "inner": 2.2,
-      "outer": 3.8
+      "inner": 2.1,
+      "outer": 3.3
     },
     {
       "id": "air-2-1",
@@ -606,17 +101,17 @@
       "stage": 2,
       "module": 1,
       "position": [
-        1112,
-        1.2858791391047208e-14,
-        210
+        1365.4,
+        73,
+        0
       ],
       "direction": [
         0,
-        6.123233995736766e-17,
-        1
+        1,
+        0
       ],
-      "inner": 6.5,
-      "outer": 9
+      "inner": 3.5,
+      "outer": 5
     },
     {
       "id": "cathode-2-1",
@@ -625,17 +120,17 @@
       "stage": 2,
       "module": 1,
       "position": [
-        1202,
-        54.35199947152935,
-        202.84442352070434
+        1466.2,
+        73,
+        0
       ],
       "direction": [
         0,
-        -0.25881904510252074,
-        -0.9659258262890683
+        -1,
+        0
       ],
-      "inner": 4.5,
-      "outer": 7
+      "inner": 3.4,
+      "outer": 5.2
     },
     {
       "id": "hydrogen-2-1",
@@ -644,17 +139,17 @@
       "stage": 2,
       "module": 1,
       "position": [
-        1351,
-        192.07815044970587,
-        216.60289268802515
+        1399,
+        -139.30003589374985,
+        139.30003589374988
       ],
       "direction": [
         0,
-        -0.6634800931592839,
-        -0.7481939360763009
+        0.7071067811865475,
+        -0.7071067811865476
       ],
-      "inner": 2.2,
-      "outer": 3.8
+      "inner": 2.1,
+      "outer": 3.3
     },
     {
       "id": "return-2-1",
@@ -663,245 +158,17 @@
       "stage": 2,
       "module": 1,
       "position": [
-        992,
-        1.3164953090834047e-14,
-        215
-      ],
-      "direction": [
-        -1,
-        0,
-        0
-      ],
-      "inner": 2.2,
-      "outer": 3.8
-    },
-    {
-      "id": "air-2-2",
-      "fluid": "air",
-      "medium": "air",
-      "stage": 2,
-      "module": 2,
-      "position": [
-        1112,
-        -210,
-        2.5717582782094416e-14
+        1296,
+        -139.3000358937499,
+        -139.30003589374985
       ],
       "direction": [
         0,
-        -1,
-        1.2246467991473532e-16
+        -0.7071067811865477,
+        -0.7071067811865475
       ],
-      "inner": 6.5,
-      "outer": 9
-    },
-    {
-      "id": "cathode-2-2",
-      "fluid": "cathode",
-      "medium": "cathode",
-      "stage": 2,
-      "module": 2,
-      "position": [
-        1202,
-        -202.8444235207043,
-        54.35199947152941
-      ],
-      "direction": [
-        0,
-        0.9659258262890682,
-        -0.258819045102521
-      ],
-      "inner": 4.5,
-      "outer": 7
-    },
-    {
-      "id": "hydrogen-2-2",
-      "fluid": "hydrogen",
-      "medium": "hydrogen",
-      "stage": 2,
-      "module": 2,
-      "position": [
-        1351,
-        -216.60289268802515,
-        192.0781504497059
-      ],
-      "direction": [
-        0,
-        0.7481939360763008,
-        -0.6634800931592841
-      ],
-      "inner": 2.2,
-      "outer": 3.8
-    },
-    {
-      "id": "return-2-2",
-      "fluid": "return",
-      "medium": "return",
-      "stage": 2,
-      "module": 2,
-      "position": [
-        992,
-        -215,
-        2.6329906181668095e-14
-      ],
-      "direction": [
-        -1,
-        0,
-        0
-      ],
-      "inner": 2.2,
-      "outer": 3.8
-    },
-    {
-      "id": "air-2-3",
-      "fluid": "air",
-      "medium": "air",
-      "stage": 2,
-      "module": 3,
-      "position": [
-        1112,
-        -3.857637417314162e-14,
-        -210
-      ],
-      "direction": [
-        0,
-        -1.8369701987210297e-16,
-        -1
-      ],
-      "inner": 6.5,
-      "outer": 9
-    },
-    {
-      "id": "cathode-2-3",
-      "fluid": "cathode",
-      "medium": "cathode",
-      "stage": 2,
-      "module": 3,
-      "position": [
-        1202,
-        -54.35199947152933,
-        -202.84442352070434
-      ],
-      "direction": [
-        0,
-        0.25881904510252063,
-        0.9659258262890683
-      ],
-      "inner": 4.5,
-      "outer": 7
-    },
-    {
-      "id": "hydrogen-2-3",
-      "fluid": "hydrogen",
-      "medium": "hydrogen",
-      "stage": 2,
-      "module": 3,
-      "position": [
-        1351,
-        -192.07815044970593,
-        -216.60289268802512
-      ],
-      "direction": [
-        0,
-        0.6634800931592842,
-        0.7481939360763007
-      ],
-      "inner": 2.2,
-      "outer": 3.8
-    },
-    {
-      "id": "return-2-3",
-      "fluid": "return",
-      "medium": "return",
-      "stage": 2,
-      "module": 3,
-      "position": [
-        992,
-        -3.9494859272502136e-14,
-        -215
-      ],
-      "direction": [
-        -1,
-        0,
-        0
-      ],
-      "inner": 2.2,
-      "outer": 3.8
-    },
-    {
-      "id": "air-2-4",
-      "fluid": "air",
-      "medium": "air",
-      "stage": 2,
-      "module": 4,
-      "position": [
-        1112,
-        210,
-        -5.143516556418883e-14
-      ],
-      "direction": [
-        0,
-        1,
-        -2.4492935982947064e-16
-      ],
-      "inner": 6.5,
-      "outer": 9
-    },
-    {
-      "id": "cathode-2-4",
-      "fluid": "cathode",
-      "medium": "cathode",
-      "stage": 2,
-      "module": 4,
-      "position": [
-        1202,
-        202.84442352070434,
-        -54.351999471529346
-      ],
-      "direction": [
-        0,
-        -0.9659258262890683,
-        0.2588190451025207
-      ],
-      "inner": 4.5,
-      "outer": 7
-    },
-    {
-      "id": "hydrogen-2-4",
-      "fluid": "hydrogen",
-      "medium": "hydrogen",
-      "stage": 2,
-      "module": 4,
-      "position": [
-        1351,
-        216.60289268802507,
-        -192.07815044970593
-      ],
-      "direction": [
-        0,
-        -0.7481939360763006,
-        0.6634800931592842
-      ],
-      "inner": 2.2,
-      "outer": 3.8
-    },
-    {
-      "id": "return-2-4",
-      "fluid": "return",
-      "medium": "return",
-      "stage": 2,
-      "module": 4,
-      "position": [
-        992,
-        215,
-        -5.265981236333619e-14
-      ],
-      "direction": [
-        -1,
-        0,
-        0
-      ],
-      "inner": 2.2,
-      "outer": 3.8
+      "inner": 2.1,
+      "outer": 3.3
     },
     {
       "id": "air-3-1",
@@ -910,17 +177,17 @@
       "stage": 3,
       "module": 1,
       "position": [
-        1507,
-        1.432836755002403e-14,
-        234
+        1796.76,
+        95,
+        0
       ],
       "direction": [
         0,
-        6.123233995736766e-17,
-        1
+        1,
+        0
       ],
-      "inner": 6.5,
-      "outer": 9
+      "inner": 3.5,
+      "outer": 5
     },
     {
       "id": "cathode-3-1",
@@ -929,17 +196,17 @@
       "stage": 3,
       "module": 1,
       "position": [
-        1597,
-        60.56365655398985,
-        226.02664335164198
+        1891.08,
+        95,
+        0
       ],
       "direction": [
         0,
-        -0.25881904510252074,
-        -0.9659258262890683
+        -1,
+        0
       ],
-      "inner": 4.5,
-      "outer": 7
+      "inner": 3.4,
+      "outer": 5.2
     },
     {
       "id": "hydrogen-3-1",
@@ -948,17 +215,17 @@
       "stage": 3,
       "module": 1,
       "position": [
-        1746,
-        232.30743555741736,
-        261.78857000399455
+        1828.2,
+        -153.4421715174808,
+        153.44217151748083
       ],
       "direction": [
         0,
-        -0.6637355301640495,
-        -0.747967342868556
+        0.7071067811865475,
+        -0.7071067811865476
       ],
-      "inner": 2.2,
-      "outer": 3.8
+      "inner": 2.1,
+      "outer": 3.3
     },
     {
       "id": "return-3-1",
@@ -967,332 +234,405 @@
       "stage": 3,
       "module": 1,
       "position": [
-        1387,
-        1.4634529249810872e-14,
-        239
-      ],
-      "direction": [
-        -1,
-        0,
-        0
-      ],
-      "inner": 2.2,
-      "outer": 3.8
-    },
-    {
-      "id": "air-3-2",
-      "fluid": "air",
-      "medium": "air",
-      "stage": 3,
-      "module": 2,
-      "position": [
-        1507,
-        -234,
-        2.865673510004806e-14
+        1736,
+        -153.44217151748086,
+        -153.4421715174808
       ],
       "direction": [
         0,
-        -1,
-        1.2246467991473532e-16
+        -0.7071067811865477,
+        -0.7071067811865475
       ],
-      "inner": 6.5,
-      "outer": 9
-    },
-    {
-      "id": "cathode-3-2",
-      "fluid": "cathode",
-      "medium": "cathode",
-      "stage": 3,
-      "module": 2,
-      "position": [
-        1597,
-        -226.02664335164195,
-        60.563656553989915
-      ],
-      "direction": [
-        0,
-        0.9659258262890682,
-        -0.258819045102521
-      ],
-      "inner": 4.5,
-      "outer": 7
-    },
-    {
-      "id": "hydrogen-3-2",
-      "fluid": "hydrogen",
-      "medium": "hydrogen",
-      "stage": 3,
-      "module": 2,
-      "position": [
-        1746,
-        -261.7885700039946,
-        232.30743555741736
-      ],
-      "direction": [
-        0,
-        0.747967342868556,
-        -0.6637355301640496
-      ],
-      "inner": 2.2,
-      "outer": 3.8
-    },
-    {
-      "id": "return-3-2",
-      "fluid": "return",
-      "medium": "return",
-      "stage": 3,
-      "module": 2,
-      "position": [
-        1387,
-        -239,
-        2.9269058499621745e-14
-      ],
-      "direction": [
-        -1,
-        0,
-        0
-      ],
-      "inner": 2.2,
-      "outer": 3.8
-    },
-    {
-      "id": "air-3-3",
-      "fluid": "air",
-      "medium": "air",
-      "stage": 3,
-      "module": 3,
-      "position": [
-        1507,
-        -4.2985102650072094e-14,
-        -234
-      ],
-      "direction": [
-        0,
-        -1.8369701987210297e-16,
-        -1
-      ],
-      "inner": 6.5,
-      "outer": 9
-    },
-    {
-      "id": "cathode-3-3",
-      "fluid": "cathode",
-      "medium": "cathode",
-      "stage": 3,
-      "module": 3,
-      "position": [
-        1597,
-        -60.56365655398983,
-        -226.02664335164198
-      ],
-      "direction": [
-        0,
-        0.25881904510252063,
-        0.9659258262890683
-      ],
-      "inner": 4.5,
-      "outer": 7
-    },
-    {
-      "id": "hydrogen-3-3",
-      "fluid": "hydrogen",
-      "medium": "hydrogen",
-      "stage": 3,
-      "module": 3,
-      "position": [
-        1746,
-        -232.30743555741748,
-        -261.78857000399444
-      ],
-      "direction": [
-        0,
-        0.6637355301640496,
-        0.7479673428685559
-      ],
-      "inner": 2.2,
-      "outer": 3.8
-    },
-    {
-      "id": "return-3-3",
-      "fluid": "return",
-      "medium": "return",
-      "stage": 3,
-      "module": 3,
-      "position": [
-        1387,
-        -4.390358774943261e-14,
-        -239
-      ],
-      "direction": [
-        -1,
-        0,
-        0
-      ],
-      "inner": 2.2,
-      "outer": 3.8
-    },
-    {
-      "id": "air-3-4",
-      "fluid": "air",
-      "medium": "air",
-      "stage": 3,
-      "module": 4,
-      "position": [
-        1507,
-        234,
-        -5.731347020009613e-14
-      ],
-      "direction": [
-        0,
-        1,
-        -2.4492935982947064e-16
-      ],
-      "inner": 6.5,
-      "outer": 9
-    },
-    {
-      "id": "cathode-3-4",
-      "fluid": "cathode",
-      "medium": "cathode",
-      "stage": 3,
-      "module": 4,
-      "position": [
-        1597,
-        226.02664335164198,
-        -60.56365655398984
-      ],
-      "direction": [
-        0,
-        -0.9659258262890683,
-        0.2588190451025207
-      ],
-      "inner": 4.5,
-      "outer": 7
-    },
-    {
-      "id": "hydrogen-3-4",
-      "fluid": "hydrogen",
-      "medium": "hydrogen",
-      "stage": 3,
-      "module": 4,
-      "position": [
-        1746,
-        261.78857000399466,
-        -232.30743555741725
-      ],
-      "direction": [
-        0,
-        -0.7479673428685563,
-        0.6637355301640493
-      ],
-      "inner": 2.2,
-      "outer": 3.8
-    },
-    {
-      "id": "return-3-4",
-      "fluid": "return",
-      "medium": "return",
-      "stage": 3,
-      "module": 4,
-      "position": [
-        1387,
-        239,
-        -5.853811699924349e-14
-      ],
-      "direction": [
-        -1,
-        0,
-        0
-      ],
-      "inner": 2.2,
-      "outer": 3.8
+      "inner": 2.1,
+      "outer": 3.3
     }
   ],
-  "stackChecks": [
+  "stacks": [
     {
       "stage": 1,
-      "modules": 3,
+      "modules": 1,
+      "totalPhysicalCells": 311,
       "physicalCellsPerModule": [
-        279,
-        279,
-        279
+        311
       ],
-      "totalPhysicalCells": 837,
-      "plateThickness": 0.55,
-      "nominalInnerCoolingGap": 0.46,
-      "constructedInnerCoolingGap": 0.4602,
-      "numericRelief": 0.0002,
-      "outerCoolingGap": 1.160749184309911,
-      "cellInner": 138,
-      "cellOuter": 233.7,
-      "axialCoolingLength": 282,
+      "plateThickness": 0.281,
+      "innerDiameter": 100,
+      "outerDiameter": 354,
+      "axialLength": 471,
+      "nominalInnerPitch": 1.01,
+      "constructedInnerPitch": 1.010158409514403,
+      "constructedInnerCoolingGap": 0.7291555666170374,
+      "outerCoolingGap": 3.294914290404993,
       "coolingDirection": "front-to-rear",
-      "moduleGapAtInner": 1,
-      "moduleGapAtOuter": 1.8492265625,
-      "sideFrameMinimumThickness": 2.3213971842793497
+      "fullAxialEndFacesOpen": true,
+      "localSeating": "four 2-mm-wide corner ties and local pressure-channel pockets",
+      "nominalUncutPlateVolume": 16808.55638455469,
+      "verifiedConnectedPlateCount": 311,
+      "cornerSeatRelief": 0.025,
+      "removedMachiningOffcuts": [
+        {
+          "plate": 0,
+          "volume": 0.5005756580897108,
+          "bounds": {
+            "min": [
+              895.69140625,
+              49.996028900146484,
+              0.3645777702331543
+            ],
+            "max": [
+              998.588623046875,
+              50.02861404418945,
+              0.6458926200866699
+            ]
+          }
+        },
+        {
+          "plate": 1,
+          "volume": 10.90417885663542,
+          "bounds": {
+            "min": [
+              895.4498291015625,
+              49.97278594970703,
+              1.3745702505111694
+            ],
+            "max": [
+              998.8221435546875,
+              50.42893600463867,
+              1.6692688465118408
+            ]
+          }
+        },
+        {
+          "plate": 2,
+          "volume": 37.736837253530545,
+          "bounds": {
+            "min": [
+              894.9374389648438,
+              49.92914581298828,
+              2.3840014934539795
+            ],
+            "max": [
+              999.31689453125,
+              51.40618133544922,
+              2.7393085956573486
+            ]
+          }
+        },
+        {
+          "plate": 308,
+          "volume": 37.736837253530396,
+          "bounds": {
+            "min": [
+              894.9374389648438,
+              49.92914581298828,
+              -2.7393085956573486
+            ],
+            "max": [
+              999.31689453125,
+              51.40618133544922,
+              -2.3840014934539795
+            ]
+          }
+        },
+        {
+          "plate": 309,
+          "volume": 10.904177552140862,
+          "bounds": {
+            "min": [
+              895.4498291015625,
+              49.97278594970703,
+              -1.6692688465118408
+            ],
+            "max": [
+              998.8221435546875,
+              50.42893600463867,
+              -1.3745702505111694
+            ]
+          }
+        },
+        {
+          "plate": 310,
+          "volume": 0.5005756639347917,
+          "bounds": {
+            "min": [
+              895.69140625,
+              49.996028900146484,
+              -0.6458926200866699
+            ],
+            "max": [
+              998.588623046875,
+              50.02861404418945,
+              -0.3645777702331543
+            ]
+          }
+        }
+      ],
+      "removedOffcutVolume": 98.28318223786174,
+      "outerCoolingSeal": {
+        "wallThickness": 0.3,
+        "outerDiameter": 354,
+        "plateSeatingZone": 0.325,
+        "axialEndFaces": "open"
+      },
+      "plateMaterialRetainedFraction": 0.9969051689187666
     },
     {
       "stage": 2,
-      "modules": 4,
+      "modules": 1,
+      "totalPhysicalCells": 455,
       "physicalCellsPerModule": [
-        372,
-        372,
-        372,
-        372
+        455
       ],
-      "totalPhysicalCells": 1488,
-      "plateThickness": 0.55,
-      "nominalInnerCoolingGap": 0.36,
-      "constructedInnerCoolingGap": 0.36019999999999996,
-      "numericRelief": 0.0002,
-      "outerCoolingGap": 0.635328280650987,
-      "cellInner": 220,
-      "cellOuter": 286.5,
-      "axialCoolingLength": 375,
+      "plateThickness": 0.281,
+      "innerDiameter": 146,
+      "outerDiameter": 394,
+      "axialLength": 420,
+      "nominalInnerPitch": 1.01,
+      "constructedInnerPitch": 1.0080714888441973,
+      "constructedInnerCoolingGap": 0.7270701772476664,
+      "outerCoolingGap": 2.4393971829251493,
       "coolingDirection": "front-to-rear",
-      "moduleGapAtInner": 1,
-      "moduleGapAtOuter": 1.3785761904761904,
-      "sideFrameMinimumThickness": 2.2865840681255527
+      "fullAxialEndFacesOpen": true,
+      "localSeating": "four 2-mm-wide corner ties and local pressure-channel pockets",
+      "nominalUncutPlateVolume": 14634.462284942638,
+      "verifiedConnectedPlateCount": 455,
+      "cornerSeatRelief": 0.025,
+      "removedMachiningOffcuts": [
+        {
+          "plate": 0,
+          "volume": 0.40685679819745246,
+          "bounds": {
+            "min": [
+              1371.5364990234375,
+              72.9972915649414,
+              0.363535076379776
+            ],
+            "max": [
+              1459.863525390625,
+              73.02850341796875,
+              0.6447438597679138
+            ]
+          }
+        },
+        {
+          "plate": 1,
+          "volume": 9.080794060387253,
+          "bounds": {
+            "min": [
+              1371.34375,
+              72.98143005371094,
+              1.371529221534729
+            ],
+            "max": [
+              1460.04833984375,
+              73.42486572265625,
+              1.6616554260253906
+            ]
+          }
+        },
+        {
+          "plate": 2,
+          "volume": 30.985670327322996,
+          "bounds": {
+            "min": [
+              1370.9482421875,
+              72.95165252685547,
+              2.3792619705200195
+            ],
+            "max": [
+              1460.426025390625,
+              74.36931610107422,
+              2.7090559005737305
+            ]
+          }
+        },
+        {
+          "plate": 452,
+          "volume": 30.985657262439673,
+          "bounds": {
+            "min": [
+              1370.9482421875,
+              72.95165252685547,
+              -2.7090559005737305
+            ],
+            "max": [
+              1460.426025390625,
+              74.36931610107422,
+              -2.3792619705200195
+            ]
+          }
+        },
+        {
+          "plate": 453,
+          "volume": 9.080796596034665,
+          "bounds": {
+            "min": [
+              1371.34375,
+              72.98143005371094,
+              -1.6616554260253906
+            ],
+            "max": [
+              1460.04833984375,
+              73.42486572265625,
+              -1.371529221534729
+            ]
+          }
+        },
+        {
+          "plate": 454,
+          "volume": 0.4068567981978391,
+          "bounds": {
+            "min": [
+              1371.5364990234375,
+              72.9972915649414,
+              -0.6447438597679138
+            ],
+            "max": [
+              1459.863525390625,
+              73.02850341796875,
+              -0.363535076379776
+            ]
+          }
+        }
+      ],
+      "removedOffcutVolume": 80.94663184257988,
+      "outerCoolingSeal": {
+        "wallThickness": 0.3,
+        "outerDiameter": 394,
+        "plateSeatingZone": 0.325,
+        "axialEndFaces": "open"
+      },
+      "plateMaterialRetainedFraction": 0.9968712409450946
     },
     {
       "stage": 3,
-      "modules": 4,
+      "modules": 1,
+      "totalPhysicalCells": 591,
       "physicalCellsPerModule": [
-        372,
-        372,
-        372,
-        372
+        591
       ],
-      "totalPhysicalCells": 1488,
-      "plateThickness": 0.55,
-      "nominalInnerCoolingGap": 0.46,
-      "constructedInnerCoolingGap": 0.4602,
-      "numericRelief": 0.0002,
-      "outerCoolingGap": 0.8866322476308484,
-      "cellInner": 244,
-      "cellOuter": 346.999,
-      "axialCoolingLength": 375,
+      "plateThickness": 0.281,
+      "innerDiameter": 190,
+      "outerDiameter": 434,
+      "axialLength": 393,
+      "nominalInnerPitch": 1.01,
+      "constructedInnerPitch": 1.0099874859256526,
+      "constructedInnerCoolingGap": 0.7289866994977552,
+      "outerCoolingGap": 2.0260171520034795,
       "coolingDirection": "front-to-rear",
-      "moduleGapAtInner": 1,
-      "moduleGapAtOuter": 1.495726495726496,
-      "sideFrameMinimumThickness": 2.488568850793598
+      "fullAxialEndFacesOpen": true,
+      "localSeating": "four 2-mm-wide corner ties and local pressure-channel pockets",
+      "nominalUncutPlateVolume": 13472.809933715542,
+      "verifiedConnectedPlateCount": 591,
+      "cornerSeatRelief": 0.025,
+      "removedMachiningOffcuts": [
+        {
+          "plate": 0,
+          "volume": 0.3699816894346289,
+          "bounds": {
+            "min": [
+              1802.8963623046875,
+              94.99790954589844,
+              0.36449334025382996
+            ],
+            "max": [
+              1884.7435302734375,
+              95.02859497070312,
+              0.6456524729728699
+            ]
+          }
+        },
+        {
+          "plate": 1,
+          "volume": 8.347512920702002,
+          "bounds": {
+            "min": [
+              1802.7034912109375,
+              94.98567962646484,
+              1.3744348287582397
+            ],
+            "max": [
+              1884.928466796875,
+              95.4252700805664,
+              1.662410020828247
+            ]
+          }
+        },
+        {
+          "plate": 2,
+          "volume": 28.349655669655522,
+          "bounds": {
+            "min": [
+              1802.3118896484375,
+              94.96271514892578,
+              2.384221076965332
+            ],
+            "max": [
+              1885.302490234375,
+              96.361083984375,
+              2.7022972106933594
+            ]
+          }
+        },
+        {
+          "plate": 588,
+          "volume": 28.34964457095241,
+          "bounds": {
+            "min": [
+              1802.3118896484375,
+              94.96271514892578,
+              -2.7022972106933594
+            ],
+            "max": [
+              1885.302490234375,
+              96.361083984375,
+              -2.384221076965332
+            ]
+          }
+        },
+        {
+          "plate": 589,
+          "volume": 8.34751543414374,
+          "bounds": {
+            "min": [
+              1802.7034912109375,
+              94.98567962646484,
+              -1.662410020828247
+            ],
+            "max": [
+              1884.928466796875,
+              95.4252700805664,
+              -1.3744348287582397
+            ]
+          }
+        },
+        {
+          "plate": 590,
+          "volume": 0.36998168088445854,
+          "bounds": {
+            "min": [
+              1802.8963623046875,
+              94.99790954589844,
+              -0.6456524729728699
+            ],
+            "max": [
+              1884.7435302734375,
+              95.02859497070312,
+              -0.36449334025382996
+            ]
+          }
+        }
+      ],
+      "removedOffcutVolume": 74.13429196577277,
+      "outerCoolingSeal": {
+        "wallThickness": 0.3,
+        "outerDiameter": 434,
+        "plateSeatingZone": 0.325,
+        "axialEndFaces": "open"
+      },
+      "plateMaterialRetainedFraction": 0.9968506228992513
     }
   ],
-  "physicalCells": 3813,
-  "layoutOverrides": {
-    "intakeInnerEnds": "both open",
-    "intakeLinerRadialContraction": 16,
-    "compressorDiscSurfacesRemoved": 3,
-    "compressorBackplates": 2,
-    "compressorReturnVanes": 0,
-    "mainInnerShellFront": 210,
-    "mainInnerShellRear": 1387,
-    "innerShellStopsAtThirdStageFront": true,
-    "innerAftCone": false,
-    "outerWaistRadius": 410,
-    "thirdStageOuterDiameter": 700,
-    "hydrogenInlet": "each module outer cylindrical surface"
-  },
   "machinery": {
     "fanFront": 50,
     "fanRear": 210,
@@ -1323,7 +663,7 @@
     },
     "compressorStages": 2,
     "compressorBladeCount": 18,
-    "neckStart": 675,
+    "neckStart": 721.5,
     "driveArchitecture": "independent-front-and-rear-motors",
     "motorSizing": "schematic-only",
     "casingInside": [
@@ -1332,521 +672,521 @@
         165
       ],
       [
-        483.75,
+        484.64285714285717,
         165
       ],
       [
-        487.5,
+        489.2857142857143,
         165
       ],
       [
-        491.25,
+        493.92857142857144,
         165
       ],
       [
-        495,
+        498.57142857142856,
         165
       ],
       [
-        498.75,
+        503.2142857142857,
         165
       ],
       [
-        502.5,
+        507.8571428571429,
         165
       ],
       [
-        506.25,
+        512.5,
         165
       ],
       [
-        510,
+        517.1428571428571,
         165
       ],
       [
-        513.75,
+        521.7857142857143,
         165
       ],
       [
-        517.5,
+        526.4285714285714,
         165
       ],
       [
-        521.25,
+        531.0714285714286,
         165
       ],
       [
-        525,
+        535.7142857142858,
         165
       ],
       [
-        528.75,
+        540.3571428571429,
         165
       ],
       [
-        532.5,
+        545,
         165
       ],
       [
-        536.25,
+        549.6428571428571,
         165
       ],
       [
-        540,
+        554.2857142857143,
         165
       ],
       [
-        543.75,
+        558.9285714285714,
         165
       ],
       [
-        547.5,
+        563.5714285714286,
         165
       ],
       [
-        551.25,
+        568.2142857142858,
         165
       ],
       [
-        555,
+        572.8571428571429,
         165
       ],
       [
-        556.75,
-        164.855
+        575.0238095238095,
+        164.85500000000002
       ],
       [
-        558.5,
+        577.1904761904763,
         164.44
       ],
       [
-        560.25,
+        579.3571428571429,
         163.785
       ],
       [
-        562,
-        162.92
+        581.5238095238095,
+        162.92000000000002
       ],
       [
-        563.75,
-        161.875
+        583.6904761904761,
+        161.87500000000003
       ],
       [
-        565.5,
-        160.68
+        585.8571428571429,
+        160.67999999999998
       ],
       [
-        567.25,
+        588.0238095238095,
         159.365
       ],
       [
-        569,
-        157.96
+        590.1904761904761,
+        157.96000000000004
       ],
       [
-        570.75,
-        156.495
+        592.3571428571429,
+        156.49499999999998
       ],
       [
-        572.5,
+        594.5238095238095,
         155
       ],
       [
-        574.25,
-        153.505
+        596.6904761904761,
+        153.50500000000002
       ],
       [
-        576,
-        152.04
+        598.8571428571429,
+        152.03999999999996
       ],
       [
-        577.75,
+        601.0238095238095,
         150.635
       ],
       [
-        579.5,
-        149.32
+        603.1904761904761,
+        149.32000000000002
       ],
       [
-        581.25,
-        148.125
+        605.3571428571429,
+        148.12499999999997
       ],
       [
-        583,
+        607.5238095238095,
         147.07999999999998
       ],
       [
-        584.75,
+        609.6904761904761,
         146.215
       ],
       [
-        586.5,
+        611.8571428571428,
         145.56
       ],
       [
-        588.25,
-        145.145
+        614.0238095238095,
+        145.14499999999998
       ],
       [
-        590,
+        616.1904761904761,
         145
       ],
       [
-        591.6,
+        618.1714285714286,
         144.9275
       ],
       [
-        593.2,
+        620.1523809523809,
         144.72
       ],
       [
-        594.8,
-        144.3925
+        622.1333333333333,
+        144.39249999999998
       ],
       [
-        596.4,
+        624.1142857142856,
         143.96
       ],
       [
-        598,
+        626.0952380952381,
         143.4375
       ],
       [
-        599.6,
-        142.84
+        628.0761904761905,
+        142.83999999999997
       ],
       [
-        601.2,
-        142.18249999999998
+        630.0571428571428,
+        142.1825
       ],
       [
-        602.8,
-        141.48000000000002
+        632.0380952380953,
+        141.48
       ],
       [
-        604.4,
-        140.7475
-      ],
-      [
-        606,
-        140
-      ],
-      [
-        607.6,
-        139.2525
-      ],
-      [
-        609.2,
-        138.51999999999998
-      ],
-      [
-        610.8,
-        137.81750000000002
-      ],
-      [
-        612.4,
-        137.16
-      ],
-      [
-        614,
-        136.5625
-      ],
-      [
-        615.6,
-        136.04
-      ],
-      [
-        617.2,
-        135.6075
-      ],
-      [
-        618.8,
-        135.28
-      ],
-      [
-        620.4,
-        135.0725
-      ],
-      [
-        622,
-        135
-      ],
-      [
-        623.4,
-        134.4925
-      ],
-      [
-        624.8,
-        133.04000000000005
-      ],
-      [
-        626.2,
-        130.74749999999992
-      ],
-      [
-        627.6,
-        127.71999999999994
-      ],
-      [
-        629,
-        124.0625
-      ],
-      [
-        630.4,
-        119.88000000000007
-      ],
-      [
-        631.8,
-        115.27750000000016
-      ],
-      [
-        633.2,
-        110.35999999999984
-      ],
-      [
-        634.6,
-        105.23249999999992
+        634.0190476190476,
+        140.74750000000003
       ],
       [
         636,
-        100
+        140
       ],
       [
-        637.4,
-        94.7675000000001
+        637.9809523809524,
+        139.25249999999997
       ],
       [
-        638.8,
-        89.64000000000016
+        639.9619047619047,
+        138.52
       ],
       [
-        640.2,
-        84.72249999999985
+        641.9428571428572,
+        137.8175
       ],
       [
-        641.6,
-        80.11999999999992
+        643.9238095238095,
+        137.16000000000003
       ],
       [
-        643,
-        75.9375
+        645.9047619047619,
+        136.5625
       ],
       [
-        644.4,
-        72.28000000000006
+        647.8857142857144,
+        136.04
       ],
       [
-        645.8,
+        649.8666666666667,
+        135.60750000000002
+      ],
+      [
+        651.8476190476191,
+        135.28
+      ],
+      [
+        653.8285714285714,
+        135.0725
+      ],
+      [
+        655.8095238095239,
+        135
+      ],
+      [
+        657.5428571428572,
+        134.49249999999998
+      ],
+      [
+        659.2761904761905,
+        133.03999999999996
+      ],
+      [
+        661.0095238095239,
+        130.74749999999992
+      ],
+      [
+        662.7428571428571,
+        127.72000000000008
+      ],
+      [
+        664.4761904761905,
+        124.06250000000007
+      ],
+      [
+        666.2095238095238,
+        119.88000000000002
+      ],
+      [
+        667.9428571428572,
+        115.27749999999999
+      ],
+      [
+        669.6761904761905,
+        110.35999999999993
+      ],
+      [
+        671.4095238095239,
+        105.23249999999987
+      ],
+      [
+        673.1428571428571,
+        100.00000000000017
+      ],
+      [
+        674.8761904761905,
+        94.76750000000013
+      ],
+      [
+        676.6095238095238,
+        89.64000000000007
+      ],
+      [
+        678.3428571428572,
+        84.72250000000003
+      ],
+      [
+        680.0761904761905,
+        80.11999999999998
+      ],
+      [
+        681.8095238095239,
+        75.93749999999993
+      ],
+      [
+        683.5428571428572,
+        72.27999999999992
+      ],
+      [
+        685.2761904761904,
         69.25250000000008
       ],
       [
-        647.2,
-        66.95999999999994
+        687.0095238095238,
+        66.96000000000004
       ],
       [
-        648.6,
-        65.50749999999998
+        688.7428571428571,
+        65.50750000000001
       ],
       [
-        650,
+        690.4761904761905,
         65
       ],
       [
-        651.25,
-        64.65925
+        692.027380952381,
+        64.65924999999997
       ],
       [
-        652.5,
-        63.684
+        693.5785714285714,
+        63.68400000000001
       ],
       [
-        653.75,
-        62.14475
+        695.129761904762,
+        62.14474999999995
       ],
       [
-        655,
-        60.112
+        696.6809523809524,
+        60.11200000000004
       ],
       [
-        656.25,
-        57.65625
+        698.2321428571429,
+        57.65624999999995
       ],
       [
-        657.5,
-        54.848
+        699.7833333333333,
+        54.84800000000007
       ],
       [
-        658.75,
-        51.75775
+        701.3345238095238,
+        51.757749999999966
       ],
       [
-        660,
-        48.455999999999996
+        702.8857142857142,
+        48.4560000000001
       ],
       [
-        661.25,
-        45.01325
+        704.4369047619048,
+        45.013249999999985
       ],
       [
-        662.5,
-        41.5
+        705.9880952380952,
+        41.50000000000013
       ],
       [
-        663.75,
-        37.98675
+        707.5392857142857,
+        37.986750000000015
       ],
       [
-        665,
-        34.544
+        709.0904761904762,
+        34.543999999999905
       ],
       [
-        666.25,
-        31.24225
+        710.6416666666667,
+        31.242250000000034
       ],
       [
-        667.5,
-        28.152
+        712.1928571428572,
+        28.151999999999937
       ],
       [
-        668.75,
-        25.34375
+        713.7440476190476,
+        25.34375000000005
       ],
       [
-        670,
-        22.88799999999999
+        715.2952380952381,
+        22.88799999999997
       ],
       [
-        671.25,
-        20.855250000000005
+        716.8464285714285,
+        20.85525000000004
       ],
       [
-        672.5,
-        19.316000000000003
+        718.3976190476191,
+        19.31599999999999
       ],
       [
-        673.75,
-        18.34075
+        719.9488095238095,
+        18.34075000000002
       ],
       [
-        675,
+        721.5,
         18
       ],
       [
-        675.75,
+        722.425,
         18
       ],
       [
-        676.5,
+        723.35,
         18
       ],
       [
-        677.25,
+        724.275,
         18
       ],
       [
-        678,
+        725.2,
         18
       ],
       [
-        678.75,
+        726.125,
         18
       ],
       [
-        679.5,
+        727.05,
         18
       ],
       [
-        680.25,
+        727.975,
         18
       ],
       [
-        681,
+        728.9,
         18
       ],
       [
-        681.75,
+        729.825,
         18
       ],
       [
-        682.5,
+        730.75,
         18
       ],
       [
-        683.25,
+        731.675,
         18
       ],
       [
-        684,
+        732.6,
         18
       ],
       [
-        684.75,
+        733.525,
         18
       ],
       [
-        685.5,
+        734.45,
         18
       ],
       [
-        686.25,
+        735.375,
         18
       ],
       [
-        687,
+        736.3,
         18
       ],
       [
-        687.75,
+        737.225,
         18
       ],
       [
-        688.5,
+        738.15,
         18
       ],
       [
-        689.25,
+        739.075,
         18
       ],
       [
-        690,
+        740,
         18
       ]
     ],
     "stages": [
       {
         "number": 1,
-        "plate": 544,
-        "back": 549,
+        "plate": 559.2380952380952,
+        "back": 565.4285714285714,
         "radius": 143.8,
         "eye": 41,
         "bladeInner": 39,
         "bladeOuter": 162.8,
-        "heightIn": 22,
-        "heightOut": 9.5,
-        "hubStart": 514,
-        "hubShoulder": 522,
-        "shaftFront": 487,
-        "shaftRear": 549,
-        "diffuserStart": 552,
-        "diffuserEnd": 567,
+        "heightIn": 27.23809523809524,
+        "heightOut": 11.761904761904763,
+        "hubStart": 522.0952380952381,
+        "hubShoulder": 532,
+        "shaftFront": 488.6666666666667,
+        "shaftRear": 565.4285714285714,
+        "diffuserStart": 569.1428571428571,
+        "diffuserEnd": 587.7142857142858,
         "diffuserInner": 148.2
       },
       {
         "number": 2,
-        "plate": 611,
-        "back": 616,
+        "plate": 642.1904761904761,
+        "back": 648.3809523809524,
         "radius": 114.8,
         "eye": 35.6,
         "bladeInner": 33.5,
         "bladeOuter": 134.8,
-        "heightIn": 27,
-        "heightOut": 11,
-        "hubStart": 576,
-        "hubShoulder": 584,
-        "shaftFront": 611,
-        "shaftRear": 638,
-        "diffuserStart": 619,
-        "diffuserEnd": 629,
+        "heightIn": 33.42857142857143,
+        "heightOut": 13.61904761904762,
+        "hubStart": 598.8571428571429,
+        "hubShoulder": 608.7619047619048,
+        "shaftFront": 642.1904761904761,
+        "shaftRear": 675.6190476190476,
+        "diffuserStart": 652.0952380952381,
+        "diffuserEnd": 664.4761904761905,
         "diffuserInner": 119.2
       }
     ],
@@ -1858,15 +1198,15 @@
     "restoredBackplates": [
       {
         "stage": 1,
-        "front": 544,
-        "rear": 549,
+        "front": 559.2380952380952,
+        "rear": 565.4285714285714,
         "radius": 143.8,
         "segments": 512
       },
       {
         "stage": 2,
-        "front": 611,
-        "rear": 616,
+        "front": 642.1904761904761,
+        "rear": 648.3809523809524,
         "radius": 114.8,
         "segments": 512
       }
@@ -1875,2841 +1215,928 @@
     "returnDiaphragmSupportCount": 0,
     "inletGuideVaneCount": 0
   },
-  "shellGeometry": {
-    "innerCurve": "monotone cubic Hermite; level stator support, early expansion, third-stage front-rim endface contact",
-    "outerCurve": "preserved fan inlet; cubic Hermite contraction, constant waist, cubic Hermite tail contraction",
-    "outerWaist": {
-      "front": 850,
-      "rear": 1762,
-      "radius": 410
-    },
-    "innerConstantRadius": {
-      "front": 210,
-      "rear": 285,
-      "radius": 248
-    },
-    "innerWall": 5,
-    "stackClearances": [
-      {
-        "stage": 1,
-        "enclosed": true,
-        "minimumRadialClearance": 83.22284866557092,
-        "x": 690,
-        "rearRadialClearance": 102.71602298408445
-      },
-      {
-        "stage": 2,
-        "enclosed": true,
-        "minimumRadialClearance": 50.418089207169146,
-        "x": 992,
-        "rearRadialClearance": 57.4093865619887
-      },
-      {
-        "stage": 3,
-        "enclosed": false,
-        "frontRimContact": true,
-        "casingAfterFront": false
-      }
-    ],
-    "seamStations": [
-      550,
-      1110,
-      1750
-    ],
-    "innerTerminal": {
-      "x": 1387,
-      "outerRadius": 350,
-      "wall": 2,
-      "coolingRadialClearance": 0.9180764537708228,
-      "contact": "stage 3 outer frame endface only",
-      "casingAroundStage3": false,
-      "aftCasing": false
-    },
-    "wiringFeedthrough": {
-      "x": 1345,
-      "angle": 330,
-      "boreRadius": 4.35
-    },
-    "fanSweptClearance": {
-      "front": 50,
-      "rear": 210,
-      "radius": 498,
-      "minimumRadialClearance": 1.8810135399545516,
-      "x": 210,
-      "intersectionVolume": 0
-    },
-    "interShellClearance": {
-      "minimumRadialClearance": 53.90385894028327,
-      "x": 1387
-    },
-    "outerAccessCovers": 3,
-    "outerFasteners": 38,
-    "innerFasteners": 8,
-    "detailRelief": 0.025,
-    "detailsWithinOriginalEnvelope": true
-  },
-  "waterManagement": {
-    "dimensionStatus": "schematic assembly detail; no separation efficiency claim",
-    "separatorCount": 2,
-    "independentDrainCount": 2,
-    "drainInnerDiameter": 4,
-    "drainOuterDiameter": 7,
-    "tailDrainPositions": [
+  "shells": {
+    "profile": [
       [
-        1990,
-        -120,
-        -130
+        0,
+        506
       ],
       [
-        1990,
-        -120,
-        130
+        2064,
+        506
+      ],
+      [
+        2068.1666666666665,
+        505.96173683449075
+      ],
+      [
+        2072.3333333333335,
+        505.84910300925924
+      ],
+      [
+        2076.5,
+        505.66533203125
+      ],
+      [
+        2080.6666666666665,
+        505.4136574074074
+      ],
+      [
+        2084.8333333333335,
+        505.0973126446759
+      ],
+      [
+        2089,
+        504.71953125
+      ],
+      [
+        2093.1666666666665,
+        504.2835467303241
+      ],
+      [
+        2097.3333333333335,
+        503.7925925925926
+      ],
+      [
+        2101.5,
+        503.24990234375
+      ],
+      [
+        2105.6666666666665,
+        502.65870949074076
+      ],
+      [
+        2109.8333333333335,
+        502.0222475405093
+      ],
+      [
+        2114,
+        501.34375
+      ],
+      [
+        2118.1666666666665,
+        500.6264503761574
+      ],
+      [
+        2122.3333333333335,
+        499.87358217592595
+      ],
+      [
+        2126.5,
+        499.08837890625
+      ],
+      [
+        2130.6666666666665,
+        498.27407407407406
+      ],
+      [
+        2134.8333333333335,
+        497.4339011863426
+      ],
+      [
+        2139,
+        496.57109375
+      ],
+      [
+        2143.1666666666665,
+        495.6888852719907
+      ],
+      [
+        2147.3333333333335,
+        494.79050925925924
+      ],
+      [
+        2151.5,
+        493.87919921875
+      ],
+      [
+        2155.6666666666665,
+        492.9581886574074
+      ],
+      [
+        2159.8333333333335,
+        492.0307110821759
+      ],
+      [
+        2164,
+        491.1
+      ],
+      [
+        2168.1666666666665,
+        490.1692889178241
+      ],
+      [
+        2172.3333333333335,
+        489.2418113425926
+      ],
+      [
+        2176.5,
+        488.32080078125
+      ],
+      [
+        2180.6666666666665,
+        487.40949074074075
+      ],
+      [
+        2184.8333333333335,
+        486.51111472800926
+      ],
+      [
+        2189,
+        485.62890625
+      ],
+      [
+        2193.1666666666665,
+        484.7660988136574
+      ],
+      [
+        2197.3333333333335,
+        483.9259259259259
+      ],
+      [
+        2201.5,
+        483.11162109375
+      ],
+      [
+        2205.6666666666665,
+        482.32641782407404
+      ],
+      [
+        2209.8333333333335,
+        481.5735496238426
+      ],
+      [
+        2214,
+        480.85625
+      ],
+      [
+        2218.1666666666665,
+        480.17775245949076
+      ],
+      [
+        2222.3333333333335,
+        479.5412905092592
+      ],
+      [
+        2226.5,
+        478.95009765624997
+      ],
+      [
+        2230.6666666666665,
+        478.4074074074074
+      ],
+      [
+        2234.8333333333335,
+        477.9164532696759
+      ],
+      [
+        2239,
+        477.48046875
+      ],
+      [
+        2243.1666666666665,
+        477.10268735532406
+      ],
+      [
+        2247.3333333333335,
+        476.7863425925926
+      ],
+      [
+        2251.5,
+        476.53466796875
+      ],
+      [
+        2255.6666666666665,
+        476.35089699074075
+      ],
+      [
+        2259.8333333333335,
+        476.23826316550924
+      ],
+      [
+        2264,
+        476.2
       ]
     ],
-    "groups": [
-      "anodeSeparator",
-      "anodeDrain",
-      "cathodeSeparator",
-      "cathodeDrain"
+    "guides": [
+      {
+        "from": 1,
+        "to": 2,
+        "front": 1211,
+        "contractionEnd": 1231,
+        "rear": 1651,
+        "radialStart": 178.2,
+        "radialEnd": 72.2,
+        "wall": 1.2,
+        "axialGap": 20,
+        "linerToCellsClearance": 0.7999999999999972
+      },
+      {
+        "from": 2,
+        "to": 3,
+        "front": 1651,
+        "contractionEnd": 1671,
+        "rear": 2064,
+        "radialStart": 198.2,
+        "radialEnd": 94.2,
+        "wall": 1.2,
+        "axialGap": 20,
+        "linerToCellsClearance": 0.7999999999999972
+      }
     ],
-    "baffleCountPerSeparator": 2,
-    "wiringIncluded": false
-  },
-  "wiring": {
-    "parts": 3,
-    "bundles": 1,
-    "shortBranches": 3,
-    "frameConnectors": 3,
-    "clamps": 3,
-    "angleDegrees": 330,
-    "sheathDiameter": 4.8,
-    "branchDiameter": 3.6,
-    "interfaceBoxCentre": [
-      620,
-      181.86533479473206,
-      -105.0000000000001
+    "cavities": [
+      {
+        "front": 1231,
+        "rear": 1651,
+        "innerRadius": 71
+      },
+      {
+        "front": 1671,
+        "rear": 2064,
+        "innerRadius": 93
+      }
     ],
-    "routeStart": 650,
-    "routeEnd": 1674.5,
-    "casingFeedthrough": {
-      "x": 1345,
-      "angle": 330,
-      "innerRadius": 344.21740153298487,
-      "outerRadius": 350.9272331215147,
-      "sleeveOuterRadius": 4.15,
-      "sleeveBoreRadius": 2.9
+    "removedOverallInnerShell": true,
+    "statorSupport": {
+      "front": 232,
+      "rear": 288,
+      "inner": 243,
+      "radius": 248
     },
-    "exposedThirdStageRouteRadius": 364,
-    "representation": "insulated multicore harness only; no conductor interconnection or power-electronics design"
+    "straightBore": 1000,
+    "exitBore": 940.4,
+    "length": 2264,
+    "fanTipClearance": 2
   },
   "plumbing": {
     "units": "mm",
-    "independentModules": 11,
+    "stages": [
+      {
+        "stage": 1,
+        "airX": 890.72,
+        "wetX": 1003.76,
+        "feedX": 928.4,
+        "returnX": 805,
+        "rootRailRadius": 53.3,
+        "hydrogenEdgeRailRadius": 173,
+        "interfacesPerMedium": 1,
+        "feedFace": "outer cylindrical face",
+        "returnFace": "outer cylindrical face",
+        "collectorRepresentation": "local pressure channels seated in radial plate edges"
+      },
+      {
+        "stage": 2,
+        "airX": 1365.4,
+        "wetX": 1466.2,
+        "feedX": 1399,
+        "returnX": 1296,
+        "rootRailRadius": 76.3,
+        "hydrogenEdgeRailRadius": 193,
+        "interfacesPerMedium": 1,
+        "feedFace": "outer cylindrical face",
+        "returnFace": "outer cylindrical face",
+        "collectorRepresentation": "local pressure channels seated in radial plate edges"
+      },
+      {
+        "stage": 3,
+        "airX": 1796.76,
+        "wetX": 1891.08,
+        "feedX": 1828.2,
+        "returnX": 1736,
+        "rootRailRadius": 98.3,
+        "hydrogenEdgeRailRadius": 213,
+        "interfacesPerMedium": 1,
+        "feedFace": "outer cylindrical face",
+        "returnFace": "outer cylindrical face",
+        "collectorRepresentation": "local pressure channels seated in radial plate edges"
+      }
+    ],
     "portCounts": {
-      "air": 11,
-      "cathode": 11,
-      "hydrogen": 11,
-      "return": 11
+      "air": 3,
+      "cathode": 3,
+      "hydrogen": 3,
+      "return": 3
     },
-    "moduleManifoldsAreIsolatedArcs": true,
-    "manifoldRootOffset": 5,
-    "modules": [
-      {
-        "stage": 1,
-        "module": 1,
-        "rootRadius": 133,
-        "airX": 780.24,
-        "wetX": 847.9200000000001,
-        "internalFeedX": 956,
-        "internalReturnX": 706,
-        "manifoldAngles": [
-          34.22381220790932,
-          145.77618779209067
-        ],
-        "cathodeRepresentativeLength": 67.68000000000006,
-        "hydrogenInlet": {
-          "face": "outer cylindrical face",
-          "radius": 236.701,
-          "angle": 33.70571895150628,
-          "endPlateAngle": 30.705718951506277,
-          "x": 956,
-          "direction": "radially inward",
-          "rearSpokeTangentialWidth": 1.4,
-          "endPlateBoreTangentialWidth": 0.8,
-          "endPlateBoreAxialWidth": 4.4,
-          "maximumExternalRadius": 247.501
-        }
-      },
-      {
-        "stage": 1,
-        "module": 2,
-        "rootRadius": 133,
-        "airX": 780.24,
-        "wetX": 847.9200000000001,
-        "internalFeedX": 956,
-        "internalReturnX": 706,
-        "manifoldAngles": [
-          154.22381220790933,
-          265.7761877920907
-        ],
-        "cathodeRepresentativeLength": 67.68000000000006,
-        "hydrogenInlet": {
-          "face": "outer cylindrical face",
-          "radius": 236.701,
-          "angle": 153.70571895150627,
-          "endPlateAngle": 150.70571895150627,
-          "x": 956,
-          "direction": "radially inward",
-          "rearSpokeTangentialWidth": 1.4,
-          "endPlateBoreTangentialWidth": 0.8,
-          "endPlateBoreAxialWidth": 4.4,
-          "maximumExternalRadius": 247.501
-        }
-      },
-      {
-        "stage": 1,
-        "module": 3,
-        "rootRadius": 133,
-        "airX": 780.24,
-        "wetX": 847.9200000000001,
-        "internalFeedX": 956,
-        "internalReturnX": 706,
-        "manifoldAngles": [
-          274.2238122079093,
-          385.77618779209064
-        ],
-        "cathodeRepresentativeLength": 67.68000000000006,
-        "hydrogenInlet": {
-          "face": "outer cylindrical face",
-          "radius": 236.701,
-          "angle": 273.70571895150624,
-          "endPlateAngle": 270.70571895150624,
-          "x": 956,
-          "direction": "radially inward",
-          "rearSpokeTangentialWidth": 1.4,
-          "endPlateBoreTangentialWidth": 0.8,
-          "endPlateBoreAxialWidth": 4.4,
-          "maximumExternalRadius": 247.501
-        }
-      },
-      {
-        "stage": 2,
-        "module": 1,
-        "rootRadius": 215,
-        "airX": 1112,
-        "wetX": 1202,
-        "internalFeedX": 1351,
-        "internalReturnX": 1008,
-        "manifoldAngles": [
-          49.136418651541796,
-          130.8635813484582
-        ],
-        "cathodeRepresentativeLength": 90,
-        "hydrogenInlet": {
-          "face": "outer cylindrical face",
-          "radius": 289.501,
-          "angle": 48.43417232564509,
-          "endPlateAngle": 45.43417232564509,
-          "x": 1351,
-          "direction": "radially inward",
-          "rearSpokeTangentialWidth": 1.4,
-          "endPlateBoreTangentialWidth": 0.8,
-          "endPlateBoreAxialWidth": 4.4,
-          "maximumExternalRadius": 300.301
-        }
-      },
-      {
-        "stage": 2,
-        "module": 2,
-        "rootRadius": 215,
-        "airX": 1112,
-        "wetX": 1202,
-        "internalFeedX": 1351,
-        "internalReturnX": 1008,
-        "manifoldAngles": [
-          139.1364186515418,
-          220.8635813484582
-        ],
-        "cathodeRepresentativeLength": 90,
-        "hydrogenInlet": {
-          "face": "outer cylindrical face",
-          "radius": 289.501,
-          "angle": 138.43417232564508,
-          "endPlateAngle": 135.43417232564508,
-          "x": 1351,
-          "direction": "radially inward",
-          "rearSpokeTangentialWidth": 1.4,
-          "endPlateBoreTangentialWidth": 0.8,
-          "endPlateBoreAxialWidth": 4.4,
-          "maximumExternalRadius": 300.301
-        }
-      },
-      {
-        "stage": 2,
-        "module": 3,
-        "rootRadius": 215,
-        "airX": 1112,
-        "wetX": 1202,
-        "internalFeedX": 1351,
-        "internalReturnX": 1008,
-        "manifoldAngles": [
-          229.1364186515418,
-          310.86358134845824
-        ],
-        "cathodeRepresentativeLength": 90,
-        "hydrogenInlet": {
-          "face": "outer cylindrical face",
-          "radius": 289.501,
-          "angle": 228.43417232564508,
-          "endPlateAngle": 225.43417232564508,
-          "x": 1351,
-          "direction": "radially inward",
-          "rearSpokeTangentialWidth": 1.4,
-          "endPlateBoreTangentialWidth": 0.8,
-          "endPlateBoreAxialWidth": 4.4,
-          "maximumExternalRadius": 300.301
-        }
-      },
-      {
-        "stage": 2,
-        "module": 4,
-        "rootRadius": 215,
-        "airX": 1112,
-        "wetX": 1202,
-        "internalFeedX": 1351,
-        "internalReturnX": 1008,
-        "manifoldAngles": [
-          319.13641865154176,
-          400.86358134845824
-        ],
-        "cathodeRepresentativeLength": 90,
-        "hydrogenInlet": {
-          "face": "outer cylindrical face",
-          "radius": 289.501,
-          "angle": 318.4341723256451,
-          "endPlateAngle": 315.4341723256451,
-          "x": 1351,
-          "direction": "radially inward",
-          "rearSpokeTangentialWidth": 1.4,
-          "endPlateBoreTangentialWidth": 0.8,
-          "endPlateBoreAxialWidth": 4.4,
-          "maximumExternalRadius": 300.301
-        }
-      },
-      {
-        "stage": 3,
-        "module": 1,
-        "rootRadius": 239,
-        "airX": 1507,
-        "wetX": 1597,
-        "internalFeedX": 1746,
-        "internalReturnX": 1403,
-        "manifoldAngles": [
-          49.12242697246258,
-          130.8775730275374
-        ],
-        "cathodeRepresentativeLength": 90,
-        "hydrogenInlet": {
-          "face": "outer cylindrical face",
-          "radius": 350,
-          "angle": 48.4146083088933,
-          "endPlateAngle": 45.4146083088933,
-          "x": 1746,
-          "direction": "radially inward",
-          "rearSpokeTangentialWidth": 1.4,
-          "endPlateBoreTangentialWidth": 0.8,
-          "endPlateBoreAxialWidth": 4.4,
-          "maximumExternalRadius": 360.8
-        }
-      },
-      {
-        "stage": 3,
-        "module": 2,
-        "rootRadius": 239,
-        "airX": 1507,
-        "wetX": 1597,
-        "internalFeedX": 1746,
-        "internalReturnX": 1403,
-        "manifoldAngles": [
-          139.12242697246256,
-          220.87757302753744
-        ],
-        "cathodeRepresentativeLength": 90,
-        "hydrogenInlet": {
-          "face": "outer cylindrical face",
-          "radius": 350,
-          "angle": 138.4146083088933,
-          "endPlateAngle": 135.4146083088933,
-          "x": 1746,
-          "direction": "radially inward",
-          "rearSpokeTangentialWidth": 1.4,
-          "endPlateBoreTangentialWidth": 0.8,
-          "endPlateBoreAxialWidth": 4.4,
-          "maximumExternalRadius": 360.8
-        }
-      },
-      {
-        "stage": 3,
-        "module": 3,
-        "rootRadius": 239,
-        "airX": 1507,
-        "wetX": 1597,
-        "internalFeedX": 1746,
-        "internalReturnX": 1403,
-        "manifoldAngles": [
-          229.1224269724626,
-          310.8775730275374
-        ],
-        "cathodeRepresentativeLength": 90,
-        "hydrogenInlet": {
-          "face": "outer cylindrical face",
-          "radius": 350,
-          "angle": 228.4146083088933,
-          "endPlateAngle": 225.4146083088933,
-          "x": 1746,
-          "direction": "radially inward",
-          "rearSpokeTangentialWidth": 1.4,
-          "endPlateBoreTangentialWidth": 0.8,
-          "endPlateBoreAxialWidth": 4.4,
-          "maximumExternalRadius": 360.8
-        }
-      },
-      {
-        "stage": 3,
-        "module": 4,
-        "rootRadius": 239,
-        "airX": 1507,
-        "wetX": 1597,
-        "internalFeedX": 1746,
-        "internalReturnX": 1403,
-        "manifoldAngles": [
-          319.1224269724626,
-          400.8775730275374
-        ],
-        "cathodeRepresentativeLength": 90,
-        "hydrogenInlet": {
-          "face": "outer cylindrical face",
-          "radius": 350,
-          "angle": 318.4146083088933,
-          "endPlateAngle": 315.4146083088933,
-          "x": 1746,
-          "direction": "radially inward",
-          "rearSpokeTangentialWidth": 1.4,
-          "endPlateBoreTangentialWidth": 0.8,
-          "endPlateBoreAxialWidth": 4.4,
-          "maximumExternalRadius": 360.8
-        }
-      }
-    ],
-    "hydrogenInletFace": "outer cylindrical face, radial inward",
-    "hydrogenReturnFace": "front face unchanged",
-    "hydrogenEndPlatePassages": 11,
-    "activeCoolingFacesCrossedByHydrogenSpokes": false,
-    "hydrogenSeamChecks": [
-      {
-        "stage": 1,
-        "module": 1,
-        "feedBoreIntersectionVolume": 0
-      },
-      {
-        "stage": 1,
-        "module": 2,
-        "feedBoreIntersectionVolume": 0
-      },
-      {
-        "stage": 1,
-        "module": 3,
-        "feedBoreIntersectionVolume": 0
-      },
-      {
-        "stage": 2,
-        "module": 1,
-        "feedBoreIntersectionVolume": 0
-      },
-      {
-        "stage": 2,
-        "module": 2,
-        "feedBoreIntersectionVolume": 0
-      },
-      {
-        "stage": 2,
-        "module": 3,
-        "feedBoreIntersectionVolume": 0
-      },
-      {
-        "stage": 2,
-        "module": 4,
-        "feedBoreIntersectionVolume": 0
-      },
-      {
-        "stage": 3,
-        "module": 1,
-        "feedBoreIntersectionVolume": 0
-      },
-      {
-        "stage": 3,
-        "module": 2,
-        "feedBoreIntersectionVolume": 0
-      },
-      {
-        "stage": 3,
-        "module": 3,
-        "feedBoreIntersectionVolume": 0
-      },
-      {
-        "stage": 3,
-        "module": 4,
-        "feedBoreIntersectionVolume": 0
-      }
-    ],
-    "internalChannelStatus": "representative module connectivity; axial cooling gaps remain open",
-    "feedHeader": {
-      "radius": 70,
-      "angle": 45
+    "independentModules": 3,
+    "pressureCircuitsSeparate": true,
+    "centralAir": {
+      "outerRadius": 24,
+      "innerRadius": 18,
+      "end": 2180
     },
-    "returnHeader": {
-      "radius": 70,
-      "angle": 225
+    "outerHydrogenHeaders": {
+      "radius": 350,
+      "feedAngle": 135,
+      "returnAngle": 225
     },
-    "wetHeader": {
-      "radius": 95,
-      "angle": 315
-    },
-    "wetSeparatorRouteRadius": 125
-  },
-  "errors": [],
-  "exportedCellGeometry": {
-    "modelBytes": 78270040,
-    "modules": [
-      {
-        "id": "stack-1-1",
-        "stage": 1,
-        "module": 1,
-        "physicalCells": 279,
-        "nominalInnerCoolingGap": 0.46,
-        "probeDiameter": 0.36800000000000005,
-        "axialCoolingProbes": 280
-      },
-      {
-        "id": "stack-1-2",
-        "stage": 1,
-        "module": 2,
-        "physicalCells": 279,
-        "nominalInnerCoolingGap": 0.46,
-        "probeDiameter": 0.36800000000000005,
-        "axialCoolingProbes": 280
-      },
-      {
-        "id": "stack-1-3",
-        "stage": 1,
-        "module": 3,
-        "physicalCells": 279,
-        "nominalInnerCoolingGap": 0.46,
-        "probeDiameter": 0.36800000000000005,
-        "axialCoolingProbes": 280
-      },
-      {
-        "id": "stack-2-1",
-        "stage": 2,
-        "module": 1,
-        "physicalCells": 372,
-        "nominalInnerCoolingGap": 0.36,
-        "probeDiameter": 0.288,
-        "axialCoolingProbes": 373
-      },
-      {
-        "id": "stack-2-2",
-        "stage": 2,
-        "module": 2,
-        "physicalCells": 372,
-        "nominalInnerCoolingGap": 0.36,
-        "probeDiameter": 0.288,
-        "axialCoolingProbes": 373
-      },
-      {
-        "id": "stack-2-3",
-        "stage": 2,
-        "module": 3,
-        "physicalCells": 372,
-        "nominalInnerCoolingGap": 0.36,
-        "probeDiameter": 0.288,
-        "axialCoolingProbes": 373
-      },
-      {
-        "id": "stack-2-4",
-        "stage": 2,
-        "module": 4,
-        "physicalCells": 372,
-        "nominalInnerCoolingGap": 0.36,
-        "probeDiameter": 0.288,
-        "axialCoolingProbes": 373
-      },
-      {
-        "id": "stack-3-1",
-        "stage": 3,
-        "module": 1,
-        "physicalCells": 372,
-        "nominalInnerCoolingGap": 0.46,
-        "probeDiameter": 0.36800000000000005,
-        "axialCoolingProbes": 373
-      },
-      {
-        "id": "stack-3-2",
-        "stage": 3,
-        "module": 2,
-        "physicalCells": 372,
-        "nominalInnerCoolingGap": 0.46,
-        "probeDiameter": 0.36800000000000005,
-        "axialCoolingProbes": 373
-      },
-      {
-        "id": "stack-3-3",
-        "stage": 3,
-        "module": 3,
-        "physicalCells": 372,
-        "nominalInnerCoolingGap": 0.46,
-        "probeDiameter": 0.36800000000000005,
-        "axialCoolingProbes": 373
-      },
-      {
-        "id": "stack-3-4",
-        "stage": 3,
-        "module": 4,
-        "physicalCells": 372,
-        "nominalInnerCoolingGap": 0.46,
-        "probeDiameter": 0.36800000000000005,
-        "axialCoolingProbes": 373
-      }
-    ],
-    "physicalCells": 3813,
-    "minimumMeasuredThickness": 0.5499903655552316,
-    "maximumMeasuredThickness": 0.5500235144984345,
-    "minimumMeasuredInnerCoolingGap": 0.3601883360912436,
-    "maximumMeasuredInnerCoolingGap": 0.4602124767568812,
-    "axialCoolingProbes": 3824,
-    "maximumSolidObstruction": 0,
-    "obstructionChecks": 199,
-    "portCounts": {
-      "air": 11,
-      "hydrogen": 11,
-      "return": 11,
-      "cathode": 11
-    },
-    "assemblyEnvelopes": [
-      {
-        "stage": 1,
-        "measuredOuterDiameter": 473.4020180501664,
-        "specifiedOuterDiameter": 473.402
-      },
-      {
-        "stage": 2,
-        "measuredOuterDiameter": 579.0020208597766,
-        "specifiedOuterDiameter": 579.002
-      },
-      {
-        "stage": 3,
-        "measuredOuterDiameter": 700.0000281521953,
-        "specifiedOuterDiameter": 700
-      }
-    ],
-    "innerCasingRear": 1387,
-    "passed": true
-  },
-  "previousAssemblyChecks": {
-    "sourceModelSha256": "bc5178d7f330f24fc31ef76982298b5251a588c11361877ccae4390513d0f582",
-    "sourceReportSha256": "74f2fa4d69ca833a7c45b9cb4f78c5d2035d87231de0a0a4e96c9d11f5096d1e",
-    "inheritedAt": "2026-10-25T16:31:23.782Z",
-    "fullAssemblyRecomputed": false,
-    "solidChecks": 1071,
-    "broadPhasePairs": 4753,
-    "collisions": [],
-    "fluidChecks": {
-      "gasSeparation": {
-        "intersectionVolume": 0
-      },
-      "completeCathode": {
-        "connectedComponents": 1,
-        "obstructions": []
-      },
-      "completeAnode": {
-        "connectedComponents": 1,
-        "obstructions": []
-      },
-      "1-1-air-port": {
-        "connectedVolume": 86.37524214806534
-      },
-      "1-1-air-channel": {
-        "connectedVolume": 43.26076053322393
-      },
-      "1-1-cathode-midpoint": {
-        "connectedVolume": 5.39385722310117
-      },
-      "1-1-wet-channel": {
-        "connectedVolume": 43.26043923531832
-      },
-      "1-1-wet-port": {
-        "connectedVolume": 57.35693558935399
-      },
-      "1-1-feed-port": {
-        "connectedVolume": 2.0559866255468773
-      },
-      "1-1-feed-channel": {
-        "connectedVolume": 22.46257020104281
-      },
-      "1-1-anode-midpoint": {
-        "connectedVolume": 4.532338361078069
-      },
-      "1-1-return-channel": {
-        "connectedVolume": 22.608109344987113
-      },
-      "1-1-return-port": {
-        "connectedVolume": 9.244941907094569
-      },
-      "1-2-air-port": {
-        "connectedVolume": 86.37544350570727
-      },
-      "1-2-air-channel": {
-        "connectedVolume": 43.260803493776436
-      },
-      "1-2-cathode-midpoint": {
-        "connectedVolume": 5.393857223100999
-      },
-      "1-2-wet-channel": {
-        "connectedVolume": 43.260482039335564
-      },
-      "1-2-wet-port": {
-        "connectedVolume": 57.35690801458012
-      },
-      "1-2-feed-port": {
-        "connectedVolume": 2.055980152948323
-      },
-      "1-2-feed-channel": {
-        "connectedVolume": 22.462568058799697
-      },
-      "1-2-anode-midpoint": {
-        "connectedVolume": 4.532338361078062
-      },
-      "1-2-return-channel": {
-        "connectedVolume": 22.608108601333775
-      },
-      "1-2-return-port": {
-        "connectedVolume": 9.245063746423865
-      },
-      "1-3-air-port": {
-        "connectedVolume": 86.37544350576724
-      },
-      "1-3-air-channel": {
-        "connectedVolume": 43.2608034031464
-      },
-      "1-3-cathode-midpoint": {
-        "connectedVolume": 5.393857223100998
-      },
-      "1-3-wet-channel": {
-        "connectedVolume": 43.26048231932198
-      },
-      "1-3-wet-port": {
-        "connectedVolume": 57.35693217950571
-      },
-      "1-3-feed-port": {
-        "connectedVolume": 2.0559776858975383
-      },
-      "1-3-feed-channel": {
-        "connectedVolume": 22.462579623902233
-      },
-      "1-3-anode-midpoint": {
-        "connectedVolume": 4.532338361078033
-      },
-      "1-3-return-channel": {
-        "connectedVolume": 22.608096914976972
-      },
-      "1-3-return-port": {
-        "connectedVolume": 9.245062893602109
-      },
-      "2-1-air-port": {
-        "connectedVolume": 86.40719660363818
-      },
-      "2-1-air-channel": {
-        "connectedVolume": 43.27362656943572
-      },
-      "2-1-cathode-midpoint": {
-        "connectedVolume": 5.393857223105072
-      },
-      "2-1-wet-channel": {
-        "connectedVolume": 43.27362656500862
-      },
-      "2-1-wet-port": {
-        "connectedVolume": 57.64394565473319
-      },
-      "2-1-feed-port": {
-        "connectedVolume": 2.0559991073339283
-      },
-      "2-1-feed-channel": {
-        "connectedVolume": 22.762724698523538
-      },
-      "2-1-anode-midpoint": {
-        "connectedVolume": 4.532338361081438
-      },
-      "2-1-return-channel": {
-        "connectedVolume": 22.52612992068866
-      },
-      "2-1-return-port": {
-        "connectedVolume": 9.247767050381952
-      },
-      "2-2-air-port": {
-        "connectedVolume": 86.40719660363817
-      },
-      "2-2-air-channel": {
-        "connectedVolume": 43.27362656943584
-      },
-      "2-2-cathode-midpoint": {
-        "connectedVolume": 5.3938572231055515
-      },
-      "2-2-wet-channel": {
-        "connectedVolume": 43.27362659686361
-      },
-      "2-2-wet-port": {
-        "connectedVolume": 57.64394565473157
-      },
-      "2-2-feed-port": {
-        "connectedVolume": 2.0559991073339483
-      },
-      "2-2-feed-channel": {
-        "connectedVolume": 22.762724698522067
-      },
-      "2-2-anode-midpoint": {
-        "connectedVolume": 4.532338361081267
-      },
-      "2-2-return-channel": {
-        "connectedVolume": 22.52612992068851
-      },
-      "2-2-return-port": {
-        "connectedVolume": 9.247767050382025
-      },
-      "2-3-air-port": {
-        "connectedVolume": 86.40719736589607
-      },
-      "2-3-air-channel": {
-        "connectedVolume": 43.27362656943581
-      },
-      "2-3-cathode-midpoint": {
-        "connectedVolume": 5.393857223105048
-      },
-      "2-3-wet-channel": {
-        "connectedVolume": 43.273626492941595
-      },
-      "2-3-wet-port": {
-        "connectedVolume": 57.64394565473306
-      },
-      "2-3-feed-port": {
-        "connectedVolume": 2.0559991073339265
-      },
-      "2-3-feed-channel": {
-        "connectedVolume": 22.76272469852232
-      },
-      "2-3-anode-midpoint": {
-        "connectedVolume": 4.532338361081423
-      },
-      "2-3-return-channel": {
-        "connectedVolume": 22.52612992068896
-      },
-      "2-3-return-port": {
-        "connectedVolume": 9.2477670503818
-      },
-      "2-4-air-port": {
-        "connectedVolume": 86.40719736589587
-      },
-      "2-4-air-channel": {
-        "connectedVolume": 43.273626569435855
-      },
-      "2-4-cathode-midpoint": {
-        "connectedVolume": 5.393857223105524
-      },
-      "2-4-wet-channel": {
-        "connectedVolume": 43.27362649294127
-      },
-      "2-4-wet-port": {
-        "connectedVolume": 57.64394565473225
-      },
-      "2-4-feed-port": {
-        "connectedVolume": 2.055999107333954
-      },
-      "2-4-feed-channel": {
-        "connectedVolume": 22.762724698522366
-      },
-      "2-4-anode-midpoint": {
-        "connectedVolume": 4.532338361081325
-      },
-      "2-4-return-channel": {
-        "connectedVolume": 22.526129920688284
-      },
-      "2-4-return-port": {
-        "connectedVolume": 9.24776705038194
-      },
-      "3-1-air-port": {
-        "connectedVolume": 86.4119332301022
-      },
-      "3-1-air-channel": {
-        "connectedVolume": 43.27361689962995
-      },
-      "3-1-cathode-midpoint": {
-        "connectedVolume": 5.393857223105091
-      },
-      "3-1-wet-channel": {
-        "connectedVolume": 43.2736168118478
-      },
-      "3-1-wet-port": {
-        "connectedVolume": 57.70095521242618
-      },
-      "3-1-feed-port": {
-        "connectedVolume": 2.055950777314944
-      },
-      "3-1-feed-channel": {
-        "connectedVolume": 22.83625483093044
-      },
-      "3-1-anode-midpoint": {
-        "connectedVolume": 4.532338361081688
-      },
-      "3-1-return-channel": {
-        "connectedVolume": 22.569620527404602
-      },
-      "3-1-return-port": {
-        "connectedVolume": 9.24771168241546
-      },
-      "3-2-air-port": {
-        "connectedVolume": 86.41193224361858
-      },
-      "3-2-air-channel": {
-        "connectedVolume": 43.27361689962932
-      },
-      "3-2-cathode-midpoint": {
-        "connectedVolume": 5.393857223105176
-      },
-      "3-2-wet-channel": {
-        "connectedVolume": 43.273616894758305
-      },
-      "3-2-wet-port": {
-        "connectedVolume": 57.7009552124256
-      },
-      "3-2-feed-port": {
-        "connectedVolume": 2.055950777314852
-      },
-      "3-2-feed-channel": {
-        "connectedVolume": 22.836254830929366
-      },
-      "3-2-anode-midpoint": {
-        "connectedVolume": 4.532338361081301
-      },
-      "3-2-return-channel": {
-        "connectedVolume": 22.569620527404496
-      },
-      "3-2-return-port": {
-        "connectedVolume": 9.247711682415819
-      },
-      "3-3-air-port": {
-        "connectedVolume": 86.41193224361861
-      },
-      "3-3-air-channel": {
-        "connectedVolume": 43.27361689962999
-      },
-      "3-3-cathode-midpoint": {
-        "connectedVolume": 5.393857223105323
-      },
-      "3-3-wet-channel": {
-        "connectedVolume": 43.27361689475816
-      },
-      "3-3-wet-port": {
-        "connectedVolume": 57.700955212426145
-      },
-      "3-3-feed-port": {
-        "connectedVolume": 2.055950777314951
-      },
-      "3-3-feed-channel": {
-        "connectedVolume": 22.83625483092968
-      },
-      "3-3-anode-midpoint": {
-        "connectedVolume": 4.532338361081671
-      },
-      "3-3-return-channel": {
-        "connectedVolume": 22.5696205274039
-      },
-      "3-3-return-port": {
-        "connectedVolume": 9.247711682415956
-      },
-      "3-4-air-port": {
-        "connectedVolume": 86.41193224361817
-      },
-      "3-4-air-channel": {
-        "connectedVolume": 43.273616899629324
-      },
-      "3-4-cathode-midpoint": {
-        "connectedVolume": 5.393857223105181
-      },
-      "3-4-wet-channel": {
-        "connectedVolume": 43.27361689475815
-      },
-      "3-4-wet-port": {
-        "connectedVolume": 57.700955212427836
-      },
-      "3-4-feed-port": {
-        "connectedVolume": 2.0559507773148447
-      },
-      "3-4-feed-channel": {
-        "connectedVolume": 22.836254830929484
-      },
-      "3-4-anode-midpoint": {
-        "connectedVolume": 4.532338361081165
-      },
-      "3-4-return-channel": {
-        "connectedVolume": 22.569620527404016
-      },
-      "3-4-return-port": {
-        "connectedVolume": 9.247711682415842
-      }
-    },
-    "errors": []
-  },
-  "verificationScope": "Targeted exported-machinery update; full prior assembly checks retained under previousAssemblyChecks",
-  "targetedUpdate": {
-    "status": "passed",
-    "updatedAt": "2026-10-25T16:31:23.782Z",
-    "source": "C:\\Users\\孟宇奥\\Desktop\\新构型\\fuelcell-propulsion-new-concept-github\\new-design\\model.glb",
-    "output": "C:\\Users\\孟宇奥\\Desktop\\新构型\\fuelcell-propulsion-new-concept-github\\new-design\\public\\model.glb",
-    "oldModelSha256": "bc5178d7f330f24fc31ef76982298b5251a588c11361877ccae4390513d0f582",
-    "newModelSha256": "5f058aeffcd513090cc211e3a9733b7143f742abeee5dd4fffd347204e6cb4bd",
-    "oldReportSha256": "74f2fa4d69ca833a7c45b9cb4f78c5d2035d87231de0a0a4e96c9d11f5096d1e",
-    "oldModelBytes": 78270040,
-    "newModelBytes": 78268204,
-    "changedNodes": [
-      {
-        "id": "fan-spinner",
-        "oldGeometrySha256": "8540c66d4e7f0dc9682c4fda799be6441683b2e7d99e614e98ed7247b799bb92",
-        "newGeometrySha256": "54a94b28f86964d7acb24d91d27cf5f764d30e99693a79efa96f16061d0787d7",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "8c4f64d3fc250a49b006aa7ef74bd3cdee81d976af616d39a67814412c51a50b"
-      },
-      {
-        "id": "compressor-rotor-2",
-        "oldGeometrySha256": "cfb942382d27985b86dcb3b77462a246a29db77ae4e71ce9d512953ed7cd6c35",
-        "newGeometrySha256": "7763ac3476c5b2f0c304054df7e4873952ce4cd8a563b991ebde712ac12fc7ad",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "a7dc117d7619a57569bcb3674d8e8f000b62cda0103b2db13dc2bd6b9a55dd3d"
-      }
-    ],
-    "unchangedNodeCount": 96,
-    "unchangedNodeGeometryHashes": [
-      {
-        "id": "anode-separator",
-        "oldGeometrySha256": "7a75c3c01032d5ab99bd773ba7c6063add2f3d787985a5f78d8ec32e219b3460",
-        "newGeometrySha256": "7a75c3c01032d5ab99bd773ba7c6063add2f3d787985a5f78d8ec32e219b3460",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "d004b7062de6d0c7d0e1737897c9a1c4777b389a66a0acac1167581e2b7bfcec"
-      },
-      {
-        "id": "anode-separator-baffles",
-        "oldGeometrySha256": "496de51881ace9a789b130df4fefa8ab8d3ac01f9a265a873767dc06e88aee8f",
-        "newGeometrySha256": "496de51881ace9a789b130df4fefa8ab8d3ac01f9a265a873767dc06e88aee8f",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "e57bd21dd380215787a8dcf788992bb4b76b77e2b4fe0181b87b4bcef56b086d"
-      },
-      {
-        "id": "anode-drain-valve",
-        "oldGeometrySha256": "612ecd692f60a54d897e0bd970cc7c7f8a1e1a5b71bda415be61634095c4616d",
-        "newGeometrySha256": "612ecd692f60a54d897e0bd970cc7c7f8a1e1a5b71bda415be61634095c4616d",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "aec1346433aa1510c1f13ee6bb42058598ad0f4c06314284a2bc435de8b92ed8"
-      },
-      {
-        "id": "anode-drain-pipe",
-        "oldGeometrySha256": "5d53eed203b78d78db4bb0cc6a382f003f5b25792264b8448e8c2e1b2a38b989",
-        "newGeometrySha256": "5d53eed203b78d78db4bb0cc6a382f003f5b25792264b8448e8c2e1b2a38b989",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "3c66b4283c61d8466b11aa6586a5f8918c4b1fdc2dc9bfc25d4ee332a88e7657"
-      },
-      {
-        "id": "cathode-separator",
-        "oldGeometrySha256": "cf055e729614f83202ec58d21eea65252d715d210ffc49c4006d39cc83210938",
-        "newGeometrySha256": "cf055e729614f83202ec58d21eea65252d715d210ffc49c4006d39cc83210938",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "d004b7062de6d0c7d0e1737897c9a1c4777b389a66a0acac1167581e2b7bfcec"
-      },
-      {
-        "id": "cathode-separator-baffles",
-        "oldGeometrySha256": "4372f7b02c9bf288dc0c536abed010ed4953135fa395c9cbbd64faf8cad54ade",
-        "newGeometrySha256": "4372f7b02c9bf288dc0c536abed010ed4953135fa395c9cbbd64faf8cad54ade",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "e57bd21dd380215787a8dcf788992bb4b76b77e2b4fe0181b87b4bcef56b086d"
-      },
-      {
-        "id": "cathode-drain-valve",
-        "oldGeometrySha256": "f8dcde2ff2670cbdb1eeb48771b449d7517e69b7768cfe7a8e1163841d132f35",
-        "newGeometrySha256": "f8dcde2ff2670cbdb1eeb48771b449d7517e69b7768cfe7a8e1163841d132f35",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "aec1346433aa1510c1f13ee6bb42058598ad0f4c06314284a2bc435de8b92ed8"
-      },
-      {
-        "id": "cathode-drain-pipe",
-        "oldGeometrySha256": "c66b32e0c30c6baa2b7bce0b7666b1ab0e04950338cee288258d013bcc275dc2",
-        "newGeometrySha256": "c66b32e0c30c6baa2b7bce0b7666b1ab0e04950338cee288258d013bcc275dc2",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "3c66b4283c61d8466b11aa6586a5f8918c4b1fdc2dc9bfc25d4ee332a88e7657"
-      },
-      {
-        "id": "air-network",
-        "oldGeometrySha256": "804971e98e4d0e62bd48682811dff780c14ba1878b31158e1366988d134a8624",
-        "newGeometrySha256": "804971e98e4d0e62bd48682811dff780c14ba1878b31158e1366988d134a8624",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "766b828318489de98d4d474c2035f4d049cafc2347165343332b990af080f57c"
-      },
-      {
-        "id": "cathodeExhaust-network",
-        "oldGeometrySha256": "d6335d9318ea88c5332b15f78ce29f97ba5ee848873bcc679c2996436849fac0",
-        "newGeometrySha256": "d6335d9318ea88c5332b15f78ce29f97ba5ee848873bcc679c2996436849fac0",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "6977a71e4221674f089346e9a11badaf2729fe1af96bcf9ca088f93c599b12d2"
-      },
-      {
-        "id": "hydrogen-network",
-        "oldGeometrySha256": "d7b98bab772a70919d3529135f2c953178e389edf6b512125175b63a336dc540",
-        "newGeometrySha256": "d7b98bab772a70919d3529135f2c953178e389edf6b512125175b63a336dc540",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "10ca7dc31acbf2adaf2ee9f1e8c3d496b28d589978ba13d6864fb012ca59b619"
-      },
-      {
-        "id": "return-network",
-        "oldGeometrySha256": "714115787c078c6c18fe819320bd9ee326bad15fe308087e282b1bfef110ccce",
-        "newGeometrySha256": "714115787c078c6c18fe819320bd9ee326bad15fe308087e282b1bfef110ccce",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "1b6036b7f43031644b4d8e1a31e4a93b750806beccfa5f43ec19d6ee4f65a01a"
-      },
-      {
-        "id": "stack-1-1",
-        "oldGeometrySha256": "24853361ed55e67f33cb36c947f187d30c437a5d0cd7ce250ef1ce3168ad8a48",
-        "newGeometrySha256": "24853361ed55e67f33cb36c947f187d30c437a5d0cd7ce250ef1ce3168ad8a48",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "85e0c18d1d9581642a83cb9f0e7cf9cb06b8f70b5216a5ebac3bf21e782bfe60"
-      },
-      {
-        "id": "stack-frames-1-1",
-        "oldGeometrySha256": "1655a0a0acac146b4899df6f8abab74f03bc7fc73cb3340cf6d4ccfac5970a4f",
-        "newGeometrySha256": "1655a0a0acac146b4899df6f8abab74f03bc7fc73cb3340cf6d4ccfac5970a4f",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "26685d23f4fbe044f1bc25e57026e4e55af3587793fc3e654cfa065414c70271"
-      },
-      {
-        "id": "stack-fasteners-1-1",
-        "oldGeometrySha256": "4d6d4a9194f961cd40b4a6b10b07679f83960d931fa95e6f53dafea3a9ba780d",
-        "newGeometrySha256": "4d6d4a9194f961cd40b4a6b10b07679f83960d931fa95e6f53dafea3a9ba780d",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "9ff4136c4332c59290c936fc337121d10cec107fa6d125c7bb0aa8c6914937eb"
-      },
-      {
-        "id": "stack-washers-1-1",
-        "oldGeometrySha256": "f0efd7cb89f13fd750c0ef933c1e2a8db2137b55a37044e72d3f28d3bc1eaa4b",
-        "newGeometrySha256": "f0efd7cb89f13fd750c0ef933c1e2a8db2137b55a37044e72d3f28d3bc1eaa4b",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "6919f83d1f054e2b781b8f5769d6c07ae075346634452155c2e02f7d4de93425"
-      },
-      {
-        "id": "stack-seals-1-1",
-        "oldGeometrySha256": "3cdfa9c24dfe7c377db8b2aabaff253ed5330b0f7b94cf51995a4fed339f351d",
-        "newGeometrySha256": "3cdfa9c24dfe7c377db8b2aabaff253ed5330b0f7b94cf51995a4fed339f351d",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "a3cab3e14a5b39c259e268da3752734817384591d2ac7cd6d80f5dfd75a8fb4e"
-      },
-      {
-        "id": "stack-1-2",
-        "oldGeometrySha256": "358429bae442450dea18c2a899c87ee042bc8325ef9168aa2dd0fef7e611b670",
-        "newGeometrySha256": "358429bae442450dea18c2a899c87ee042bc8325ef9168aa2dd0fef7e611b670",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "85e0c18d1d9581642a83cb9f0e7cf9cb06b8f70b5216a5ebac3bf21e782bfe60"
-      },
-      {
-        "id": "stack-frames-1-2",
-        "oldGeometrySha256": "e0dbdffef906f27a1714616c3340c14cf5abbd9a808dea95699b3188656a1178",
-        "newGeometrySha256": "e0dbdffef906f27a1714616c3340c14cf5abbd9a808dea95699b3188656a1178",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "26685d23f4fbe044f1bc25e57026e4e55af3587793fc3e654cfa065414c70271"
-      },
-      {
-        "id": "stack-fasteners-1-2",
-        "oldGeometrySha256": "d53b511247b41a1a2444aa8a2e1fe1eb5dfb9704c4024c4c5a5d735384e583b1",
-        "newGeometrySha256": "d53b511247b41a1a2444aa8a2e1fe1eb5dfb9704c4024c4c5a5d735384e583b1",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "9ff4136c4332c59290c936fc337121d10cec107fa6d125c7bb0aa8c6914937eb"
-      },
-      {
-        "id": "stack-washers-1-2",
-        "oldGeometrySha256": "e5aaa83f4c135cbe03531878ed3158b91553b4ab8f6ddf7f9c9051703c3f6fa0",
-        "newGeometrySha256": "e5aaa83f4c135cbe03531878ed3158b91553b4ab8f6ddf7f9c9051703c3f6fa0",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "6919f83d1f054e2b781b8f5769d6c07ae075346634452155c2e02f7d4de93425"
-      },
-      {
-        "id": "stack-seals-1-2",
-        "oldGeometrySha256": "719ef768084564284813012c76dd19e625ca68c416d38e4930935a54dbd29941",
-        "newGeometrySha256": "719ef768084564284813012c76dd19e625ca68c416d38e4930935a54dbd29941",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "a3cab3e14a5b39c259e268da3752734817384591d2ac7cd6d80f5dfd75a8fb4e"
-      },
-      {
-        "id": "stack-1-3",
-        "oldGeometrySha256": "b3a873d966f4228c64451beeafb00d46f4be8388b5b76e663334204c9539e964",
-        "newGeometrySha256": "b3a873d966f4228c64451beeafb00d46f4be8388b5b76e663334204c9539e964",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "85e0c18d1d9581642a83cb9f0e7cf9cb06b8f70b5216a5ebac3bf21e782bfe60"
-      },
-      {
-        "id": "stack-frames-1-3",
-        "oldGeometrySha256": "18830af14e63cdec7ef92db00b0533e92d061f199e0e0ea33ae1c67c8a1c2aed",
-        "newGeometrySha256": "18830af14e63cdec7ef92db00b0533e92d061f199e0e0ea33ae1c67c8a1c2aed",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "26685d23f4fbe044f1bc25e57026e4e55af3587793fc3e654cfa065414c70271"
-      },
-      {
-        "id": "stack-fasteners-1-3",
-        "oldGeometrySha256": "279aded1b88ad3c3a87217f74a4ddd3beb6c3aadcd6f94dde9cdd5dd21f5a747",
-        "newGeometrySha256": "279aded1b88ad3c3a87217f74a4ddd3beb6c3aadcd6f94dde9cdd5dd21f5a747",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "9ff4136c4332c59290c936fc337121d10cec107fa6d125c7bb0aa8c6914937eb"
-      },
-      {
-        "id": "stack-washers-1-3",
-        "oldGeometrySha256": "448905c5669fe1ce2f2a2feb639a07b99de69c0676d04a6b4409dc23a595d556",
-        "newGeometrySha256": "448905c5669fe1ce2f2a2feb639a07b99de69c0676d04a6b4409dc23a595d556",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "6919f83d1f054e2b781b8f5769d6c07ae075346634452155c2e02f7d4de93425"
-      },
-      {
-        "id": "stack-seals-1-3",
-        "oldGeometrySha256": "0369fa157d3c8219358145a9a8b334a1cf75ae53800e946384efd98f2b3999ba",
-        "newGeometrySha256": "0369fa157d3c8219358145a9a8b334a1cf75ae53800e946384efd98f2b3999ba",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "a3cab3e14a5b39c259e268da3752734817384591d2ac7cd6d80f5dfd75a8fb4e"
-      },
-      {
-        "id": "stack-2-1",
-        "oldGeometrySha256": "01ebb3f0320c7b4250a66f4f75b9b39506fb24d1ff702472f1cff4bb7e334956",
-        "newGeometrySha256": "01ebb3f0320c7b4250a66f4f75b9b39506fb24d1ff702472f1cff4bb7e334956",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "85e0c18d1d9581642a83cb9f0e7cf9cb06b8f70b5216a5ebac3bf21e782bfe60"
-      },
-      {
-        "id": "stack-frames-2-1",
-        "oldGeometrySha256": "500277ce06cdbbf0a8e124b2530a6d0335fd36bc3fb00197497780916042688f",
-        "newGeometrySha256": "500277ce06cdbbf0a8e124b2530a6d0335fd36bc3fb00197497780916042688f",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "26685d23f4fbe044f1bc25e57026e4e55af3587793fc3e654cfa065414c70271"
-      },
-      {
-        "id": "stack-fasteners-2-1",
-        "oldGeometrySha256": "f32993447d065b5891e458849f644ea06880a13e8f5fd1919c2be34d9bb3f2e2",
-        "newGeometrySha256": "f32993447d065b5891e458849f644ea06880a13e8f5fd1919c2be34d9bb3f2e2",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "9ff4136c4332c59290c936fc337121d10cec107fa6d125c7bb0aa8c6914937eb"
-      },
-      {
-        "id": "stack-washers-2-1",
-        "oldGeometrySha256": "722e74593806292006d0590619392ec0e4341e72d551617663aad3b1e26a01c8",
-        "newGeometrySha256": "722e74593806292006d0590619392ec0e4341e72d551617663aad3b1e26a01c8",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "6919f83d1f054e2b781b8f5769d6c07ae075346634452155c2e02f7d4de93425"
-      },
-      {
-        "id": "stack-seals-2-1",
-        "oldGeometrySha256": "b8c67a82dbc7430dca3734d145ab3e4974da04cd73e187ed1737f87fd12ad4bc",
-        "newGeometrySha256": "b8c67a82dbc7430dca3734d145ab3e4974da04cd73e187ed1737f87fd12ad4bc",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "a3cab3e14a5b39c259e268da3752734817384591d2ac7cd6d80f5dfd75a8fb4e"
-      },
-      {
-        "id": "stack-2-2",
-        "oldGeometrySha256": "824603eeb887e33258be3f9637d866dea2f9a2ec3c184efccbb9a2f5fef9b17d",
-        "newGeometrySha256": "824603eeb887e33258be3f9637d866dea2f9a2ec3c184efccbb9a2f5fef9b17d",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "85e0c18d1d9581642a83cb9f0e7cf9cb06b8f70b5216a5ebac3bf21e782bfe60"
-      },
-      {
-        "id": "stack-frames-2-2",
-        "oldGeometrySha256": "f3ae1522aea59678f16433f02efab5dd0195af1caef80dd7d0edd473b6d0ddd7",
-        "newGeometrySha256": "f3ae1522aea59678f16433f02efab5dd0195af1caef80dd7d0edd473b6d0ddd7",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "26685d23f4fbe044f1bc25e57026e4e55af3587793fc3e654cfa065414c70271"
-      },
-      {
-        "id": "stack-fasteners-2-2",
-        "oldGeometrySha256": "814a14a52d1b7d06073bb4f643d130d97da775598dba4279c2ff9c024798d749",
-        "newGeometrySha256": "814a14a52d1b7d06073bb4f643d130d97da775598dba4279c2ff9c024798d749",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "9ff4136c4332c59290c936fc337121d10cec107fa6d125c7bb0aa8c6914937eb"
-      },
-      {
-        "id": "stack-washers-2-2",
-        "oldGeometrySha256": "b81acc2c08e8e0de78a945bfddf91ce5b23717eeace9b8a73e4a85dbbb962a1e",
-        "newGeometrySha256": "b81acc2c08e8e0de78a945bfddf91ce5b23717eeace9b8a73e4a85dbbb962a1e",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "6919f83d1f054e2b781b8f5769d6c07ae075346634452155c2e02f7d4de93425"
-      },
-      {
-        "id": "stack-seals-2-2",
-        "oldGeometrySha256": "4095c496e2f9a56c92943858868a08bcd2ffeda6b9458d816c96ad71c2a5daae",
-        "newGeometrySha256": "4095c496e2f9a56c92943858868a08bcd2ffeda6b9458d816c96ad71c2a5daae",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "a3cab3e14a5b39c259e268da3752734817384591d2ac7cd6d80f5dfd75a8fb4e"
-      },
-      {
-        "id": "stack-2-3",
-        "oldGeometrySha256": "011c9523865d1010e322786f5ec3c234adbac7c9b3053319a706e8b66248bbd7",
-        "newGeometrySha256": "011c9523865d1010e322786f5ec3c234adbac7c9b3053319a706e8b66248bbd7",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "85e0c18d1d9581642a83cb9f0e7cf9cb06b8f70b5216a5ebac3bf21e782bfe60"
-      },
-      {
-        "id": "stack-frames-2-3",
-        "oldGeometrySha256": "d0c515ec5fdde4bf360e8e064c8a0b5deacebac456b92e7c070b9ce2e185be82",
-        "newGeometrySha256": "d0c515ec5fdde4bf360e8e064c8a0b5deacebac456b92e7c070b9ce2e185be82",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "26685d23f4fbe044f1bc25e57026e4e55af3587793fc3e654cfa065414c70271"
-      },
-      {
-        "id": "stack-fasteners-2-3",
-        "oldGeometrySha256": "3da3b97f1b866028cd380279ba32d677228722a2e4bb1889975008f03c5294e9",
-        "newGeometrySha256": "3da3b97f1b866028cd380279ba32d677228722a2e4bb1889975008f03c5294e9",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "9ff4136c4332c59290c936fc337121d10cec107fa6d125c7bb0aa8c6914937eb"
-      },
-      {
-        "id": "stack-washers-2-3",
-        "oldGeometrySha256": "a3b24a883817d7867517f0990b14d33a703bbd12dd312658cefff41235d97a40",
-        "newGeometrySha256": "a3b24a883817d7867517f0990b14d33a703bbd12dd312658cefff41235d97a40",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "6919f83d1f054e2b781b8f5769d6c07ae075346634452155c2e02f7d4de93425"
-      },
-      {
-        "id": "stack-seals-2-3",
-        "oldGeometrySha256": "22b32ca6c93fd5d09fcf36cee27cb53c3e7bee33ac1c823b8b2e91ffc87a2e13",
-        "newGeometrySha256": "22b32ca6c93fd5d09fcf36cee27cb53c3e7bee33ac1c823b8b2e91ffc87a2e13",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "a3cab3e14a5b39c259e268da3752734817384591d2ac7cd6d80f5dfd75a8fb4e"
-      },
-      {
-        "id": "stack-2-4",
-        "oldGeometrySha256": "868887509fe9ed21a36db9c70392e0e068d4dc68ca49c37ef478e43ff50a8742",
-        "newGeometrySha256": "868887509fe9ed21a36db9c70392e0e068d4dc68ca49c37ef478e43ff50a8742",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "85e0c18d1d9581642a83cb9f0e7cf9cb06b8f70b5216a5ebac3bf21e782bfe60"
-      },
-      {
-        "id": "stack-frames-2-4",
-        "oldGeometrySha256": "1a1d59df1054784e51aac5deb44e4e5842a95cfec80019bfa48a428fe680d4c0",
-        "newGeometrySha256": "1a1d59df1054784e51aac5deb44e4e5842a95cfec80019bfa48a428fe680d4c0",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "26685d23f4fbe044f1bc25e57026e4e55af3587793fc3e654cfa065414c70271"
-      },
-      {
-        "id": "stack-fasteners-2-4",
-        "oldGeometrySha256": "2b8ade05c8166bc4865c45d202f62124f495d1a3b329a1afdd81f162d053baef",
-        "newGeometrySha256": "2b8ade05c8166bc4865c45d202f62124f495d1a3b329a1afdd81f162d053baef",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "9ff4136c4332c59290c936fc337121d10cec107fa6d125c7bb0aa8c6914937eb"
-      },
-      {
-        "id": "stack-washers-2-4",
-        "oldGeometrySha256": "09698c0fdb604ae82555951d740ddf80f76b153472f918df863f8f97bc3a7ff8",
-        "newGeometrySha256": "09698c0fdb604ae82555951d740ddf80f76b153472f918df863f8f97bc3a7ff8",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "6919f83d1f054e2b781b8f5769d6c07ae075346634452155c2e02f7d4de93425"
-      },
-      {
-        "id": "stack-seals-2-4",
-        "oldGeometrySha256": "53b73ab7366af4d8bcfc5b2d500aff43b96348e9dfcc0956a0c7b8c2a0eff3f7",
-        "newGeometrySha256": "53b73ab7366af4d8bcfc5b2d500aff43b96348e9dfcc0956a0c7b8c2a0eff3f7",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "a3cab3e14a5b39c259e268da3752734817384591d2ac7cd6d80f5dfd75a8fb4e"
-      },
-      {
-        "id": "stack-3-1",
-        "oldGeometrySha256": "75a5eb2abbbaba37e1942ab4745a56e68ee3ec5f811e964bfac5d22d0f64f94a",
-        "newGeometrySha256": "75a5eb2abbbaba37e1942ab4745a56e68ee3ec5f811e964bfac5d22d0f64f94a",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "85e0c18d1d9581642a83cb9f0e7cf9cb06b8f70b5216a5ebac3bf21e782bfe60"
-      },
-      {
-        "id": "stack-frames-3-1",
-        "oldGeometrySha256": "5642fbf0b94f73a85c3d985236cc6bfb649f9fc855c0cf6d62b8c693a9cde218",
-        "newGeometrySha256": "5642fbf0b94f73a85c3d985236cc6bfb649f9fc855c0cf6d62b8c693a9cde218",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "26685d23f4fbe044f1bc25e57026e4e55af3587793fc3e654cfa065414c70271"
-      },
-      {
-        "id": "stack-fasteners-3-1",
-        "oldGeometrySha256": "a08658381c2937b599fb21d5b21f0aaf663b5806f923d6adaecf635f5c775d21",
-        "newGeometrySha256": "a08658381c2937b599fb21d5b21f0aaf663b5806f923d6adaecf635f5c775d21",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "9ff4136c4332c59290c936fc337121d10cec107fa6d125c7bb0aa8c6914937eb"
-      },
-      {
-        "id": "stack-washers-3-1",
-        "oldGeometrySha256": "112aadd2c17bc9e4b7474f2cc9a37fdb18890bd1942f9617cfff9bddb109029d",
-        "newGeometrySha256": "112aadd2c17bc9e4b7474f2cc9a37fdb18890bd1942f9617cfff9bddb109029d",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "6919f83d1f054e2b781b8f5769d6c07ae075346634452155c2e02f7d4de93425"
-      },
-      {
-        "id": "stack-seals-3-1",
-        "oldGeometrySha256": "19c9836a8df0d86b2649d752c4496863ca106af00caa85cfdce417478c9c462c",
-        "newGeometrySha256": "19c9836a8df0d86b2649d752c4496863ca106af00caa85cfdce417478c9c462c",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "a3cab3e14a5b39c259e268da3752734817384591d2ac7cd6d80f5dfd75a8fb4e"
-      },
-      {
-        "id": "stack-3-2",
-        "oldGeometrySha256": "17c00cfc01ac06dc830a4cf54bf7a8232ba7d221bb67e74e55c8ddd65dc5a589",
-        "newGeometrySha256": "17c00cfc01ac06dc830a4cf54bf7a8232ba7d221bb67e74e55c8ddd65dc5a589",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "85e0c18d1d9581642a83cb9f0e7cf9cb06b8f70b5216a5ebac3bf21e782bfe60"
-      },
-      {
-        "id": "stack-frames-3-2",
-        "oldGeometrySha256": "32842af64cd3dae87c6739130972214d34c287836d13534e35f75e53a6eea147",
-        "newGeometrySha256": "32842af64cd3dae87c6739130972214d34c287836d13534e35f75e53a6eea147",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "26685d23f4fbe044f1bc25e57026e4e55af3587793fc3e654cfa065414c70271"
-      },
-      {
-        "id": "stack-fasteners-3-2",
-        "oldGeometrySha256": "76355b056d93058ef4bd13adf8c9b249b7c1a76a1235708f41e1289712ce27d4",
-        "newGeometrySha256": "76355b056d93058ef4bd13adf8c9b249b7c1a76a1235708f41e1289712ce27d4",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "9ff4136c4332c59290c936fc337121d10cec107fa6d125c7bb0aa8c6914937eb"
-      },
-      {
-        "id": "stack-washers-3-2",
-        "oldGeometrySha256": "5f9b7dc16c15e835bcda3dc2914aed92cc977ee0bc4c2e74c8b8de24e7b88f30",
-        "newGeometrySha256": "5f9b7dc16c15e835bcda3dc2914aed92cc977ee0bc4c2e74c8b8de24e7b88f30",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "6919f83d1f054e2b781b8f5769d6c07ae075346634452155c2e02f7d4de93425"
-      },
-      {
-        "id": "stack-seals-3-2",
-        "oldGeometrySha256": "a6bdd8b847b97d4b42e25969d4c52963a0867592e207384de1215c0d43c9989c",
-        "newGeometrySha256": "a6bdd8b847b97d4b42e25969d4c52963a0867592e207384de1215c0d43c9989c",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "a3cab3e14a5b39c259e268da3752734817384591d2ac7cd6d80f5dfd75a8fb4e"
-      },
-      {
-        "id": "stack-3-3",
-        "oldGeometrySha256": "969d6d12bcb4f3c8912d4361b1a136e7444863dcb68ab43c571ae3fe7ba2640b",
-        "newGeometrySha256": "969d6d12bcb4f3c8912d4361b1a136e7444863dcb68ab43c571ae3fe7ba2640b",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "85e0c18d1d9581642a83cb9f0e7cf9cb06b8f70b5216a5ebac3bf21e782bfe60"
-      },
-      {
-        "id": "stack-frames-3-3",
-        "oldGeometrySha256": "a3a11b6c16eadc0cbb176a88ce31f39a4c24f836ec8f86cf9fc3d17c29dc8568",
-        "newGeometrySha256": "a3a11b6c16eadc0cbb176a88ce31f39a4c24f836ec8f86cf9fc3d17c29dc8568",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "26685d23f4fbe044f1bc25e57026e4e55af3587793fc3e654cfa065414c70271"
-      },
-      {
-        "id": "stack-fasteners-3-3",
-        "oldGeometrySha256": "7539ef183db70e0e03711291fe2bc8986a0d6674db64373bf8e2b82498b36501",
-        "newGeometrySha256": "7539ef183db70e0e03711291fe2bc8986a0d6674db64373bf8e2b82498b36501",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "9ff4136c4332c59290c936fc337121d10cec107fa6d125c7bb0aa8c6914937eb"
-      },
-      {
-        "id": "stack-washers-3-3",
-        "oldGeometrySha256": "3702e0ae2b88f5c078ead149902d9a52379acc8145f27bd1b33959c5b4c27019",
-        "newGeometrySha256": "3702e0ae2b88f5c078ead149902d9a52379acc8145f27bd1b33959c5b4c27019",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "6919f83d1f054e2b781b8f5769d6c07ae075346634452155c2e02f7d4de93425"
-      },
-      {
-        "id": "stack-seals-3-3",
-        "oldGeometrySha256": "7e7e725febefc456e6a5d3df3ad5d84475b3cb19aaa15a91b6f452a09ff7e1a3",
-        "newGeometrySha256": "7e7e725febefc456e6a5d3df3ad5d84475b3cb19aaa15a91b6f452a09ff7e1a3",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "a3cab3e14a5b39c259e268da3752734817384591d2ac7cd6d80f5dfd75a8fb4e"
-      },
-      {
-        "id": "stack-3-4",
-        "oldGeometrySha256": "d5d614c2706988b426162e04b759e9ac090b51599168210880916b07c8cbb0eb",
-        "newGeometrySha256": "d5d614c2706988b426162e04b759e9ac090b51599168210880916b07c8cbb0eb",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "85e0c18d1d9581642a83cb9f0e7cf9cb06b8f70b5216a5ebac3bf21e782bfe60"
-      },
-      {
-        "id": "stack-frames-3-4",
-        "oldGeometrySha256": "c33f0b0f612129d45cfc2176d281e705dcf491bc1a830c2eaced030204dc28ca",
-        "newGeometrySha256": "c33f0b0f612129d45cfc2176d281e705dcf491bc1a830c2eaced030204dc28ca",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "26685d23f4fbe044f1bc25e57026e4e55af3587793fc3e654cfa065414c70271"
-      },
-      {
-        "id": "stack-fasteners-3-4",
-        "oldGeometrySha256": "73e7fd25b1dcb498b90521399e5beb466cc54988afb584c8f0324f22c5795f91",
-        "newGeometrySha256": "73e7fd25b1dcb498b90521399e5beb466cc54988afb584c8f0324f22c5795f91",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "9ff4136c4332c59290c936fc337121d10cec107fa6d125c7bb0aa8c6914937eb"
-      },
-      {
-        "id": "stack-washers-3-4",
-        "oldGeometrySha256": "ab7c0295656c0791e5b0ad9a8041a006db02ac02044d3265473be94390bd16ac",
-        "newGeometrySha256": "ab7c0295656c0791e5b0ad9a8041a006db02ac02044d3265473be94390bd16ac",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "6919f83d1f054e2b781b8f5769d6c07ae075346634452155c2e02f7d4de93425"
-      },
-      {
-        "id": "stack-seals-3-4",
-        "oldGeometrySha256": "c34f3692ac0f2261f46e44f58d86dafaf32cfa7071562068c2e6b79c46c8b697",
-        "newGeometrySha256": "c34f3692ac0f2261f46e44f58d86dafaf32cfa7071562068c2e6b79c46c8b697",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "a3cab3e14a5b39c259e268da3752734817384591d2ac7cd6d80f5dfd75a8fb4e"
-      },
-      {
-        "id": "fan",
-        "oldGeometrySha256": "eca56a034bbb351fb651eded3d7b7896518ad01850e54ef0a74886e46d6554ec",
-        "newGeometrySha256": "eca56a034bbb351fb651eded3d7b7896518ad01850e54ef0a74886e46d6554ec",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "ac395bf1431172e31ade1b9d4bfb92e3605d180c56d62281e1b52795a62bacb0"
-      },
-      {
-        "id": "fan-stators",
-        "oldGeometrySha256": "d0f64513a5d40733cda6c70d949a7f938521a110c936cadb6529050c311fb2da",
-        "newGeometrySha256": "d0f64513a5d40733cda6c70d949a7f938521a110c936cadb6529050c311fb2da",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "ac395bf1431172e31ade1b9d4bfb92e3605d180c56d62281e1b52795a62bacb0"
-      },
-      {
-        "id": "main-motor",
-        "oldGeometrySha256": "03fd5df9d50c26bbd2937c50004cb8798b4ab4b0a8965e2462fc6b2a61ef052e",
-        "newGeometrySha256": "03fd5df9d50c26bbd2937c50004cb8798b4ab4b0a8965e2462fc6b2a61ef052e",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "ce06e8bc40ded3ad6d91758fe1d3e5ca6725054e505a8240b9e147e5213641ca"
-      },
-      {
-        "id": "motor-front-cap",
-        "oldGeometrySha256": "bb8d5e131b1fc4d5f31f0700017851f851db914319137eace73af16213846a49",
-        "newGeometrySha256": "bb8d5e131b1fc4d5f31f0700017851f851db914319137eace73af16213846a49",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "8c4f64d3fc250a49b006aa7ef74bd3cdee81d976af616d39a67814412c51a50b"
-      },
-      {
-        "id": "motor-rear-cap",
-        "oldGeometrySha256": "7e79dab4912be779469d09b3dd2a1ad06428f814c3ac7f1f3e903781ed792626",
-        "newGeometrySha256": "7e79dab4912be779469d09b3dd2a1ad06428f814c3ac7f1f3e903781ed792626",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "ac395bf1431172e31ade1b9d4bfb92e3605d180c56d62281e1b52795a62bacb0"
-      },
-      {
-        "id": "motor-shaft-collar",
-        "oldGeometrySha256": "f6699412a12f5ecaf03bb6eef760a2c160562bec651613f347fb793c27912e9c",
-        "newGeometrySha256": "f6699412a12f5ecaf03bb6eef760a2c160562bec651613f347fb793c27912e9c",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "e0ab49a6a24dcfd2487a9df26e78e08e77e19e74b6206bcb260fb9e721d79cb3"
-      },
-      {
-        "id": "motor-housing",
-        "oldGeometrySha256": "3652b74da5b23fbeac2358f2764286d2f0b64f31e27030723d08ae9f7258aa09",
-        "newGeometrySha256": "3652b74da5b23fbeac2358f2764286d2f0b64f31e27030723d08ae9f7258aa09",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "a0d9a237050ea7f6fec6f95fd8f020f3636c8730fbd6b02dda800eef8aa3c704"
-      },
-      {
-        "id": "intake-fasteners",
-        "oldGeometrySha256": "4ab816cb2a815124d7aaef47d2408683889055651ef268e11c5ed99b69a324a4",
-        "newGeometrySha256": "4ab816cb2a815124d7aaef47d2408683889055651ef268e11c5ed99b69a324a4",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "e0ab49a6a24dcfd2487a9df26e78e08e77e19e74b6206bcb260fb9e721d79cb3"
-      },
-      {
-        "id": "intake-inner-shell",
-        "oldGeometrySha256": "fff886bd91bc108c0a57fc1e3baa68df80e9b0bd5bfe9a49a280aeb7d8d1f74a",
-        "newGeometrySha256": "fff886bd91bc108c0a57fc1e3baa68df80e9b0bd5bfe9a49a280aeb7d8d1f74a",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "d4dbbff4a467ba8fef34de738744c691bf5c81f7d3ec222386a31e3189282446"
-      },
-      {
-        "id": "compressor-rotor-1",
-        "oldGeometrySha256": "21af41fa4aded1b7d99d179773bebaf9f8430ea1845b0a800a2d3585b8fcd75a",
-        "newGeometrySha256": "21af41fa4aded1b7d99d179773bebaf9f8430ea1845b0a800a2d3585b8fcd75a",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "a7dc117d7619a57569bcb3674d8e8f000b62cda0103b2db13dc2bd6b9a55dd3d"
-      },
-      {
-        "id": "compressor-diffuser-1",
-        "oldGeometrySha256": "5aa4c7c4cc484a2a536043cf42692272a457508377577107b2eb2fa581368bb6",
-        "newGeometrySha256": "5aa4c7c4cc484a2a536043cf42692272a457508377577107b2eb2fa581368bb6",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "866ca8cc085f0d5bffc16454aeee3fcc036738a699e8e359bfa4d20280fea798"
-      },
-      {
-        "id": "compressor-diffuser-2",
-        "oldGeometrySha256": "76142b55eb56ebd8fac6bbb198268da9b8b501c45b34e07a200b114ac26b4d24",
-        "newGeometrySha256": "76142b55eb56ebd8fac6bbb198268da9b8b501c45b34e07a200b114ac26b4d24",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "866ca8cc085f0d5bffc16454aeee3fcc036738a699e8e359bfa4d20280fea798"
-      },
-      {
-        "id": "compressor-motor-1",
-        "oldGeometrySha256": "67e8a98616e10eda3927187eab18603c395036f53c3fad868726fcf8277334f3",
-        "newGeometrySha256": "67e8a98616e10eda3927187eab18603c395036f53c3fad868726fcf8277334f3",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "e0ab49a6a24dcfd2487a9df26e78e08e77e19e74b6206bcb260fb9e721d79cb3"
-      },
-      {
-        "id": "compressor-motor-2",
-        "oldGeometrySha256": "890646b317fcc3dadf4cda0e5497093ae2a08aa0b707cd0fc15dc16f8d3da6f7",
-        "newGeometrySha256": "890646b317fcc3dadf4cda0e5497093ae2a08aa0b707cd0fc15dc16f8d3da6f7",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "e0ab49a6a24dcfd2487a9df26e78e08e77e19e74b6206bcb260fb9e721d79cb3"
-      },
-      {
-        "id": "compressor-front-flange",
-        "oldGeometrySha256": "9dfa93f0ade5f74185a284f64e7adfd33187f7be8bb368e113fb86939eec9ecb",
-        "newGeometrySha256": "9dfa93f0ade5f74185a284f64e7adfd33187f7be8bb368e113fb86939eec9ecb",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "8f12b95040f2f7daa2e669c86ec0b5ca0f7fd1075cbac2665b76bad04ea86a7a"
-      },
-      {
-        "id": "compressor-rear-flange",
-        "oldGeometrySha256": "39fccd8a3c5856de449d7d91185b28ef943cced705021e21682384f76fa07891",
-        "newGeometrySha256": "39fccd8a3c5856de449d7d91185b28ef943cced705021e21682384f76fa07891",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "8f12b95040f2f7daa2e669c86ec0b5ca0f7fd1075cbac2665b76bad04ea86a7a"
-      },
-      {
-        "id": "compressor-casing",
-        "oldGeometrySha256": "71b5cdaebee2aa11c6693e1110fc87245b879abf889ca1ba7da6cedc6f743ffe",
-        "newGeometrySha256": "71b5cdaebee2aa11c6693e1110fc87245b879abf889ca1ba7da6cedc6f743ffe",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "201c990c68a1254ccefe2ef4e0e0d1ba40c62b0be6eeb5d521db31976f332d1a"
-      },
-      {
-        "id": "compressor-fasteners",
-        "oldGeometrySha256": "95ad46d23ee6834f990a333a53804c6794be462550d1a6d067bda264baf1ff2b",
-        "newGeometrySha256": "95ad46d23ee6834f990a333a53804c6794be462550d1a6d067bda264baf1ff2b",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "e0ab49a6a24dcfd2487a9df26e78e08e77e19e74b6206bcb260fb9e721d79cb3"
-      },
-      {
-        "id": "pump",
-        "oldGeometrySha256": "e331c01032dd91cbb77b065359337204b7c863891178eb8f06526fdf39a13dba",
-        "newGeometrySha256": "e331c01032dd91cbb77b065359337204b7c863891178eb8f06526fdf39a13dba",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "6adb845a7232f704700216a880c56bc47fbfda568639f5e5a3654fc8d3c34767"
-      },
-      {
-        "id": "pump-hardware",
-        "oldGeometrySha256": "b811556eadcbaae818efe260ba96e501add2f849492ba1aad7ed8bc3e0b0c252",
-        "newGeometrySha256": "b811556eadcbaae818efe260ba96e501add2f849492ba1aad7ed8bc3e0b0c252",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "06220526750dc1014b7cabe60230d7bca6bcabb034449daf0753a94cb72ff8fc"
-      },
-      {
-        "id": "outer-shell",
-        "oldGeometrySha256": "ae03f670f84bc735b3e1b7c32a28bbb308e7fd31f9e16e77968cac7448d413b6",
-        "newGeometrySha256": "ae03f670f84bc735b3e1b7c32a28bbb308e7fd31f9e16e77968cac7448d413b6",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "b9277ad0d90ab95585c67e62fae90e6f7e14f01aba2a8aff8960a03dc34e4eb9"
-      },
-      {
-        "id": "outer-shell-port-trims",
-        "oldGeometrySha256": "7e2a11b307279aca8271be232c4bb474e7baaeebe72f9a0eadcb9ef2dc4f73a4",
-        "newGeometrySha256": "7e2a11b307279aca8271be232c4bb474e7baaeebe72f9a0eadcb9ef2dc4f73a4",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "3ab9fc8dc08dbc50aae9bf7710771aab505e9dfdca08bebcec37870f3caa5999"
-      },
-      {
-        "id": "outer-shell-access-covers",
-        "oldGeometrySha256": "a945fe76a21758aa29b2e436097a3e55a12b607a92b639ba96b986d5ed7c2f35",
-        "newGeometrySha256": "a945fe76a21758aa29b2e436097a3e55a12b607a92b639ba96b986d5ed7c2f35",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "d52b3d379508e0bed1c262841ec258bc434fa76ee1f78384efe6c2c0449763b2"
-      },
-      {
-        "id": "outer-shell-fasteners",
-        "oldGeometrySha256": "8f7f50e4e60d1f03c2b5e429ff983d49838a64f6b246722b9cf7c107f0d7c2dd",
-        "newGeometrySha256": "8f7f50e4e60d1f03c2b5e429ff983d49838a64f6b246722b9cf7c107f0d7c2dd",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "b74d217c6a6d8e884d7d60e9487b4e51fc363ac1e3486661dfae6422d8954629"
-      },
-      {
-        "id": "inner-shell",
-        "oldGeometrySha256": "23865f68d2a6dceb2b2e374837d8612a3a86a65967bd6be0c67c5df2849a50a6",
-        "newGeometrySha256": "23865f68d2a6dceb2b2e374837d8612a3a86a65967bd6be0c67c5df2849a50a6",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "c2fee99e32eba57fab1168ec124b9dc23800110a3e33f89fb2f56637291de095"
-      },
-      {
-        "id": "inner-shell-fasteners",
-        "oldGeometrySha256": "c722a4b0c3020e522d4966ee1b0c88f8eefd9ffc6273182ca98aa00b1a82091f",
-        "newGeometrySha256": "c722a4b0c3020e522d4966ee1b0c88f8eefd9ffc6273182ca98aa00b1a82091f",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "40d08ede4e1514769277270995dac138774808547e4b57b5b397347c60ab68e8"
-      },
-      {
-        "id": "wiring-harness",
-        "oldGeometrySha256": "0fb92b25484c0cc57733252481fa0a4970e4f284384a9e337c2d5d38c5652dde",
-        "newGeometrySha256": "0fb92b25484c0cc57733252481fa0a4970e4f284384a9e337c2d5d38c5652dde",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "e7e92ebbd730e0ba0559071149a291ef70da4e683e95281e4571f4a82110a46a"
-      },
-      {
-        "id": "wiring-connectors",
-        "oldGeometrySha256": "dd32e28cfd9d9a9e58fd3c6029ab9035d72364082f644cfd5375d5c5c69fe745",
-        "newGeometrySha256": "dd32e28cfd9d9a9e58fd3c6029ab9035d72364082f644cfd5375d5c5c69fe745",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "0908e716191650806fdf09451adcc2195b0e6b348069c0619c242e68a993ebee"
-      },
-      {
-        "id": "wiring-clamps",
-        "oldGeometrySha256": "6c3c402204b9345a3ee3aeeeccd6a1226a6a97661016500b7f49242db0bb90b7",
-        "newGeometrySha256": "6c3c402204b9345a3ee3aeeeccd6a1226a6a97661016500b7f49242db0bb90b7",
-        "transformSha256": "36280974615b7de7b275a9744558dc58704ec917d321fe0c7ea9d4780a2f435c",
-        "materialsSha256": "4099294c926d2912def0b80ed55f7173b94eff89911fb4b0e97c2e7dda20e6e3"
-      }
-    ],
-    "allUnchangedGeometryHashesMatch": true,
-    "allNodeTransformsUnchanged": true,
-    "allMaterialsUnchanged": true,
-    "collisionScope": "Only the two updated exported solids against every other exported assembly part; previous non-target pairs are reused",
-    "toleranceSource": "scripts/verify-new-design-compressor.mjs solidIntersections.toleranceMm3",
-    "toleranceMm3": 0.02,
-    "broadPhasePairs": 193,
-    "exactChecks": 13,
-    "maximumIntersectionVolumeMm3": 0,
-    "checks": [
-      {
-        "parts": [
-          "fan-spinner",
-          "fan"
-        ],
-        "volumeMm3": 0
-      },
-      {
-        "parts": [
-          "fan-spinner",
-          "outer-shell"
-        ],
-        "volumeMm3": 0
-      },
-      {
-        "parts": [
-          "fan-spinner",
-          "outer-shell-port-trims"
-        ],
-        "volumeMm3": 0
-      },
-      {
-        "parts": [
-          "fan-spinner",
-          "outer-shell-fasteners"
-        ],
-        "volumeMm3": 0
-      },
-      {
-        "parts": [
-          "compressor-rotor-2",
-          "compressor-diffuser-2"
-        ],
-        "volumeMm3": 0
-      },
-      {
-        "parts": [
-          "compressor-rotor-2",
-          "compressor-motor-2"
-        ],
-        "volumeMm3": 0
-      },
-      {
-        "parts": [
-          "compressor-rotor-2",
-          "compressor-rear-flange"
-        ],
-        "volumeMm3": 0
-      },
-      {
-        "parts": [
-          "compressor-rotor-2",
-          "compressor-casing"
-        ],
-        "volumeMm3": 0
-      },
-      {
-        "parts": [
-          "compressor-rotor-2",
-          "compressor-fasteners"
-        ],
-        "volumeMm3": 0
-      },
-      {
-        "parts": [
-          "compressor-rotor-2",
-          "outer-shell"
-        ],
-        "volumeMm3": 0
-      },
-      {
-        "parts": [
-          "compressor-rotor-2",
-          "outer-shell-port-trims"
-        ],
-        "volumeMm3": 0
-      },
-      {
-        "parts": [
-          "compressor-rotor-2",
-          "outer-shell-fasteners"
-        ],
-        "volumeMm3": 0
-      },
-      {
-        "parts": [
-          "compressor-rotor-2",
-          "inner-shell"
-        ],
-        "volumeMm3": 0
-      }
-    ],
-    "collisions": [],
-    "fluidAndStackGeneratorsRun": false
-  },
-  "exportedCellGeometryReuse": {
-    "sourceModelSha256": "bc5178d7f330f24fc31ef76982298b5251a588c11361877ccae4390513d0f582",
-    "reason": "All stack, plumbing, shell and wiring mesh/transform hashes are unchanged",
-    "unchangedStackNodeIds": [
-      "stack-1-1",
-      "stack-frames-1-1",
-      "stack-fasteners-1-1",
-      "stack-washers-1-1",
-      "stack-seals-1-1",
-      "stack-1-2",
-      "stack-frames-1-2",
-      "stack-fasteners-1-2",
-      "stack-washers-1-2",
-      "stack-seals-1-2",
-      "stack-1-3",
-      "stack-frames-1-3",
-      "stack-fasteners-1-3",
-      "stack-washers-1-3",
-      "stack-seals-1-3",
-      "stack-2-1",
-      "stack-frames-2-1",
-      "stack-fasteners-2-1",
-      "stack-washers-2-1",
-      "stack-seals-2-1",
-      "stack-2-2",
-      "stack-frames-2-2",
-      "stack-fasteners-2-2",
-      "stack-washers-2-2",
-      "stack-seals-2-2",
-      "stack-2-3",
-      "stack-frames-2-3",
-      "stack-fasteners-2-3",
-      "stack-washers-2-3",
-      "stack-seals-2-3",
-      "stack-2-4",
-      "stack-frames-2-4",
-      "stack-fasteners-2-4",
-      "stack-washers-2-4",
-      "stack-seals-2-4",
-      "stack-3-1",
-      "stack-frames-3-1",
-      "stack-fasteners-3-1",
-      "stack-washers-3-1",
-      "stack-seals-3-1",
-      "stack-3-2",
-      "stack-frames-3-2",
-      "stack-fasteners-3-2",
-      "stack-washers-3-2",
-      "stack-seals-3-2",
-      "stack-3-3",
-      "stack-frames-3-3",
-      "stack-fasteners-3-3",
-      "stack-washers-3-3",
-      "stack-seals-3-3",
-      "stack-3-4",
-      "stack-frames-3-4",
-      "stack-fasteners-3-4",
-      "stack-washers-3-4",
-      "stack-seals-3-4"
-    ],
-    "changedNodesOutsideStackAxialEnvelope": true
-  },
-  "compressorGeometry": {
-    "status": "passed",
-    "scope": "Two backed eighteen-blade rotors; static covers and interstage return assembly removed; structural geometry only",
-    "source": "exported GLB",
-    "modelModifiedAt": "2026-10-25T16:31:23.909Z",
-    "units": "mm",
-    "frontParts": 20,
-    "componentCounts": {
-      "fan": 1,
-      "fan-spinner": 1,
-      "fan-stators": 18,
-      "main-motor": 1,
-      "motor-front-cap": 1,
-      "motor-rear-cap": 1,
-      "motor-shaft-collar": 1,
-      "motor-housing": 1,
-      "intake-fasteners": 16,
-      "intake-inner-shell": 1,
-      "compressor-rotor-1": 1,
-      "compressor-diffuser-1": 18,
-      "compressor-rotor-2": 1,
-      "compressor-diffuser-2": 18,
-      "compressor-motor-1": 1,
-      "compressor-motor-2": 1,
-      "compressor-front-flange": 1,
-      "compressor-rear-flange": 1,
-      "compressor-casing": 1,
-      "compressor-fasteners": 24
-    },
-    "solidIntersections": {
-      "toleranceMm3": 0.02,
-      "candidates": 43,
-      "maximumVolumeMm3": 0.00047644073101860325,
-      "collisions": []
-    },
-    "fanStators": {
-      "blades": 18,
-      "stationary": true,
-      "frontMm": 235,
-      "rearMm": 285,
-      "axialClearanceFromFanMm": 25,
-      "shellCheck": "actual exported shell solids",
-      "shellIntersections": [
-        {
-          "id": "outer-shell",
-          "volumeMm3": 0
-        },
-        {
-          "id": "inner-shell",
-          "volumeMm3": 0
-        }
-      ]
-    },
-    "fanTwist": {
-      "buriedRootAngleToAxisDeg": 25,
-      "exposedRoot": {
-        "radiusMm": 108,
-        "spanFraction": 0.07142857142857142,
-        "specifiedAngleToAxisDeg": 25.597667638483966,
-        "measuredAngleToAxisDeg": 25.597667444513277,
-        "maximumEndpointErrorMm": 0.000004042642977501399
-      },
-      "tip": {
-        "radiusMm": 491.3632718583675,
-        "spanFraction": 1,
-        "specifiedAngleToAxisDeg": 66,
-        "measuredAngleToAxisDeg": 66.00000074421143,
-        "maximumEndpointErrorMm": 0.000010956874341077661
-      },
-      "measuredSections": [
-        {
-          "radiusMm": 108,
-          "spanFraction": 0.07142857142857142,
-          "specifiedAngleToAxisDeg": 25.597667638483966,
-          "measuredAngleToAxisDeg": 25.597667444513277,
-          "maximumEndpointErrorMm": 0.000004042642977501399
-        },
-        {
-          "radiusMm": 123,
-          "spanFraction": 0.10714285714285714,
-          "specifiedAngleToAxisDeg": 26.311133381924197,
-          "measuredAngleToAxisDeg": 26.31113080482412,
-          "maximumEndpointErrorMm": 0.000004666417836884017
-        },
-        {
-          "radiusMm": 138,
-          "spanFraction": 0.14285714285714285,
-          "specifiedAngleToAxisDeg": 27.271137026239067,
-          "measuredAngleToAxisDeg": 27.27113709412595,
-          "maximumEndpointErrorMm": 0.000006934179945149803
-        },
-        {
-          "radiusMm": 153,
-          "spanFraction": 0.17857142857142858,
-          "specifiedAngleToAxisDeg": 28.45526603498542,
-          "measuredAngleToAxisDeg": 28.455268444646848,
-          "maximumEndpointErrorMm": 0.000006294588684086466
-        },
-        {
-          "radiusMm": 168,
-          "spanFraction": 0.21428571428571427,
-          "specifiedAngleToAxisDeg": 29.841107871720116,
-          "measuredAngleToAxisDeg": 29.84110862724636,
-          "maximumEndpointErrorMm": 0.000005812510426862555
-        },
-        {
-          "radiusMm": 183,
-          "spanFraction": 0.25,
-          "specifiedAngleToAxisDeg": 31.40625,
-          "measuredAngleToAxisDeg": 31.406251789210042,
-          "maximumEndpointErrorMm": 0.000007101677774032923
-        },
-        {
-          "radiusMm": 198,
-          "spanFraction": 0.2857142857142857,
-          "specifiedAngleToAxisDeg": 33.12827988338192,
-          "measuredAngleToAxisDeg": 33.12828099525532,
-          "maximumEndpointErrorMm": 0.000006029781449630572
-        },
-        {
-          "radiusMm": 213,
-          "spanFraction": 0.32142857142857145,
-          "specifiedAngleToAxisDeg": 34.98478498542274,
-          "measuredAngleToAxisDeg": 34.98478336351273,
-          "maximumEndpointErrorMm": 0.000007792734906716422
-        },
-        {
-          "radiusMm": 228,
-          "spanFraction": 0.35714285714285715,
-          "specifiedAngleToAxisDeg": 36.9533527696793,
-          "measuredAngleToAxisDeg": 36.953352209921505,
-          "maximumEndpointErrorMm": 0.000008672668441807876
-        },
-        {
-          "radiusMm": 243,
-          "spanFraction": 0.39285714285714285,
-          "specifiedAngleToAxisDeg": 39.01157069970846,
-          "measuredAngleToAxisDeg": 39.01156842295273,
-          "maximumEndpointErrorMm": 0.000006927924201866281
-        },
-        {
-          "radiusMm": 258,
-          "spanFraction": 0.42857142857142855,
-          "specifiedAngleToAxisDeg": 41.137026239067055,
-          "measuredAngleToAxisDeg": 41.13702658576235,
-          "maximumEndpointErrorMm": 0.00001289279406410018
-        },
-        {
-          "radiusMm": 273,
-          "spanFraction": 0.4642857142857143,
-          "specifiedAngleToAxisDeg": 43.30730685131195,
-          "measuredAngleToAxisDeg": 43.307306042272025,
-          "maximumEndpointErrorMm": 0.000008283626239215319
-        },
-        {
-          "radiusMm": 288,
-          "spanFraction": 0.5,
-          "specifiedAngleToAxisDeg": 45.5,
-          "measuredAngleToAxisDeg": 45.500000451955295,
-          "maximumEndpointErrorMm": 0.000008666439994300793
-        },
-        {
-          "radiusMm": 303,
-          "spanFraction": 0.5357142857142857,
-          "specifiedAngleToAxisDeg": 47.69269314868805,
-          "measuredAngleToAxisDeg": 47.69269112020143,
-          "maximumEndpointErrorMm": 0.000009999205087014888
-        },
-        {
-          "radiusMm": 318,
-          "spanFraction": 0.5714285714285714,
-          "specifiedAngleToAxisDeg": 49.862973760932945,
-          "measuredAngleToAxisDeg": 49.862974165016155,
-          "maximumEndpointErrorMm": 0.000014759917038573818
-        },
-        {
-          "radiusMm": 333,
-          "spanFraction": 0.6071428571428571,
-          "specifiedAngleToAxisDeg": 51.98842930029154,
-          "measuredAngleToAxisDeg": 51.98842670386657,
-          "maximumEndpointErrorMm": 0.0000071350267056566336
-        },
-        {
-          "radiusMm": 348,
-          "spanFraction": 0.6428571428571429,
-          "specifiedAngleToAxisDeg": 54.0466472303207,
-          "measuredAngleToAxisDeg": 54.04664600835485,
-          "maximumEndpointErrorMm": 0.000008278600552363769
-        },
-        {
-          "radiusMm": 363,
-          "spanFraction": 0.6785714285714286,
-          "specifiedAngleToAxisDeg": 56.015215014577265,
-          "measuredAngleToAxisDeg": 56.0152168956829,
-          "maximumEndpointErrorMm": 0.000016875069542382774
-        },
-        {
-          "radiusMm": 378,
-          "spanFraction": 0.7142857142857143,
-          "specifiedAngleToAxisDeg": 57.87172011661807,
-          "measuredAngleToAxisDeg": 57.871722354989345,
-          "maximumEndpointErrorMm": 0.00001295933845164381
-        },
-        {
-          "radiusMm": 393,
-          "spanFraction": 0.75,
-          "specifiedAngleToAxisDeg": 59.59375,
-          "measuredAngleToAxisDeg": 59.593751240238134,
-          "maximumEndpointErrorMm": 0.000015235934557262914
-        },
-        {
-          "radiusMm": 408,
-          "spanFraction": 0.7857142857142857,
-          "specifiedAngleToAxisDeg": 61.15889212827988,
-          "measuredAngleToAxisDeg": 61.15888945058303,
-          "maximumEndpointErrorMm": 0.000015053034525144
-        },
-        {
-          "radiusMm": 423,
-          "spanFraction": 0.8214285714285714,
-          "specifiedAngleToAxisDeg": 62.54473396501457,
-          "measuredAngleToAxisDeg": 62.54473677199683,
-          "maximumEndpointErrorMm": 0.000012567111146565073
-        },
-        {
-          "radiusMm": 438,
-          "spanFraction": 0.8571428571428571,
-          "specifiedAngleToAxisDeg": 63.72886297376093,
-          "measuredAngleToAxisDeg": 63.728862066385894,
-          "maximumEndpointErrorMm": 0.000012293138329632983
-        },
-        {
-          "radiusMm": 453,
-          "spanFraction": 0.8928571428571429,
-          "specifiedAngleToAxisDeg": 64.68886661807579,
-          "measuredAngleToAxisDeg": 64.68886826974551,
-          "maximumEndpointErrorMm": 0.00000650356758146204
-        },
-        {
-          "radiusMm": 468,
-          "spanFraction": 0.9285714285714286,
-          "specifiedAngleToAxisDeg": 65.40233236151603,
-          "measuredAngleToAxisDeg": 65.40232981235303,
-          "maximumEndpointErrorMm": 0.000013011829196227719
-        },
-        {
-          "radiusMm": 483,
-          "spanFraction": 0.9642857142857143,
-          "specifiedAngleToAxisDeg": 65.84684766763849,
-          "measuredAngleToAxisDeg": 65.84685120397981,
-          "maximumEndpointErrorMm": 0.00001448686357579221
-        },
-        {
-          "radiusMm": 491.3632718583675,
-          "spanFraction": 1,
-          "specifiedAngleToAxisDeg": 66,
-          "measuredAngleToAxisDeg": 66.00000074421143,
-          "maximumEndpointErrorMm": 0.000010956874341077661
-        }
-      ]
-    },
-    "fanRadialSections": [
-      {
-        "radiusMm": 125,
-        "separatedBlades": 16
-      },
-      {
-        "radiusMm": 300,
-        "separatedBlades": 16
-      },
-      {
-        "radiusMm": 470,
-        "separatedBlades": 16
-      }
-    ],
-    "fanSpinner": {
-      "frontMm": 0,
-      "baseMm": 110,
-      "axialLengthMm": 110,
-      "frontTipRadiusMm": 0.3500000148912188,
-      "baseRadiusMm": 100.00000470917108,
-      "maximumConicalProfileErrorMm": 0.000007620330691793242,
-      "retainedFanPlacement": {
-        "frontMm": 50,
-        "centreMm": 130,
-        "rearMm": 210
-      },
-      "sharedHubBaseVertex": {
-        "position": [
-          110,
-          100,
+    "sealedCoolingGuidePenetrations": [
+      {
+        "medium": "air",
+        "centre": [
+          1365.4,
+          72.20000000014507,
           0
         ],
-        "errorMm": 0
-      }
-    },
-    "fanBladeSeparation": {
-      "exposedBladeCount": 16,
-      "sharedHubExcludedToRadiusMm": 100.1,
-      "checkedPairs": 120,
-      "minimumSeparationMm": 29.574457705182674,
-      "distanceSearchLimitMm": 50
-    },
-    "fanMotionEnvelope": {
-      "radialRunningGapMm": 0.8,
-      "method": "conservative continuous rotational envelope",
-      "maximumIntersectionMm3": 0,
-      "intersections": [
-        {
-          "id": "outer-shell",
-          "volumeMm3": 0
-        }
-      ]
-    },
-    "independentDrives": {
-      "rotatingGroups": [
-        {
-          "id": "compressor-rotor-1",
-          "rotor": "compressor-1",
-          "frontMm": 487,
-          "rearMm": 549,
-          "connectedComponents": 1
-        },
-        {
-          "id": "compressor-rotor-2",
-          "rotor": "compressor-2",
-          "frontMm": 576,
-          "rearMm": 638,
-          "connectedComponents": 1
-        }
-      ],
-      "motorHousingsStationary": true,
-      "axialSeparationBetweenRotorsMm": 27,
-      "motorSizing": "geometric placeholders; no 16 kW packaging or operating performance claim"
-    },
-    "compressorMotionEnvelopes": [
+        "outerRadius": 6.2,
+        "length": 5
+      },
       {
-        "stage": 1,
-        "method": "continuous 360-degree swept profile with circumscribed facets",
-        "verifiedRunningGapMm": 0.8,
-        "uncoveredRotorMm3": 0,
-        "maximumIntersectionMm3": 0,
-        "intersections": [
-          {
-            "id": "compressor-motor-1",
-            "volumeMm3": 0
-          },
-          {
-            "id": "compressor-casing",
-            "volumeMm3": 0
-          },
-          {
-            "id": "compressor-fasteners",
-            "volumeMm3": 0
-          }
+        "medium": "cathode",
+        "centre": [
+          1466.2,
+          72.19999999920121,
+          0
+        ],
+        "outerRadius": 6.4,
+        "length": 5
+      },
+      {
+        "medium": "air",
+        "centre": [
+          1796.76,
+          94.20000000077752,
+          0
+        ],
+        "outerRadius": 6.2,
+        "length": 5
+      },
+      {
+        "medium": "cathode",
+        "centre": [
+          1891.08,
+          94.20000000124098,
+          0
+        ],
+        "outerRadius": 6.4,
+        "length": 5
+      },
+      {
+        "medium": "return",
+        "centre": [
+          2077,
+          -140.5980843769651,
+          -164.02749476035103
+        ],
+        "outerRadius": 5.2,
+        "length": 5
+      },
+      {
+        "medium": "feed",
+        "centre": [
+          2187,
+          -97.53536262080038,
+          101.64392114701802
+        ],
+        "outerRadius": 5.2,
+        "length": 5
+      }
+    ],
+    "separators": [
+      {
+        "key": "anode",
+        "front": 2090,
+        "rear": 2120,
+        "centre": [
+          2105,
+          -65,
+          70
+        ],
+        "radius": 18,
+        "baffles": 2,
+        "drainOutlet": [
+          2234,
+          -114,
+          70
         ]
       },
       {
-        "stage": 2,
-        "method": "continuous 360-degree swept profile with circumscribed facets",
-        "verifiedRunningGapMm": 0.8,
-        "uncoveredRotorMm3": 0,
-        "maximumIntersectionMm3": 0,
-        "intersections": [
-          {
-            "id": "compressor-diffuser-2",
-            "volumeMm3": 0
-          },
-          {
-            "id": "compressor-motor-2",
-            "volumeMm3": 0
-          },
-          {
-            "id": "compressor-rear-flange",
-            "volumeMm3": 0
-          },
-          {
-            "id": "compressor-casing",
-            "volumeMm3": 0
-          },
-          {
-            "id": "compressor-fasteners",
-            "volumeMm3": 0
-          }
+        "key": "cathode",
+        "front": 2100,
+        "rear": 2150,
+        "centre": [
+          2125,
+          65,
+          45
+        ],
+        "radius": 20,
+        "baffles": 2,
+        "drainOutlet": [
+          2234,
+          14,
+          45
         ]
       }
     ],
-    "compressorInletSupports": {
-      "stationary": true,
-      "connectedMotorAndSupports": 1,
-      "motorFrontMm": 484,
-      "motorRearMm": 510,
-      "intakeLinerAxialClearanceLowerBoundMm": 4,
-      "radialSections": [
-        {
-          "radiusMm": 45,
-          "separatedSupports": 3,
-          "supports": [
-            {
-              "centreXmm": 492,
-              "axialWidthMm": 4.79998779296875
-            },
-            {
-              "centreXmm": 492,
-              "axialWidthMm": 4.79998779296875
-            },
-            {
-              "centreXmm": 492,
-              "axialWidthMm": 4.79998779296875
-            }
-          ]
-        },
-        {
-          "radiusMm": 70,
-          "separatedSupports": 3,
-          "supports": [
-            {
-              "centreXmm": 492,
-              "axialWidthMm": 4.79998779296875
-            },
-            {
-              "centreXmm": 492,
-              "axialWidthMm": 4.79998779296875
-            },
-            {
-              "centreXmm": 492,
-              "axialWidthMm": 4.79998779296875
-            }
-          ]
-        },
-        {
-          "radiusMm": 100,
-          "separatedSupports": 3,
-          "supports": [
-            {
-              "centreXmm": 492,
-              "axialWidthMm": 4.79998779296875
-            },
-            {
-              "centreXmm": 492,
-              "axialWidthMm": 4.79998779296875
-            },
-            {
-              "centreXmm": 492,
-              "axialWidthMm": 4.79998779296875
-            }
-          ]
-        },
-        {
-          "radiusMm": 130,
-          "separatedSupports": 3,
-          "supports": [
-            {
-              "centreXmm": 492,
-              "axialWidthMm": 4.79998779296875
-            },
-            {
-              "centreXmm": 492,
-              "axialWidthMm": 4.79998779296875
-            },
-            {
-              "centreXmm": 492,
-              "axialWidthMm": 4.79998779296875
-            }
-          ]
-        },
-        {
-          "radiusMm": 155,
-          "separatedSupports": 3,
-          "supports": [
-            {
-              "centreXmm": 492,
-              "axialWidthMm": 4.79998779296875
-            },
-            {
-              "centreXmm": 492,
-              "axialWidthMm": 4.79998779296875
-            },
-            {
-              "centreXmm": 492,
-              "axialWidthMm": 4.79998779296875
-            }
-          ]
-        }
+    "independentDrainCount": 2,
+    "cathodeTailGasOutlet": [
+      2234,
+      65,
+      45
+    ],
+    "pump": {
+      "front": 2130,
+      "rear": 2170,
+      "centreYZ": [
+        -65,
+        70
       ],
-      "openChannels": [
-        {
-          "channel": 1,
-          "probeRadiusMm": 1,
-          "obstructions": []
-        },
-        {
-          "channel": 2,
-          "probeRadiusMm": 1,
-          "obstructions": []
-        },
-        {
-          "channel": 3,
-          "probeRadiusMm": 1,
-          "obstructions": []
-        }
-      ]
+      "radius": 20
     },
-    "compressorBladeSections": [
-      {
-        "stage": 1,
-        "radiusMm": 75,
-        "separatedBlades": 18,
-        "metadataBlades": 18
-      },
-      {
-        "stage": 1,
-        "radiusMm": 120,
-        "separatedBlades": 18,
-        "metadataBlades": 18
-      },
-      {
-        "stage": 1,
-        "radiusMm": 155,
-        "separatedBlades": 18,
-        "metadataBlades": 18
-      },
-      {
-        "stage": 2,
-        "radiusMm": 60,
-        "separatedBlades": 18,
-        "metadataBlades": 18
-      },
-      {
-        "stage": 2,
-        "radiusMm": 100,
-        "separatedBlades": 18,
-        "metadataBlades": 18
-      },
-      {
-        "stage": 2,
-        "radiusMm": 125,
-        "separatedBlades": 18,
-        "metadataBlades": 18
-      }
+    "internalChannelStatus": "local edge-collector representation; broad axial cooling windows remain open"
+  },
+  "variableIntakes": {
+    "stages": [
+      2,
+      3
     ],
-    "restoredBackplates": [
-      {
-        "stage": 1,
-        "frontMm": 544,
-        "rearMm": 549,
-        "specifiedRadiusMm": 143.8,
-        "measuredRearVertexRadiusMm": 143.80000687293781,
-        "specifiedBladeTipRadiusMm": 162.8,
-        "measuredBladeTipRadiusMm": 162.80000707240038,
-        "bladeRadialOverhangMm": 19,
-        "materialBeyondBackplateMm3": 0,
-        "missingMaterialMm3": 0,
-        "verifiedRunningGapMm": 0.8,
-        "diffuserObstructionMm3": 0,
-        "casingObstructionMm3": 0
-      },
-      {
-        "stage": 2,
-        "frontMm": 611,
-        "rearMm": 616,
-        "specifiedRadiusMm": 114.8,
-        "measuredRearVertexRadiusMm": 114.80000383625237,
-        "specifiedBladeTipRadiusMm": 134.8,
-        "measuredBladeTipRadiusMm": 134.80000319451995,
-        "bladeRadialOverhangMm": 20.000000000000014,
-        "materialBeyondBackplateMm3": 0,
-        "missingMaterialMm3": 0,
-        "verifiedRunningGapMm": 0.8,
-        "diffuserObstructionMm3": 0,
-        "casingObstructionMm3": 0
-      }
+    "petalsPerStage": 24,
+    "pose": {
+      "opening": 0.55,
+      "pitchDeg": 0,
+      "yawDeg": 0
+    },
+    "deflectionRangeDeg": [
+      -5,
+      5
     ],
-    "compressorBladeAttachments": [
-      {
-        "stage": 1,
-        "rootFrontMm": 522,
-        "rootRearMm": 544,
-        "continuousRootProbeSegments": 216,
-        "backplateBridgeProbes": 162,
-        "bridgeProbeMaximumRadiusMm": 143.3,
-        "bladeRadialOverhangMm": 19,
-        "rootMissingMaterialMm3": 0,
-        "bladeBottomMissingMaterialMm3": 0,
-        "rotorConnectedComponents": 1
-      },
-      {
-        "stage": 2,
-        "rootFrontMm": 584,
-        "rootRearMm": 611,
-        "continuousRootProbeSegments": 216,
-        "backplateBridgeProbes": 162,
-        "bridgeProbeMaximumRadiusMm": 114.3,
-        "bladeRadialOverhangMm": 20.000000000000014,
-        "rootMissingMaterialMm3": 0,
-        "bladeBottomMissingMaterialMm3": 0,
-        "rotorConnectedComponents": 1
-      }
-    ],
-    "compressorAftDiffusers": [
-      {
-        "stage": 1,
-        "vanes": 18,
-        "stationary": true,
-        "measuredFrontMm": 552,
-        "measuredRearMm": 567,
-        "rotatingBladeAndDiscRearMm": 549,
-        "axialGapMm": 3
-      },
-      {
-        "stage": 2,
-        "vanes": 18,
-        "stationary": true,
-        "measuredFrontMm": 619,
-        "measuredRearMm": 629,
-        "rotatingBladeAndDiscRearMm": 616,
-        "axialGapMm": 3
-      }
-    ],
-    "outletNeck": {
-      "frontMm": 675,
-      "rearMm": 690,
-      "specifiedInnerDiameterMm": 36,
-      "specifiedOuterDiameterMm": 48,
-      "measuredInnerVertexDiameterMm": 35.99999809761325,
-      "measuredOuterVertexDiameterMm": 48.000001765057846,
-      "fullBoreProbeRadiusMm": 17.9,
+    "articulation": "independent aperture and two-axis deflection; shared browser/validation solver"
+  },
+  "parts": 70,
+  "broadPhasePairs": 2415,
+  "exactPairs": 549,
+  "collisions": [],
+  "fluidChecks": {
+    "cathodeCircuit": {
+      "connectedComponents": 1,
       "obstructions": []
     },
-    "inletToOutlet": {
-      "interpretation": "A clear structural path through the open rotor and stator arrangement; no sealed pressure-stage claim",
-      "probeRadiusMm": 0.5,
-      "segments": 89,
-      "toleranceMm3": 0.001,
-      "maximumObstructionVolumeMm3": 0,
+    "anodeCircuit": {
+      "connectedComponents": 1,
       "obstructions": []
     },
-    "removedDiscSurfaces": [
+    "gasSeparationVolume": 0
+  },
+  "errors": [],
+  "exportedVerification": {
+    "modelBytes": 28219412,
+    "watertightParts": 70,
+    "physicalCells": 1357,
+    "exactFloat32Pairs": 549,
+    "collisions": [],
+    "coolingProbes": 1357,
+    "coolingObstructions": [],
+    "dynamicStates": [
       {
-        "id": "compressor-shroud-1",
-        "absentPartId": true,
-        "witnessVolumeMm3": 0.058527096604829326,
-        "obstructions": []
+        "stage": 2,
+        "opening": 0,
+        "pitchDeg": -5,
+        "yawDeg": -5,
+        "openingDiameter": 394,
+        "pairs": 133,
+        "collisions": []
       },
       {
-        "id": "compressor-shroud-2",
-        "absentPartId": true,
-        "witnessVolumeMm3": 0.058527096604830346,
-        "obstructions": []
+        "stage": 2,
+        "opening": 0,
+        "pitchDeg": -5,
+        "yawDeg": 5,
+        "openingDiameter": 394,
+        "pairs": 133,
+        "collisions": []
       },
       {
-        "id": "compressor-return-diaphragm",
-        "absentPartId": true,
-        "witnessVolumeMm3": 5096.891297136963,
-        "obstructions": []
+        "stage": 2,
+        "opening": 0,
+        "pitchDeg": 5,
+        "yawDeg": -5,
+        "openingDiameter": 394,
+        "pairs": 133,
+        "collisions": []
+      },
+      {
+        "stage": 2,
+        "opening": 0,
+        "pitchDeg": 5,
+        "yawDeg": 5,
+        "openingDiameter": 394,
+        "pairs": 133,
+        "collisions": []
+      },
+      {
+        "stage": 2,
+        "opening": 0,
+        "pitchDeg": 0,
+        "yawDeg": 0,
+        "openingDiameter": 394,
+        "pairs": 130,
+        "collisions": []
+      },
+      {
+        "stage": 2,
+        "opening": 0.25,
+        "pitchDeg": -5,
+        "yawDeg": -5,
+        "openingDiameter": 414,
+        "pairs": 132,
+        "collisions": []
+      },
+      {
+        "stage": 2,
+        "opening": 0.25,
+        "pitchDeg": -5,
+        "yawDeg": 5,
+        "openingDiameter": 414,
+        "pairs": 132,
+        "collisions": []
+      },
+      {
+        "stage": 2,
+        "opening": 0.25,
+        "pitchDeg": 5,
+        "yawDeg": -5,
+        "openingDiameter": 414,
+        "pairs": 132,
+        "collisions": []
+      },
+      {
+        "stage": 2,
+        "opening": 0.25,
+        "pitchDeg": 5,
+        "yawDeg": 5,
+        "openingDiameter": 414,
+        "pairs": 132,
+        "collisions": []
+      },
+      {
+        "stage": 2,
+        "opening": 0.25,
+        "pitchDeg": 0,
+        "yawDeg": 0,
+        "openingDiameter": 414,
+        "pairs": 129,
+        "collisions": []
+      },
+      {
+        "stage": 2,
+        "opening": 0.55,
+        "pitchDeg": -5,
+        "yawDeg": -5,
+        "openingDiameter": 438,
+        "pairs": 132,
+        "collisions": []
+      },
+      {
+        "stage": 2,
+        "opening": 0.55,
+        "pitchDeg": -5,
+        "yawDeg": 5,
+        "openingDiameter": 438,
+        "pairs": 132,
+        "collisions": []
+      },
+      {
+        "stage": 2,
+        "opening": 0.55,
+        "pitchDeg": 5,
+        "yawDeg": -5,
+        "openingDiameter": 438,
+        "pairs": 132,
+        "collisions": []
+      },
+      {
+        "stage": 2,
+        "opening": 0.55,
+        "pitchDeg": 5,
+        "yawDeg": 5,
+        "openingDiameter": 438,
+        "pairs": 132,
+        "collisions": []
+      },
+      {
+        "stage": 2,
+        "opening": 0.55,
+        "pitchDeg": 0,
+        "yawDeg": 0,
+        "openingDiameter": 438,
+        "pairs": 129,
+        "collisions": []
+      },
+      {
+        "stage": 2,
+        "opening": 0.75,
+        "pitchDeg": -5,
+        "yawDeg": -5,
+        "openingDiameter": 454,
+        "pairs": 132,
+        "collisions": []
+      },
+      {
+        "stage": 2,
+        "opening": 0.75,
+        "pitchDeg": -5,
+        "yawDeg": 5,
+        "openingDiameter": 454,
+        "pairs": 132,
+        "collisions": []
+      },
+      {
+        "stage": 2,
+        "opening": 0.75,
+        "pitchDeg": 5,
+        "yawDeg": -5,
+        "openingDiameter": 454,
+        "pairs": 132,
+        "collisions": []
+      },
+      {
+        "stage": 2,
+        "opening": 0.75,
+        "pitchDeg": 5,
+        "yawDeg": 5,
+        "openingDiameter": 454,
+        "pairs": 132,
+        "collisions": []
+      },
+      {
+        "stage": 2,
+        "opening": 0.75,
+        "pitchDeg": 0,
+        "yawDeg": 0,
+        "openingDiameter": 454,
+        "pairs": 129,
+        "collisions": []
+      },
+      {
+        "stage": 2,
+        "opening": 1,
+        "pitchDeg": -5,
+        "yawDeg": -5,
+        "openingDiameter": 474,
+        "pairs": 132,
+        "collisions": []
+      },
+      {
+        "stage": 2,
+        "opening": 1,
+        "pitchDeg": -5,
+        "yawDeg": 5,
+        "openingDiameter": 474,
+        "pairs": 132,
+        "collisions": []
+      },
+      {
+        "stage": 2,
+        "opening": 1,
+        "pitchDeg": 5,
+        "yawDeg": -5,
+        "openingDiameter": 474,
+        "pairs": 132,
+        "collisions": []
+      },
+      {
+        "stage": 2,
+        "opening": 1,
+        "pitchDeg": 5,
+        "yawDeg": 5,
+        "openingDiameter": 474,
+        "pairs": 132,
+        "collisions": []
+      },
+      {
+        "stage": 2,
+        "opening": 1,
+        "pitchDeg": 0,
+        "yawDeg": 0,
+        "openingDiameter": 474,
+        "pairs": 129,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 0,
+        "pitchDeg": -5,
+        "yawDeg": -5,
+        "openingDiameter": 434,
+        "pairs": 140,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 0,
+        "pitchDeg": -5,
+        "yawDeg": 5,
+        "openingDiameter": 434,
+        "pairs": 140,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 0,
+        "pitchDeg": 5,
+        "yawDeg": -5,
+        "openingDiameter": 434,
+        "pairs": 140,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 0,
+        "pitchDeg": 5,
+        "yawDeg": 5,
+        "openingDiameter": 434,
+        "pairs": 140,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 0,
+        "pitchDeg": 0,
+        "yawDeg": 0,
+        "openingDiameter": 434,
+        "pairs": 136,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 0.25,
+        "pitchDeg": -5,
+        "yawDeg": -5,
+        "openingDiameter": 454,
+        "pairs": 139,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 0.25,
+        "pitchDeg": -5,
+        "yawDeg": 5,
+        "openingDiameter": 454,
+        "pairs": 139,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 0.25,
+        "pitchDeg": 5,
+        "yawDeg": -5,
+        "openingDiameter": 454,
+        "pairs": 139,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 0.25,
+        "pitchDeg": 5,
+        "yawDeg": 5,
+        "openingDiameter": 454,
+        "pairs": 139,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 0.25,
+        "pitchDeg": 0,
+        "yawDeg": 0,
+        "openingDiameter": 454,
+        "pairs": 135,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 0.55,
+        "pitchDeg": -5,
+        "yawDeg": -5,
+        "openingDiameter": 478,
+        "pairs": 138,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 0.55,
+        "pitchDeg": -5,
+        "yawDeg": 5,
+        "openingDiameter": 478,
+        "pairs": 138,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 0.55,
+        "pitchDeg": 5,
+        "yawDeg": -5,
+        "openingDiameter": 478,
+        "pairs": 138,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 0.55,
+        "pitchDeg": 5,
+        "yawDeg": 5,
+        "openingDiameter": 478,
+        "pairs": 138,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 0.55,
+        "pitchDeg": 0,
+        "yawDeg": 0,
+        "openingDiameter": 478,
+        "pairs": 135,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 0.75,
+        "pitchDeg": -5,
+        "yawDeg": -5,
+        "openingDiameter": 494,
+        "pairs": 138,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 0.75,
+        "pitchDeg": -5,
+        "yawDeg": 5,
+        "openingDiameter": 494,
+        "pairs": 138,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 0.75,
+        "pitchDeg": 5,
+        "yawDeg": -5,
+        "openingDiameter": 494,
+        "pairs": 138,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 0.75,
+        "pitchDeg": 5,
+        "yawDeg": 5,
+        "openingDiameter": 494,
+        "pairs": 138,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 0.75,
+        "pitchDeg": 0,
+        "yawDeg": 0,
+        "openingDiameter": 494,
+        "pairs": 135,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 1,
+        "pitchDeg": -5,
+        "yawDeg": -5,
+        "openingDiameter": 514,
+        "pairs": 138,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 1,
+        "pitchDeg": -5,
+        "yawDeg": 5,
+        "openingDiameter": 514,
+        "pairs": 138,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 1,
+        "pitchDeg": 5,
+        "yawDeg": -5,
+        "openingDiameter": 514,
+        "pairs": 138,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 1,
+        "pitchDeg": 5,
+        "yawDeg": 5,
+        "openingDiameter": 514,
+        "pairs": 138,
+        "collisions": []
+      },
+      {
+        "stage": 3,
+        "opening": 1,
+        "pitchDeg": 0,
+        "yawDeg": 0,
+        "openingDiameter": 514,
+        "pairs": 135,
+        "collisions": []
       }
     ],
-    "removedReturnVanes": {
-      "absentPartId": true,
-      "method": "Removed part identity; the relocated first diffuser legitimately occupies part of the former witness region"
-    },
-    "blueSleeve": {
-      "specifiedBoreDiameterMm": 330,
-      "measuredInnerVertexDiameterMm": 329.9999855862564,
-      "probeRadiusMm": 164.9,
-      "openBoreObstructionMm3": 0,
-      "frontMm": 210,
-      "rearMm": 480
-    },
-    "intakeInnerShell": {
-      "forwardInnerDiameterMm": 304,
-      "forwardOuterDiameterMm": 312,
-      "rearInnerDiameterMm": 272,
-      "rearOuterDiameterMm": 280,
-      "contractionStartMm": 440,
-      "radialContractionMm": 16,
-      "curve": "sampled smooth cubic contraction, independently checked for monotonicity and eased end slopes",
-      "firstSlopeRelativeToAverage": 0.09179393256863477,
-      "lastSlopeRelativeToAverage": 0.09179541597148955,
-      "stations": [
-        {
-          "x": 210,
-          "specifiedInnerRadiusMm": 152,
-          "specifiedOuterRadiusMm": 156,
-          "measuredInnerRadiusMm": 151.9999950325195,
-          "measuredOuterRadiusMm": 156.00000658605194,
-          "measuredVertices": 256
-        },
-        {
-          "x": 440,
-          "specifiedInnerRadiusMm": 152,
-          "specifiedOuterRadiusMm": 156,
-          "measuredInnerRadiusMm": 151.9999950325195,
-          "measuredOuterRadiusMm": 156.00000658605194,
-          "measuredVertices": 256
-        },
-        {
-          "x": 441.25,
-          "specifiedInnerRadiusMm": 151.9541015625,
-          "specifiedOuterRadiusMm": 155.9541015625,
-          "measuredInnerRadiusMm": 151.954093885645,
-          "measuredOuterRadiusMm": 155.95410961976762,
-          "measuredVertices": 256
-        },
-        {
-          "x": 442.5,
-          "specifiedInnerRadiusMm": 151.8203125,
-          "specifiedOuterRadiusMm": 155.8203125,
-          "measuredInnerRadiusMm": 151.8203044602923,
-          "measuredOuterRadiusMm": 155.82031868564002,
-          "measuredVertices": 256
-        },
-        {
-          "x": 443.75,
-          "specifiedInnerRadiusMm": 151.6044921875,
-          "specifiedOuterRadiusMm": 155.6044921875,
-          "measuredInnerRadiusMm": 151.60448534974464,
-          "measuredOuterRadiusMm": 155.6044980106252,
-          "measuredVertices": 256
-        },
-        {
-          "x": 445,
-          "specifiedInnerRadiusMm": 151.3125,
-          "specifiedOuterRadiusMm": 155.3125,
-          "measuredInnerRadiusMm": 151.31249281419048,
-          "measuredOuterRadiusMm": 155.3125068874552,
-          "measuredVertices": 256
-        },
-        {
-          "x": 446.25,
-          "specifiedInnerRadiusMm": 150.9501953125,
-          "specifiedOuterRadiusMm": 154.9501953125,
-          "measuredInnerRadiusMm": 150.9501926300754,
-          "measuredOuterRadiusMm": 154.9502005928913,
-          "measuredVertices": 256
-        },
-        {
-          "x": 447.5,
-          "specifiedInnerRadiusMm": 150.5234375,
-          "specifiedOuterRadiusMm": 154.5234375,
-          "measuredInnerRadiusMm": 150.52343024627982,
-          "measuredOuterRadiusMm": 154.52344347671408,
-          "measuredVertices": 256
-        },
-        {
-          "x": 448.75,
-          "specifiedInnerRadiusMm": 150.0380859375,
-          "specifiedOuterRadiusMm": 154.0380859375,
-          "measuredInnerRadiusMm": 150.03807925140234,
-          "measuredOuterRadiusMm": 154.03809264784053,
-          "measuredVertices": 256
-        },
-        {
-          "x": 450,
-          "specifiedInnerRadiusMm": 149.5,
-          "specifiedOuterRadiusMm": 153.5,
-          "measuredInnerRadiusMm": 149.49999367484907,
-          "measuredOuterRadiusMm": 153.50000671727864,
-          "measuredVertices": 256
-        },
-        {
-          "x": 451.25,
-          "specifiedInnerRadiusMm": 148.9150390625,
-          "specifiedOuterRadiusMm": 152.9150390625,
-          "measuredInnerRadiusMm": 148.91503365753803,
-          "measuredOuterRadiusMm": 152.9150432686652,
-          "measuredVertices": 256
-        },
-        {
-          "x": 452.5,
-          "specifiedInnerRadiusMm": 148.2890625,
-          "specifiedOuterRadiusMm": 152.2890625,
-          "measuredInnerRadiusMm": 148.28905584816908,
-          "measuredOuterRadiusMm": 152.2890690097636,
-          "measuredVertices": 256
-        },
-        {
-          "x": 453.75,
-          "specifiedInnerRadiusMm": 147.6279296875,
-          "specifiedOuterRadiusMm": 151.6279296875,
-          "measuredInnerRadiusMm": 147.62792455876354,
-          "measuredOuterRadiusMm": 151.62793522338092,
-          "measuredVertices": 256
-        },
-        {
-          "x": 455,
-          "specifiedInnerRadiusMm": 146.9375,
-          "specifiedOuterRadiusMm": 150.9375,
-          "measuredInnerRadiusMm": 146.93749418263866,
-          "measuredOuterRadiusMm": 150.93750664268728,
-          "measuredVertices": 256
-        },
-        {
-          "x": 456.25,
-          "specifiedInnerRadiusMm": 146.2236328125,
-          "specifiedOuterRadiusMm": 150.2236328125,
-          "measuredInnerRadiusMm": 146.22362611597043,
-          "measuredOuterRadiusMm": 150.2236361308299,
-          "measuredVertices": 256
-        },
-        {
-          "x": 457.5,
-          "specifiedInnerRadiusMm": 145.4921875,
-          "specifiedOuterRadiusMm": 149.4921875,
-          "measuredInnerRadiusMm": 145.4921801173301,
-          "measuredOuterRadiusMm": 149.49219362306886,
-          "measuredVertices": 256
-        },
-        {
-          "x": 458.75,
-          "specifiedInnerRadiusMm": 144.7490234375,
-          "specifiedOuterRadiusMm": 148.7490234375,
-          "measuredInnerRadiusMm": 144.7490170854933,
-          "measuredOuterRadiusMm": 148.74902943645503,
-          "measuredVertices": 256
-        },
-        {
-          "x": 460,
-          "specifiedInnerRadiusMm": 144,
-          "specifiedOuterRadiusMm": 148,
-          "measuredInnerRadiusMm": 143.999992390453,
-          "measuredOuterRadiusMm": 148.0000060775145,
-          "measuredVertices": 256
-        },
-        {
-          "x": 461.25,
-          "specifiedInnerRadiusMm": 143.2509765625,
-          "specifiedOuterRadiusMm": 147.2509765625,
-          "measuredInnerRadiusMm": 143.2509709187755,
-          "measuredOuterRadiusMm": 147.25098148573375,
-          "measuredVertices": 256
-        },
-        {
-          "x": 462.5,
-          "specifiedInnerRadiusMm": 142.5078125,
-          "specifiedOuterRadiusMm": 146.5078125,
-          "measuredInnerRadiusMm": 142.50780658753365,
-          "measuredOuterRadiusMm": 146.5078196646155,
-          "measuredVertices": 256
-        },
-        {
-          "x": 463.75,
-          "specifiedInnerRadiusMm": 141.7763671875,
-          "specifiedOuterRadiusMm": 145.7763671875,
-          "measuredInnerRadiusMm": 141.7763629686627,
-          "measuredOuterRadiusMm": 145.77637456437768,
-          "measuredVertices": 256
-        },
-        {
-          "x": 465,
-          "specifiedInnerRadiusMm": 141.0625,
-          "specifiedOuterRadiusMm": 145.0625,
-          "measuredInnerRadiusMm": 141.0624940968293,
-          "measuredOuterRadiusMm": 145.06250572805592,
-          "measuredVertices": 256
-        },
-        {
-          "x": 466.25,
-          "specifiedInnerRadiusMm": 140.3720703125,
-          "specifiedOuterRadiusMm": 144.3720703125,
-          "measuredInnerRadiusMm": 140.37206640497,
-          "measuredOuterRadiusMm": 144.3720760212281,
-          "measuredVertices": 256
-        },
-        {
-          "x": 467.5,
-          "specifiedInnerRadiusMm": 139.7109375,
-          "specifiedOuterRadiusMm": 143.7109375,
-          "measuredInnerRadiusMm": 139.7109330133281,
-          "measuredOuterRadiusMm": 143.71094355080967,
-          "measuredVertices": 256
-        },
-        {
-          "x": 468.75,
-          "specifiedInnerRadiusMm": 139.0849609375,
-          "specifiedOuterRadiusMm": 143.0849609375,
-          "measuredInnerRadiusMm": 139.08495336235882,
-          "measuredOuterRadiusMm": 143.08496747879062,
-          "measuredVertices": 256
-        },
-        {
-          "x": 470,
-          "specifiedInnerRadiusMm": 138.5,
-          "specifiedOuterRadiusMm": 142.5,
-          "measuredInnerRadiusMm": 138.49999805658746,
-          "measuredOuterRadiusMm": 142.500006741188,
-          "measuredVertices": 256
-        },
-        {
-          "x": 471.25,
-          "specifiedInnerRadiusMm": 137.9619140625,
-          "specifiedOuterRadiusMm": 141.9619140625,
-          "measuredInnerRadiusMm": 137.96190794699848,
-          "measuredOuterRadiusMm": 141.96192092256422,
-          "measuredVertices": 256
-        },
-        {
-          "x": 472.5,
-          "specifiedInnerRadiusMm": 137.4765625,
-          "specifiedOuterRadiusMm": 141.4765625,
-          "measuredInnerRadiusMm": 137.47655540444535,
-          "measuredOuterRadiusMm": 141.47656912184766,
-          "measuredVertices": 256
-        },
-        {
-          "x": 473.75,
-          "specifiedInnerRadiusMm": 137.0498046875,
-          "specifiedOuterRadiusMm": 141.0498046875,
-          "measuredInnerRadiusMm": 137.04980076479515,
-          "measuredOuterRadiusMm": 141.04981110969368,
-          "measuredVertices": 256
-        },
-        {
-          "x": 475,
-          "specifiedInnerRadiusMm": 136.6875,
-          "specifiedOuterRadiusMm": 140.6875,
-          "measuredInnerRadiusMm": 136.68749308250884,
-          "measuredOuterRadiusMm": 140.68750454820002,
-          "measuredVertices": 256
-        },
-        {
-          "x": 476.25,
-          "specifiedInnerRadiusMm": 136.3955078125,
-          "specifiedOuterRadiusMm": 140.3955078125,
-          "measuredInnerRadiusMm": 136.39550542512282,
-          "measuredOuterRadiusMm": 140.3955153955154,
-          "measuredVertices": 256
-        },
-        {
-          "x": 477.5,
-          "specifiedInnerRadiusMm": 136.1796875,
-          "specifiedOuterRadiusMm": 140.1796875,
-          "measuredInnerRadiusMm": 136.1796834536024,
-          "measuredOuterRadiusMm": 140.17969372026303,
-          "measuredVertices": 256
-        },
-        {
-          "x": 478.75,
-          "specifiedInnerRadiusMm": 136.0458984375,
-          "specifiedOuterRadiusMm": 140.0458984375,
-          "measuredInnerRadiusMm": 136.04589082808621,
-          "measuredOuterRadiusMm": 140.04590393463252,
-          "measuredVertices": 256
-        },
-        {
-          "x": 480,
-          "specifiedInnerRadiusMm": 136,
-          "specifiedOuterRadiusMm": 140,
-          "measuredInnerRadiusMm": 135.9999946741318,
-          "measuredOuterRadiusMm": 140.00000622664678,
-          "measuredVertices": 256
-        }
-      ],
-      "motorRadialClearanceMm": 1.954220441823054,
-      "motorEnvelopeExpansionMm": 0.8,
-      "motorEnvelopeObstructionMm3": 0,
-      "axialGapAfterMotorMm": 2,
-      "straightBoreObstructionMm3": 0,
-      "rearOpeningObstructionMm3": 0,
-      "frontMm": 210,
-      "rearMm": 480,
-      "openBoreObstructionMm3": 0
-    },
-    "intakeAnnulus": {
-      "radialGapMm": 9,
-      "radialGapReference": "minimum nominal gap in the forward constant-radius section",
-      "rearRadialGapMm": 25,
-      "nominalAreaMm2": 9076.061176220912,
-      "rearNominalAreaMm2": 23954.643983622173,
-      "flowProbeRadiusFromAxisMm": 160.5,
-      "maximumObstructionVolumeMm3": 0,
-      "obstructions": []
-    },
-    "failures": []
+    "errors": []
   }
 }

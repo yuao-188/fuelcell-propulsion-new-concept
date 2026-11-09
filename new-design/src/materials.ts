@@ -71,6 +71,16 @@ function surfaceFinish(source: THREE.MeshStandardMaterial, data: SurfaceData): F
     metalness: .91, roughness: id.includes('seam') ? .26 : .37, scale: 240, variation: .2, relief: .038, reflection: 1.12 };
   if (group === 'innerShell') return { ...base, color: '#82939f', metalness: .85, roughness: .43,
     grain: 'blasted', scale: 175, variation: .19, relief: .03, reflection: 1.0 };
+  if (group === 'variableIntake') {
+    if (/seal|overlap/.test(id)) return { ...base, color: '#768c99', metalness: .86, roughness: .34,
+      scale: 95, variation: .1, relief: .014 };
+    if (/rod|actuator|link|hinge|pin/.test(id)) return { ...base, color: '#b3c1c9', metalness: .96,
+      roughness: .23, scale: 80, variation: .08, relief: .01, reflection: 1.2 };
+    return { ...base, color: '#aebec8', metalness: .91, roughness: .30,
+      scale: 150, variation: .13, relief: .018, reflection: 1.15 };
+  }
+  if (group === 'interstageGuide') return { ...base, color: '#788e9c', metalness: .86, roughness: .38,
+    scale: 160, variation: .12, relief: .02 };
   if (group === 'intakeOuter') return { ...base, color: '#46738d', metalness: .75, roughness: .34,
     scale: 145, variation: .15, relief: .024, reflection: 1.1 };
   if (group === 'intakeInner') return { ...base, color: '#35596d', metalness: .7, roughness: .42,
