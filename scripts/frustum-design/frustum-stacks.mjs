@@ -37,9 +37,13 @@ export function buildFrustumStacks(ctx, { stackCutters = [], linerCutters } = {}
       // black/silver diagonal stripes in an axial cut, and a dark outer cone.
       const silverStart = start + 3.6 / widthFront;
       const silverEnd = silverStart + .65 / widthFront;
-      graphite.push(band(stack.front, stack.rear, start, silverStart));
-      graphite.push(band(stack.front, stack.rear, silverEnd, start + layerFraction));
-      laminations.push(band(stack.front, stack.rear, silverStart, silverEnd));
+      // Separate the differently coloured mating skins by a visible-scale
+      // negligible relief. Coincident double-sided faces otherwise flicker
+      // in WebGL even though the closed solids have no intersecting volume.
+      const interfaceRelief=.025/widthFront;
+      graphite.push(band(stack.front, stack.rear, start, silverStart-interfaceRelief));
+      graphite.push(band(stack.front, stack.rear, silverEnd+interfaceRelief, start + layerFraction));
+      laminations.push(band(stack.front, stack.rear, silverStart+interfaceRelief, silverEnd-interfaceRelief));
     }
     // Four small seating collars stay within the first and last lamellae.
     // They never bridge the open channels or cover an entire axial end face.

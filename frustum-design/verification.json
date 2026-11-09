@@ -271,8 +271,8 @@
       "axialEnds": "open-concentric-sloping-channels",
       "centreBore": "open-front-to-rear",
       "serviceSeats": true,
-      "bodyVolume": 18526585.831032563,
-      "foilVolume": 2873862.422492728
+      "bodyVolume": 18305429.060554747,
+      "foilVolume": 2652706.2884830306
     },
     {
       "stage": 2,
@@ -297,8 +297,8 @@
       "axialEnds": "open-concentric-sloping-channels",
       "centreBore": "open-front-to-rear",
       "serviceSeats": true,
-      "bodyVolume": 17971835.37080551,
-      "foilVolume": 2782088.4144680295
+      "bodyVolume": 17757739.498861622,
+      "foilVolume": 2567993.832432163
     },
     {
       "stage": 3,
@@ -323,8 +323,8 @@
       "axialEnds": "open-concentric-sloping-channels",
       "centreBore": "open-front-to-rear",
       "serviceSeats": true,
-      "bodyVolume": 18278911.319924317,
-      "foilVolume": 2824585.2910686345
+      "bodyVolume": 18061528.162224166,
+      "foilVolume": 2607203.724439282
     }
   ],
   "machinery": {
