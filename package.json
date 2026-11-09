@@ -11,7 +11,11 @@
     "dev:new-design": "vite --config vite.new-design.config.ts --host 127.0.0.1 --port 5175",
     "model:new-design": "node scripts/build-variable-design.mjs",
     "build:new-design": "npm run model:new-design && node scripts/verify-variable-design.mjs && tsc -p new-design/tsconfig.json && vite build --config vite.new-design.config.ts",
-    "prepare:new-design": "node scripts/prepare-new-design.mjs"
+    "prepare:new-design": "node scripts/prepare-new-design.mjs",
+    "dev:frustum-design": "vite --config vite.frustum-design.config.ts --host 127.0.0.1 --port 5176",
+    "model:frustum-design": "node scripts/frustum-design/build-variable-design.mjs",
+    "build:frustum-design": "npm run model:frustum-design && tsc -p frustum-design/tsconfig.json && vite build --config vite.frustum-design.config.ts",
+    "prepare:frustum-design": "node scripts/prepare-frustum-design.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "6.0.2",

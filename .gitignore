@@ -4,3 +4,5 @@ dist/
 dist-new-design/
 new-design/public/model.glb
 new-design/qa/
+dist-frustum-design/
+frustum-design/public/model.glb
