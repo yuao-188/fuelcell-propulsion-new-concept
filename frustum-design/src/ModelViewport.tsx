@@ -35,7 +35,9 @@ export default function ModelViewport(props: Props) {
     let renderer: THREE.WebGLRenderer;
     try { renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,stencil:true}); }
     catch { setStatus('三维显示无法启动，请启用浏览器硬件加速后刷新。'); return; }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+    // Thin illustrative interlayers need enough screen samples even on a
+    // standard-density desktop display; cap resolution remains bounded.
+    renderer.setPixelRatio(Math.min(Math.max(window.devicePixelRatio,2),2));
     renderer.outputColorSpace=THREE.SRGBColorSpace;
     renderer.toneMapping=THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure=.96;
