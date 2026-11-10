@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import {Document,NodeIO} from '@gltf-transform/core';
 import {Color} from 'three';
 import {createKernel} from './model-kernel.mjs';
-import {buildDetailedMachinery} from '../detailed-machinery.mjs';
+import {buildDetailedMachinery} from './detailed-machinery.mjs';
 import {buildStraightShells} from './straight-shells.mjs';
 import {buildFrustumStacks} from './frustum-stacks.mjs';
 import {buildCompactFluidNetworks} from './compact-fluid-networks.mjs';
@@ -35,7 +35,7 @@ for(const s of P.stacks){
 }
 add('wiring-harness','沿机匣敷设线束与三级分支','wiring','#35454e',union(wirePieces),{clip:true,metallic:.06,roughness:.6});
 
-const report={schema:1,revision:'20261109-frustum-copy',units:'mm',
+const report={schema:1,revision:'20261110-aft-hydrogen',units:'mm',
   dimensionSource:'new independent visual variant: axial lengths 300/250/220, gaps100; approximate diameters',
   scope:'illustrative hollow frustum stacks; lamella count is not a physical cell count',
   length:P.outerShell.rear,schematicStacks:3,
@@ -73,6 +73,12 @@ const mixed=fluids.bores.cathodeCircuit.intersect(fluids.bores.anodeCircuit);
 report.fluidChecks.gasSeparationVolume=mixed.volume();mixed.delete();
 if(report.fluidChecks.gasSeparationVolume>.001)report.errors.push('Pressure media overlap');
 for(const join of fluids.junctionChecks??[]){const common=join.a.intersect(join.b),v=common.volume();common.delete();if(v<.00001)report.errors.push(`${join.name}: disconnected junction`);}
+report.fluidChecks.aftSupplyReturnOverlap=[];
+for(const join of fluids.junctionChecks.filter(j=>/hydrogen-port$/.test(j.name))){
+  const common=join.a.intersect(fluids.bores.return),volume=common.volume();common.delete();
+  report.fluidChecks.aftSupplyReturnOverlap.push({branch:join.name,volume});
+  if(volume>.001)report.errors.push(`${join.name}: aft supply bypasses into return`);
+}
 await mkdir(resolve(root,'frustum-design/public'),{recursive:true});
 await writeFile(resolve(root,'frustum-design/verification.json'),JSON.stringify(report,null,2));
 if(report.collisions.length||report.errors.length){
@@ -80,6 +86,12 @@ if(report.collisions.length||report.errors.length){
   throw new Error('Assembly failed; new geometry was not exported.');
 }
 console.log('Exporting validated geometry...');
+// Inspection copies reuse the first stage's actual pipe walls. They belong to
+// a separate display mode, never to the physical assembly or its audits.
+for(const part of fluids.inspectionParts??[]){
+  const {id,name,group,color,solid,...extra}=part;
+  add(id,name,group,color,solid,extra);
+}
 const doc=new Document(),buffer=doc.createBuffer(),scene=doc.createScene('Hydrogen engine frustum variant');
 scene.setExtras({revision:report.revision,length:report.length,schematicStacks:3,countIsIllustrative:true});
 const materials=new Map();

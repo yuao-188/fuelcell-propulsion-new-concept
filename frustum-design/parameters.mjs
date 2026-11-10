@@ -21,7 +21,9 @@ export const parameters = {
   stackAppearance: { arrangement: 'schematic-concentric-frustum-lamellae', countIsIllustrative: true },
   air: { outer: 24, inner: 18, end: 1826, branchOuter: 5, branchInner: 3.5 },
   hydrogen: { outer: 4, inner: 2.5, inletX: 1876, headerRadius: 35, headerAngle: 135, rearOffset: 16,
-    branchRearOffsets: [16,16,4.5] },
+    branchRearOffsets: [16,16,4.5],
+    aftHeating: { frontOffset: 22, rearOffset: 36, radialInset: 35, turnDegrees: 360,
+      outer: 3.3, inner: 2.1, rearEntryOffset: 1, stageStartAngles: [135,135,90] } },
   pump: { front: 1776, rear: 1816, centerY: -65, centerZ: 70, radius: 20, bore: 2.5 },
   outerShell: { front: 0, shoulder: 1710, rear: 1910, radius: 506, outletRadius: 476.2, wall: 6 },
   // Only the short stator hub support remains; there is no overall inner shell.

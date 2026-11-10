@@ -10,7 +10,7 @@ import { parameters as P } from '../parameters.mjs';
 // @ts-expect-error The same deterministic solver is used in the GLB builder.
 import { getIntakeGeometry, getIntakeKinematics } from '../intake-kinematics.mjs';
 
-export type CameraView = 'perspective' | 'side' | 'front' | 'fan' | 'machinery' | 'compressor' | 'stacks' | 'cells' | 'water' | 'intake2' | 'intake3';
+export type CameraView = 'perspective' | 'side' | 'front' | 'fan' | 'machinery' | 'compressor' | 'stacks' | 'cells' | 'stage1Pipes' | 'water' | 'intake2' | 'intake3';
 export type IntakePose = { opening: number; pitchDeg: number; yawDeg: number };
 type IntakeGeometry = { id: string; positions: ArrayLike<number>; indices: ArrayLike<number> };
 
@@ -115,6 +115,8 @@ export default function ModelViewport(props: Props) {
     let root:THREE.Group|undefined,cancelled=false,frame=0,dirty=true;
     controls.addEventListener('change',()=>{dirty=true;});
     const meshes:THREE.Mesh[]=[];
+    const isFirstStageStack=(mesh:THREE.Mesh)=>mesh.userData.group==='stacks'&&Number(mesh.userData.stage)===1;
+    const isFirstStageInspection=(mesh:THREE.Mesh)=>Boolean(mesh.userData.inspectionOnly)&&Number(mesh.userData.inspectionStage)===1;
     const variableMeshes = new Map<number, Map<string, THREE.Mesh>>();
     const priorIntake = new Map<number, string>();
     // Start from the confirmed core envelope, then replace it with the loaded
@@ -137,7 +139,7 @@ export default function ModelViewport(props: Props) {
     function fit() {
       const view=latest.current.cameraView;
       const intakeStage=view==='intake2'?2:view==='intake3'?3:0;
-      const direction=view==='side'?new THREE.Vector3(0,0,1):view==='front'?new THREE.Vector3(-1,0,0):view==='fan'?new THREE.Vector3(-1,.17,.5).normalize():view==='compressor'?(latest.current.compressorView==='rotors'?new THREE.Vector3(-1,.25,1.6).normalize():new THREE.Vector3(-.08,.08,1).normalize()):intakeStage?new THREE.Vector3(-.34,.25,1).normalize():view==='machinery'?new THREE.Vector3(.2,.18,1).normalize():view==='cells'?new THREE.Vector3(-.65,.3,1).normalize():view==='water'?new THREE.Vector3(.25,.2,1).normalize():new THREE.Vector3(-.52,.30,1).normalize();
+      const direction=view==='side'?new THREE.Vector3(0,0,1):view==='front'?new THREE.Vector3(-1,0,0):view==='fan'?new THREE.Vector3(-1,.17,.5).normalize():view==='compressor'?(latest.current.compressorView==='rotors'?new THREE.Vector3(-1,.25,1.6).normalize():new THREE.Vector3(-.08,.08,1).normalize()):intakeStage?new THREE.Vector3(-.34,.25,1).normalize():view==='machinery'?new THREE.Vector3(.2,.18,1).normalize():view==='stage1Pipes'?new THREE.Vector3(.55,.22,1).normalize():view==='cells'?new THREE.Vector3(-.65,.3,1).normalize():view==='water'?new THREE.Vector3(.25,.2,1).normalize():new THREE.Vector3(-.52,.30,1).normalize();
       const first=P.stacks[0],last=P.stacks[P.stacks.length-1],r=last.outer+35;
       let box=view==='fan'?[[Math.min(-10,P.fan.spinnerFront-10),P.fan.rear+20],[-P.fan.radius-15,P.fan.radius+15],[-P.fan.radius-15,P.fan.radius+15]]:view==='compressor'?[[P.compressor.front-15,P.compressor.outlet+15],[-185,230],[-180,180]]:view==='machinery'?[[P.motorHousing.front-5,P.compressor.outlet+15],[-190,190],[-190,190]]:view==='stacks'?[[first.front-20,last.rear+20],[-r,r],[-r,r]]:view==='cells'?[[first.front-20,first.rear+20],[-first.outer-20,first.outer+20],[-first.outer-20,first.outer+20]]:view==='water'?[[last.rear+5,P.outerShell.rear-15],[-120,120],[-120,120]]:[[modelBounds.min.x-18,modelBounds.max.x+18],[modelBounds.min.y-20,modelBounds.max.y+20],[modelBounds.min.z-20,modelBounds.max.z+20]];
       if(intakeStage) {
@@ -154,6 +156,15 @@ export default function ModelViewport(props: Props) {
           waterBounds.expandByScalar(45);
           box=['x','y','z'].map(axis=>[waterBounds.min[axis as 'x'|'y'|'z'],waterBounds.max[axis as 'x'|'y'|'z']]);
         }
+      }
+      if(view==='stage1Pipes') {
+        const inspectionBounds=new THREE.Box3();
+        meshes.filter(mesh=>isFirstStageStack(mesh)||isFirstStageInspection(mesh))
+          .forEach(mesh=>inspectionBounds.expandByObject(mesh));
+        if(!inspectionBounds.isEmpty()) {
+          inspectionBounds.expandByScalar(20);
+          box=['x','y','z'].map(axis=>[inspectionBounds.min[axis as 'x'|'y'|'z'],inspectionBounds.max[axis as 'x'|'y'|'z']]);
+        } else box=[[first.front-35,first.rear+65],[-first.outer-25,first.outer+25],[-first.outer-25,first.outer+25]];
       }
       const target=new THREE.Vector3(...box.map(range=>(range[0]+range[1])/2) as [number,number,number]);controls.target.copy(target);
       const right=new THREE.Vector3().crossVectors(camera.up,direction).normalize(),up=new THREE.Vector3().crossVectors(direction,right);
@@ -215,10 +226,16 @@ export default function ModelViewport(props: Props) {
     // They prove each control changes the rendered buffers independently.
     const qaWindow=window as unknown as { __frustumDesignQA?: { snapshot: () => unknown } };
     const qaAccess={snapshot:()=>({
-      version:'20261109-frustum-copy',loaded:Boolean(root),
+      version:'20261110-aft-hydrogen',loaded:Boolean(root),cameraView:latest.current.cameraView,
       schematicStacks:meshes.filter(mesh=>/^stack-\d+-1$/.test(String(mesh.userData.id))).length,
       stackArrangement:P.stackAppearance.arrangement,countIsIllustrative:true,
       groups:meshes.reduce((result,mesh)=>{const group=String(mesh.userData.group);result[group]=(result[group]||0)+1;return result;},{} as Record<string,number>),
+      visible:meshes.filter(mesh=>mesh.visible).map(mesh=>({
+        id:mesh.userData.id,group:mesh.userData.group,stage:mesh.userData.stage,
+        inspectionOnly:Boolean(mesh.userData.inspectionOnly),inspectionStage:mesh.userData.inspectionStage,
+        clippingPlanes:((mesh.material as THREE.MeshStandardMaterial).clippingPlanes??[]).map(plane=>({normal:plane.normal.toArray(),constant:plane.constant})),
+      })),
+      visibleCaps:sections.filter(section=>section.cap.visible).map(section=>section.source.userData.id),
       intakes:Object.fromEntries([2,3].map(stage=>{
         const parts=[...(variableMeshes.get(stage)?.values()??[])].map(mesh=>{
           const position=mesh.geometry.getAttribute('position') as THREE.BufferAttribute;
@@ -235,7 +252,7 @@ export default function ModelViewport(props: Props) {
       })),
     })};
     if(new URLSearchParams(location.search).get('qa')==='1')qaWindow.__frustumDesignQA=qaAccess;
-    const modelUrl=new URL('model.glb?v=20261109-frustum-copy',document.baseURI);
+    const modelUrl=new URL('model.glb?v=20261110-aft-hydrogen',document.baseURI);
     const modelRequest=new AbortController();
     const loadFailed=()=>{if(!cancelled)setStatus('模型加载失败，请刷新页面重试。');};
     // Read the binary directly. FileLoader's rewrapped progress stream can
@@ -253,7 +270,8 @@ export default function ModelViewport(props: Props) {
         meshes.push(item);item.renderOrder=100000;item.castShadow=true;item.receiveShadow=true;
         const source=item.material as THREE.MeshStandardMaterial;
         item.material=finishes.create(source,item.userData);
-        if(item.userData.clip)addSection(item,sections.length);
+        if(item.userData.inspectionOnly)item.visible=false;
+        if(item.userData.clip&&!item.userData.inspectionOnly)addSection(item,sections.length);
         const variableStage=Number(item.userData.variableStage);
         if(variableStage===2||variableStage===3) {
           if(!variableMeshes.has(variableStage))variableMeshes.set(variableStage,new Map());
@@ -286,26 +304,32 @@ export default function ModelViewport(props: Props) {
       const cameraKey=`${p.cameraView}:${p.compressorView}`;
       const isolated=p.cameraView==='compressor', rotors=isolated&&p.compressorView==='rotors';
       const stackDetail=p.cameraView==='cells';
+      const stage1Pipes=p.cameraView==='stage1Pipes';
       const intakeStage=p.cameraView==='intake2'?2:p.cameraView==='intake3'?3:0;
-      const modeKey=`${p.viewMode}:${isolated}:${rotors}:${intakeStage}:${stackDetail}`;
-      const cut=p.viewMode==='cutaway'&&!rotors;
+      const modeKey=`${p.viewMode}:${isolated}:${rotors}:${intakeStage}:${stackDetail}:${stage1Pipes}`;
+      const cut=stage1Pipes||(p.viewMode==='cutaway'&&!rotors);
       if(priorReset!==p.resetKey||priorCamera!==cameraKey){fit();priorReset=p.resetKey;priorCamera=cameraKey;}
       if(priorMode!==modeKey||priorDepth!==p.sectionDepth){
         const assemblyClipRadius=Math.max(Math.abs(modelBounds.min.z),Math.abs(modelBounds.max.z))+2;
-        clipping.constant=(isolated?180:intakeStage?inletFraming(intakeStage).radius:stackDetail?P.stacks[0].outer+2:assemblyClipRadius)*(1-2*p.sectionDepth/100);
-        for(const {source,cap} of sections){
-          const material=source.material as THREE.MeshStandardMaterial;
-          if(priorMode!==modeKey){material.clippingPlanes=cut?[clipping]:[];material.needsUpdate=true;}
-          cap.position.z=clipping.constant;
+        clipping.constant=stage1Pipes?0:(isolated?180:intakeStage?inletFraming(intakeStage).radius:stackDetail?P.stacks[0].outer+2:assemblyClipRadius)*(1-2*p.sectionDepth/100);
+        if(priorMode!==modeKey)for(const mesh of meshes){
+          const material=mesh.material as THREE.MeshStandardMaterial;
+          const clipMesh=cut&&Boolean(mesh.userData.clip)&&!mesh.userData.inspectionOnly&&(!stage1Pipes||isFirstStageStack(mesh));
+          material.clippingPlanes=clipMesh?[clipping]:[];material.needsUpdate=true;
         }
+        for(const {cap} of sections)cap.position.z=clipping.constant;
         priorMode=modeKey;priorDepth=p.sectionDepth;dirty=true;
       }
-      const visibility=[isolated,rotors,intakeStage,stackDetail,p.showOuterShell,p.showVariableIntake,p.showInterstageGuide,p.showStacks,p.showAir,p.showHydrogen,p.showReturn,p.showIntake,p.showIntakeInner,p.showCompressorCase,p.showCathodeWater,p.showAnodeSeparator,p.showWiring].join();
+      const visibility=[isolated,rotors,intakeStage,stackDetail,stage1Pipes,p.showOuterShell,p.showVariableIntake,p.showInterstageGuide,p.showStacks,p.showAir,p.showHydrogen,p.showReturn,p.showIntake,p.showIntakeInner,p.showCompressorCase,p.showCathodeWater,p.showAnodeSeparator,p.showWiring].join();
       if(priorVisibility!==visibility){
         const visible:Record<string,boolean>={outerShell:p.showOuterShell,variableIntake:p.showVariableIntake,interstageGuide:p.showInterstageGuide,intakeOuter:p.showIntake,intakeInner:p.showIntakeInner,compressorCase:p.showCompressorCase,stacks:p.showStacks,air:p.showAir,hydrogen:p.showHydrogen,return:p.showReturn,anodeInternal:p.showHydrogen||p.showReturn,cathodeExhaust:p.showCathodeWater,cathodeSeparator:p.showCathodeWater,cathodeDrain:p.showCathodeWater,anodeSeparator:p.showAnodeSeparator,anodeDrain:p.showAnodeSeparator,wiring:p.showWiring};
         meshes.forEach(mesh=>{
           const id=String(mesh.userData.id??'');
-          if(isolated) {
+          if(mesh.userData.inspectionOnly) {
+            mesh.visible=stage1Pipes&&isFirstStageInspection(mesh)&&(visible[mesh.userData.group]??false);
+          } else if(stage1Pipes) {
+            mesh.visible=isFirstStageStack(mesh)&&p.showStacks;
+          } else if(isolated) {
             mesh.visible=id.startsWith('compressor-') && !(rotors && mesh.userData.group==='compressorCase');
           } else if(stackDetail) {
             mesh.visible=mesh.userData.group==='stacks'&&Number(mesh.userData.stage)===1&&p.showStacks;
@@ -322,9 +346,10 @@ export default function ModelViewport(props: Props) {
         source.updateWorldMatrix(true,false);
         stencil.matrix.copy(source.matrixWorld);stencil.matrixWorldNeedsUpdate=true;
         const bounds=source.geometry.boundingBox!.clone().applyMatrix4(source.matrixWorld);
-        stencil.visible=cap.visible=source.visible&&cut&&clipping.constant>bounds.min.z&&clipping.constant<bounds.max.z;
+        const clipped=Boolean((source.material as THREE.MeshStandardMaterial).clippingPlanes?.length);
+        stencil.visible=cap.visible=source.visible&&clipped&&clipping.constant>bounds.min.z&&clipping.constant<bounds.max.z;
       }
-      controls.update();grid.visible=floor.visible=p.cameraView!=='front'&&!isolated&&!intakeStage&&!stackDetail;
+      controls.update();grid.visible=floor.visible=p.cameraView!=='front'&&!isolated&&!intakeStage&&!stackDetail&&!stage1Pipes;
       if(dirty){
         renderer.render(scene,camera);
         callouts.style.display=isolated?'block':'none';

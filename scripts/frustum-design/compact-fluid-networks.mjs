@@ -50,7 +50,8 @@ export function buildCompactFluidNetworks(ctx) {
   });
   const polarDirection=(theta,sign=1)=>[0,sign*Math.cos(theta*Math.PI/180),sign*Math.sin(theta*Math.PI/180)];
   const AIR=P.air, railRadius=350, feedRadius=H.headerRadius,feedAngle=H.headerAngle, returnAngle=225, wetRadius=32;
-  const supplyStart=front.rear+H.rearOffset, returnStart=front.front+65;
+  const heating=H.aftHeating;
+  const supplyStart=front.rear+heating.frontOffset, returnStart=front.front+65;
   const returnEnd=last.rear+13,wetEnd=last.rear+11,tailOutlet=last.rear+170;
   const firstWet=front.front+.56*(front.rear-front.front);
   path('air',[[P.compressor.outlet,0,0],[AIR.end,0,0]],AIR.outer,AIR.inner);
@@ -61,7 +62,7 @@ export function buildCompactFluidNetworks(ctx) {
   for(const [i,s] of P.stacks.entries()) {
     const stage=i+1, L=s.rear-s.front;
     const airX=s.front+.32*L, wetX=s.front+.56*L, midX=(airX+wetX)/2;
-    const feedX=s.rear-9,feedHeaderX=s.rear+(H.branchRearOffsets?.[i]??H.rearOffset), returnX=s.front+65;
+    const feedX=s.rear-9,feedHeaderX=s.rear+heating.frontOffset, returnX=s.front+65;
     const rootAt=x=>stackRadiusAt(s,x,'inner')+3.3,edgeAt=x=>stackRadiusAt(s,x,'outer')-4;
     const root=rootAt(midX),edge=edgeAt(s.rear);
     const airIn=path('air',[[airX,0,0],polar(airX,rootAt(airX),0)],5,3.5,{stage:i,blindEnd:true});
@@ -70,12 +71,28 @@ export function buildCompactFluidNetworks(ctx) {
     const wetOut=path('cathode',[polar(wetX,rootAt(wetX),0),polar(wetX,wetRadius,0),...arcPoints(wetX,wetRadius,0,90).slice(1)],5.2,3.4,{stage:i,blindStart:true});
     roundedJunction('air',polar(airX,rootAt(airX),0),3.3,2.1,i);
     roundedJunction('cathode',polar(wetX,rootAt(wetX),0),3.3,2.1,i);
-    // The supply header sits inside the stack centre bore, outside the blue
-    // air pipe. Each branch turns through the interstage bay, then enters the
-    // stack axially through its rear face. Its pressure wall stays continuous.
-    const feedBend=roundPath([polar(feedHeaderX,feedRadius,feedAngle),polar(feedHeaderX,edge,feedAngle),
-      polar(s.rear+2,edge,feedAngle)],6);
-    const feedIn=path('feed',[...feedBend,polar(s.rear,edge,feedAngle),polar(feedX,edgeAt(feedX),feedAngle)],3.3,2.1,{stage:i});
+    // The central header feeds one serial, open-ended helical turn behind each
+    // stack. This is an exhaust-exposed supply route, not a closed bypass ring.
+    // The incoming radial leg is at the front axial station; the exit is 14 mm
+    // aft and then travels outward while returning to the rear-face port. The
+    // two legs cannot meet and short-circuit the circumferential passage.
+    const heatingRadius=s.rearOuter-heating.radialInset;
+    const heatingRear=s.rear+heating.rearOffset;
+    const heatingAngle=heating.stageStartAngles?.[i]??feedAngle;
+    const turnSamples=Math.ceil(heating.turnDegrees/5);
+    const helix=Array.from({length:turnSamples+1},(_,j)=>{
+      const f=j/turnSamples;
+      return polar(feedHeaderX+(heatingRear-feedHeaderX)*f,heatingRadius,heatingAngle+heating.turnDegrees*f);
+    });
+    // The third-stage entry is at 90 degrees so its radial leg clears the
+    // separate return-gas crossing at rear+13 mm, y=-65 mm.
+    const headerArc=heatingAngle===feedAngle?[polar(feedHeaderX,feedRadius,feedAngle)]:
+      arcPoints(feedHeaderX,feedRadius,feedAngle,heatingAngle);
+    const supplyLead=[...headerArc.slice(0,-1),...roundPath([headerArc.at(-1),helix[0],helix[1]],5)];
+    const returnLead=roundPath([helix.at(-2),helix.at(-1),
+      polar(s.rear+heating.rearEntryOffset,edge,feedAngle),polar(feedX,edgeAt(feedX),feedAngle)],5);
+    const feedRoute=[...supplyLead,...helix.slice(2,-2),...returnLead];
+    const feedIn=path('feed',feedRoute,heating.outer,heating.inner,{stage:i});
     const anodeMid=(feedX+returnX)/2;
     const feedRail=path('feed',[polar(feedX,edgeAt(feedX),feedAngle),polar(anodeMid,edgeAt(anodeMid),feedAngle)],3.3,2.1,{stage:i});
     roundedJunction('feed',polar(feedX,edgeAt(feedX),feedAngle),3.3,2.1,i);
@@ -92,6 +109,10 @@ export function buildCompactFluidNetworks(ctx) {
       {name:`stage-${stage}-anode-mid`,a:feedRail.bore,b:returnRail.bore});
     componentChecks.push({stage,airX,wetX,feedX,feedHeaderX,returnX,rootRailRadius:root,hydrogenEdgeRailRadius:edge,
       interfacesPerMedium:1,feedFace:'rear axial face',returnFace:'outer cylindrical face',
+      aftSupplyTurn:{front:feedHeaderX,rear:heatingRear,radius:heatingRadius,
+        degrees:heating.turnDegrees,startAngle:heatingAngle,outerRadius:heating.outer,innerRadius:heating.inner,
+        routing:'central header → one serial circumferential turn → rear-face inlet',
+        performanceClaim:false},
       collectorRepresentation:'local pressure channels seated in radial plate edges'});
   }
 
@@ -204,14 +225,31 @@ export function buildCompactFluidNetworks(ctx) {
   const color={air:C.air,cathode:'#6aa5b7',feed:C.hydrogen,return:C.return};
   const groups={air:'air',cathode:'cathodeExhaust',feed:'hydrogen',return:'return'};
   const titles={air:'阴极反应空气 · 中央主管与三级独立支路',cathode:'三级阴极湿尾气 · 独立除水回路',
-    feed:'中央孔内供氢总管 · 三级后端面入口',return:'三级阳极回氢 · 除水后循环'};
-  for(const key of keys)add(`${groups[key]}-network`,titles[key],groups[key],color[key],
-    union(networks[key].outer).subtract(key==='air'||key==='cathode'?cathodeCircuit:anodeCircuit),
-    {clip:true,metallic:.43,roughness:.31});
+    feed:'中央供氢总管 · 三级堆后环绕管与后端入口',return:'三级阳极回氢 · 除水后循环'};
+  const networkSolids={};
+  for(const key of keys){
+    const solid=union(networks[key].outer).subtract(key==='air'||key==='cathode'?cathodeCircuit:anodeCircuit);
+    networkSolids[key]=solid;
+    add(`${groups[key]}-network`,titles[key],groups[key],color[key],solid,
+      {clip:true,metallic:.43,roughness:.31});
+  }
+  // These are presentation-only copies of the already hollow pressure parts.
+  // The builder adds them after physical assembly checks. Cutting an existing
+  // pipe wall to this window leaves annular open ends, never solid pipe caps.
+  const inspectionWindow=[front.front-4,front.rear+70];
+  const inspectionBox=M.cube([inspectionWindow[1]-inspectionWindow[0],1100,1100],true)
+    .translate([(inspectionWindow[0]+inspectionWindow[1])/2,0,0]);
+  const inspectionParts=keys.map(key=>({
+    id:`inspection-stage-1-${groups[key]}`,name:`一级电堆局部完整管路 · ${titles[key]}`,
+    group:groups[key],color:color[key],solid:networkSolids[key].intersect(inspectionBox),
+    clip:false,inspectionOnly:true,inspectionStage:1,inspectionAxialWindow:inspectionWindow,
+    metallic:.43,roughness:.31,
+  }));
+  inspectionBox.delete();
   // Do not use this cutter on the pressure parts themselves. It is exclusively
   // the receiving cooling-guide sheet's matching penetration seat envelope.
   const linerCutters=union([...keys.flatMap(k=>networks[k].outer),anode.outer,cathode.outer,pumpOuter]);
-  return {ports,stackCutters:stackCutters.map(a=>union(a)),linerCutters,
+  return {ports,stackCutters:stackCutters.map(a=>union(a)),linerCutters,inspectionParts,
     bores:{...bores,cathodeCircuit,anodeCircuit},junctionChecks,
     checks:{units:'mm',stages:componentChecks,portCounts:{air:3,cathode:3,hydrogen:3,return:3},
       independentModules:3,pressureCircuitsSeparate:true,centralAir:{outerRadius:AIR.outer,innerRadius:AIR.inner,end:AIR.end},

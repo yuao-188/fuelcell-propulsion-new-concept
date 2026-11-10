@@ -115,6 +115,9 @@ export default function App() {
       setViewMode('complete');
       setVisibility(current => ({ ...current, variableIntake: true }));
     }
+    if (view === 'stage1Pipes') {
+      setVisibility(current => ({ ...current, stacks: true, air: true, hydrogen: true, return: true, cathodeWater: true }));
+    }
     // Reapply a preset even after the user has manually orbited away from it.
     setResetKey(current => current + 1);
   };
@@ -134,8 +137,8 @@ export default function App() {
       <main className="design-workspace">
         <section className="viewer-card" aria-label="推进构型三维模型">
           <div className="viewer-heading">
-            <div className="viewer-caption"><span className="caption-dot" />{cameraView === 'compressor' ? '离心式压气机' : cameraView === 'intake2' ? '二级可变进气罩' : cameraView === 'intake3' ? '三级可变进气罩' : cameraView === 'cells' ? '凸台 / 叠层' : '凸台电堆方案'}</div>
-            <div className="viewer-mode">{cameraView === 'compressor' && compressorView === 'rotors' ? '叶轮与静叶' : viewMode === 'cutaway' ? '剖切视图' : '完整视图'}</div>
+            <div className="viewer-caption"><span className="caption-dot" />{cameraView === 'compressor' ? '离心式压气机' : cameraView === 'intake2' ? '二级可变进气罩' : cameraView === 'intake3' ? '三级可变进气罩' : cameraView === 'stage1Pipes' ? '一级电堆与管路' : cameraView === 'cells' ? '凸台 / 叠层' : '凸台电堆方案'}</div>
+            <div className="viewer-mode">{cameraView === 'stage1Pipes' ? '电堆半剖 · 管路完整' : cameraView === 'compressor' && compressorView === 'rotors' ? '叶轮与静叶' : viewMode === 'cutaway' ? '剖切视图' : '完整视图'}</div>
           </div>
 
           <div className="viewer-scene">
@@ -199,6 +202,8 @@ export default function App() {
                   aria-pressed={cameraView === 'intake3'} onClick={() => selectCamera('intake3')}>三级进气罩</button>
                 <button type="button" className={cameraView === 'stacks' ? 'is-active' : ''}
                   aria-pressed={cameraView === 'stacks'} onClick={() => selectCamera('stacks')}>电堆</button>
+                <button type="button" className={cameraView === 'stage1Pipes' ? 'is-active' : ''}
+                  aria-pressed={cameraView === 'stage1Pipes'} onClick={() => selectCamera('stage1Pipes')}>一级电堆与管路</button>
                 <button type="button" className={cameraView === 'cells' ? 'is-active' : ''}
                   aria-pressed={cameraView === 'cells'} onClick={() => selectCamera('cells')}>凸台 / 叠层</button>
                 <button type="button" className={cameraView === 'water' ? 'is-active' : ''}
@@ -215,7 +220,7 @@ export default function App() {
             <h2>显示控制</h2>
           </div>
 
-          <section className="control-section view-section" aria-labelledby="view-label">
+          {cameraView !== 'stage1Pipes' && <section className="control-section view-section" aria-labelledby="view-label">
             <h3 id="view-label">观察方式</h3>
             <div className="mode-selector" role="group" aria-label="模型剖切方式">
               <button type="button" className={viewMode === 'complete' ? 'is-active' : ''}
@@ -259,7 +264,7 @@ export default function App() {
                 </div>
               </div>
             )}
-          </section>
+          </section>}
 
           <section className="control-section intake-section" aria-labelledby="intake-label">
             <h3 id="intake-label">可变进气罩</h3>
