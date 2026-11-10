@@ -53,21 +53,21 @@ export default function ModelViewport(props: Props) {
     callouts.setAttribute('class','compressor-callouts');callouts.setAttribute('aria-hidden','true');
     element.appendChild(callouts);
     const compressorX=(x:number)=>P.compressor.front+(x-480)*(P.compressor.outlet-P.compressor.front)/210;
-    const anchors:[string,number[],number,boolean][]=[
-      ['一级驱动电机',[compressorX(497),24,-16],.24,false],
-      ['一级离心叶轮',[compressorX(536.638),99.8717715,-14.3679942],.40,false],
-      ['一级扩压静叶',[compressorX(559.5),151.548,-32.53],.56,false],
-      ['一级背盘',[compressorX(546.5),100,-18],.72,false],
-      ['二级驱动电机',[compressorX(636.5),24,-16],.24,true],
-      ['二级离心叶轮',[compressorX(601.584),76.428834,-8.627901],.40,true],
-      ['二级扩压静叶',[compressorX(624),122.831,-28.079],.56,true],
-      ['二级背盘',[compressorX(613.5),80,-15],.72,true],
+    const anchors:[string,number[],number,boolean,number,'motor'|'rotor'|'diffuser'|'backplate'][]=[
+      ['一级驱动电机',[compressorX(497),24,-16],.24,false,1,'motor'],
+      ['一级离心叶轮',[compressorX(536.638),99.8717715,-14.3679942],.40,false,1,'rotor'],
+      ['一级扩压静叶',[compressorX(559.5),151.548,-32.53],.56,false,1,'diffuser'],
+      ['一级背盘',[compressorX(546.5),100,-18],.72,false,1,'backplate'],
+      ['二级驱动电机',[compressorX(636.5),24,-16],.24,true,2,'motor'],
+      ['二级离心叶轮',[compressorX(601.584),76.428834,-8.627901],.40,true,2,'rotor'],
+      ['二级扩压静叶',[compressorX(624),122.831,-28.079],.56,true,2,'diffuser'],
+      ['二级背盘',[compressorX(613.5),80,-15],.72,true,2,'backplate'],
     ];
-    const calloutItems=anchors.map(([label,point,row,rightSide])=>{
+    const calloutItems=anchors.map(([label,point,row,rightSide,stage,kind])=>{
       const group=document.createElementNS(svgNS,'g'), line=document.createElementNS(svgNS,'polyline');
       const dot=document.createElementNS(svgNS,'circle'), text=document.createElementNS(svgNS,'text');
       text.textContent=label;dot.setAttribute('r','2.3');group.append(line,dot,text);callouts.append(group);
-      return {point:new THREE.Vector3(...point),row,rightSide,group,line,dot,text};
+      return {point:new THREE.Vector3(...point),basePoint:new THREE.Vector3(...point),stage,kind,row,rightSide,group,line,dot,text};
     });
     const scene=new THREE.Scene(); scene.background=new THREE.Color('#e9eef1');
     const finishes=createEngineeringMaterials(renderer);
@@ -226,7 +226,7 @@ export default function ModelViewport(props: Props) {
     // They prove each control changes the rendered buffers independently.
     const qaWindow=window as unknown as { __frustumDesignQA?: { snapshot: () => unknown } };
     const qaAccess={snapshot:()=>({
-      version:'20261110-aft-hydrogen',loaded:Boolean(root),cameraView:latest.current.cameraView,
+      version:'20261110-independent-ports',loaded:Boolean(root),cameraView:latest.current.cameraView,
       schematicStacks:meshes.filter(mesh=>/^stack-\d+-1$/.test(String(mesh.userData.id))).length,
       stackArrangement:P.stackAppearance.arrangement,countIsIllustrative:true,
       groups:meshes.reduce((result,mesh)=>{const group=String(mesh.userData.group);result[group]=(result[group]||0)+1;return result;},{} as Record<string,number>),
@@ -252,7 +252,7 @@ export default function ModelViewport(props: Props) {
       })),
     })};
     if(new URLSearchParams(location.search).get('qa')==='1')qaWindow.__frustumDesignQA=qaAccess;
-    const modelUrl=new URL('model.glb?v=20261110-aft-hydrogen',document.baseURI);
+    const modelUrl=new URL('model.glb?v=20261110-independent-ports',document.baseURI);
     const modelRequest=new AbortController();
     const loadFailed=()=>{if(!cancelled)setStatus('模型加载失败，请刷新页面重试。');};
     // Read the binary directly. FileLoader's rewrapped progress stream can
@@ -278,6 +278,21 @@ export default function ModelViewport(props: Props) {
           variableMeshes.get(variableStage)!.set(String(item.userData.id),item);
         }
       });
+      // Keep the established axial label stations while following each
+      // compressor stage's exported radial dimensions after casing changes.
+      for(const label of calloutItems) {
+        const rotor=meshes.find(mesh=>mesh.userData.id===`compressor-rotor-${label.stage}`);
+        let radialScale=Number(rotor?.userData.radialScaleToPrevious??1);
+        if(!Number.isFinite(radialScale)||radialScale<=0)radialScale=1;
+        if(label.kind==='diffuser') {
+          const diffuser=meshes.find(mesh=>mesh.userData.id===`compressor-diffuser-${label.stage}`);
+          const inner=Number(diffuser?.userData.innerRadiusMm),outer=Number(diffuser?.userData.outerRadiusAtFrontMm);
+          if(Number.isFinite(inner)&&Number.isFinite(outer)&&outer>inner) {
+            radialScale=(inner+outer)/2/Math.hypot(label.basePoint.y,label.basePoint.z);
+          }
+        }
+        label.point.copy(label.basePoint);label.point.y*=radialScale;label.point.z*=radialScale;
+      }
       root.updateMatrixWorld(true);
       updateIntake(2,latest.current.intake2);updateIntake(3,latest.current.intake3);
       modelBounds.setFromObject(root);

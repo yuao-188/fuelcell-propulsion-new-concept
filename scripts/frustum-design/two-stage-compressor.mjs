@@ -1,44 +1,18 @@
-/** Variant-private continuously contracting casing, beginning at its inlet.
- * The existing rotor radii/axial stations constrain how early it can narrow:
- * follow each blade-tip envelope with a real running gap, then contract more
- * quickly after it. Diffuser outer edges seat against the updated inner wall;
- * their inner edges, count and axial positions remain unchanged.
+/** Variant-private casing defined by one uninterrupted smooth contraction.
+ * The user's latest contour takes precedence over the former rotor diameters.
+ * Machinery is sized from this lumen, rather than adding shoulders to the
+ * casing to preserve an earlier impeller envelope.
  */
 export function getCompressorCasingProfile(P) {
-  const K=P.compressor,scale=(K.outlet-K.front)/210;
-  const ax=x=>K.front+(x-480)*scale,rr=r=>r*K.inner/165;
-  const neckStart=K.outlet-(K.outletNeckLength??(K.outlet-K.rear)*.5);
-  const bladeTipClearance=1.0;
-  // The warped blades extend 0.15 mm behind their nominal rear face. Include
-  // that extension instead of sizing the casing only at the backplate plane.
-  const rotorEnvelopes=K.stages.map((stage,i)=>({
-    stage:i+1,rear:ax(i===0?544:611)+.15,
-    radius:rr(stage.bladeOuter),clearance:bladeTipClearance,
-  }));
-  // Keep a visible downstream diffuser passage before the final collection
-  // bend. This is not an extra level land: all interior tangents are negative.
-  const diffuserRear=ax(K.stages[1].diffuserRear);
-  const diffuserPassage=rr(K.stages[1].diffuserInner)+7.3;
-  const knots=[[K.front,K.inner],
-    ...rotorEnvelopes.map(S=>[S.rear,S.radius+S.clearance]),
-    [diffuserRear,diffuserPassage],
-    [neckStart,P.air.inner],[K.outlet,P.air.inner]];
-  if(knots.some((p,i)=>i&&(p[0]<=knots[i-1][0]||p[1]>knots[i-1][1])))
-    throw new Error('Compressor casing needs ordered axial stations and decreasing radii');
-  const h=knots.slice(1).map((p,i)=>p[0]-knots[i][0]);
-  const slopes=knots.slice(1).map((p,i)=>(p[1]-knots[i][1])/h[i]);
-  const tangents=knots.map((_,i)=>{
-    if(i===0||i===knots.length-1||slopes[i-1]*slopes[i]<=0)return 0;
-    const w1=2*h[i]+h[i-1],w2=h[i]+2*h[i-1];
-    return (w1+w2)/(w1/slopes[i-1]+w2/slopes[i]);
-  });
+  const K=P.compressor,neckStart=K.outlet,bladeTipClearance=1.5;
+  const knots=[[K.front,K.inner],[K.outlet,P.air.inner]],tangents=[0,0];
+  if(K.outlet<=K.front||K.inner<=P.air.inner)
+    throw new Error('Compressor contraction requires a positive length and decreasing radius');
   const innerAt=x=>{
     if(x<=K.front)return K.inner;
     if(x>=K.outlet)return P.air.inner;
-    const i=Math.max(1,knots.findIndex(p=>p[0]>=x)),a=knots[i-1],b=knots[i];
-    const t=(x-a[0])/(b[0]-a[0]),t2=t*t,t3=t2*t,length=b[0]-a[0];
-    return (2*t3-3*t2+1)*a[1]+(t3-2*t2+t)*length*tangents[i-1]
-      +(-2*t3+3*t2)*b[1]+(t3-t2)*length*tangents[i];
+    const t=(x-K.front)/(K.outlet-K.front),blend=t*t*(3-2*t);
+    return K.inner+(P.air.inner-K.inner)*blend;
   };
   const wallAt=r=>(P.air.outer-P.air.inner)+(K.outer-K.inner-(P.air.outer-P.air.inner))
     *Math.max(0,Math.min(1,(r-P.air.inner)/(K.inner-P.air.inner)));
@@ -51,7 +25,7 @@ export function getCompressorCasingProfile(P) {
     }
   }
   const outside=inside.map(([x,r])=>[x,r+wallAt(r)]);
-  return {neckStart,knots,tangents,innerAt,inside,outside,rotorEnvelopes,
+  return {neckStart,knots,tangents,innerAt,inside,outside,
     contractionStart:K.front,bladeTipClearance,diffuserOuterEdges:'seated-to-casing'};
 }
 
@@ -105,38 +79,55 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
       bladeInner: rr(33.5), bladeOuter: rr(secondStage.bladeOuter), heightIn: 27 * axialScale, heightOut: 11 * axialScale,
       hubStart: ax(576), hubShoulder: ax(584), shaftFront: ax(611), shaftRear: ax(638),
       diffuserStart: ax(secondStage.diffuserFront), diffuserEnd: ax(secondStage.diffuserRear), diffuserInner: rr(secondStage.diffuserInner) },
-  ];
-  const shaftRadius = rr(12.375), bladeCount = K.bladesPerStage;
+  ].map(S=>{
+    // Radial dimensions of each independent machine follow the local casing.
+    // Account for the blade's actual 0.15 mm aft extension and the disk's rear
+    // face separately; neither is clipped against the casing to hide a clash.
+    const radialScale=(innerAt(S.plate+.15)-casingProfile.bladeTipClearance)/S.bladeOuter;
+    return {...S,radialScale,
+      bladeOuter:S.bladeOuter*radialScale,
+      bladeInner:S.bladeInner*radialScale,
+      radius:Math.min(S.radius*radialScale,innerAt(S.back)-1.5),
+      eye:S.eye*radialScale,shaftRadius:rr(12.375)*radialScale,
+      bladeWidth:rr(2.6)*radialScale,rootEmbedding:rr(.8)*radialScale,
+      diffuserInner:innerAt(S.diffuserEnd)*.78,
+      diffuserOuter:innerAt(S.diffuserStart)+.5,
+      diffuserWidth:rr(2.1)*radialScale,
+    };
+  });
+  const bladeCount = K.bladesPerStage;
   const backplateSegments = K.backplateSegments;
   for (const S of stages) {
-    // Both stages' working blades extend beyond their unchanged rear disks.
+    // Both stages' working blades extend beyond their matching rear disks.
     // The supported blade bottoms embed 0.15 mm into the corresponding disk.
-    const rootFront = S.plate - S.heightIn, rootInner = S.eye * .69 - rr(.8);
-    const rotor = [axisCylinder(S.shaftFront, S.shaftRear, shaftRadius, 64),
+    const rootFront = S.plate - S.heightIn, rootInner = S.eye * .69 - S.rootEmbedding;
+    const rotor = [axisCylinder(S.shaftFront, S.shaftRear, S.shaftRadius, 64),
       axisCylinder(S.plate, S.back, S.radius, backplateSegments),
-      solidLathe([[S.hubStart, shaftRadius * 1.15], [S.hubShoulder, S.eye * .69], [S.plate, S.eye]])];
+      solidLathe([[S.hubStart, S.shaftRadius * 1.15], [S.hubShoulder, S.eye * .69], [S.plate, S.eye]])];
     // The extended inner strips lie inside the original cone at their root,
     // then emerge exactly on its surface. They join along the full axial root
     // span rather than touching only the cone's downstream end.
     for (let i = 0; i < bladeCount; i++) rotor.push(radialVane(S.bladeInner, S.bladeOuter, i * tau / bladeCount,
-      -.52, rr(2.6), 0, S.plate, t => lerp(S.heightIn, S.heightOut, t), rootInner));
+      -.52, S.bladeWidth, 0, S.plate, t => lerp(S.heightIn, S.heightOut, t), rootInner));
     add(`compressor-rotor-${S.number}`, `第${S.number}级十八叶离心叶轮与后背盘`, 'front', steel,
       union(rotor), { ...metal, roughness: .21, clip: true, rotor: `compressor-${S.number}`, bladeCount,
         stage: S.number, backplate: true, shroud: false, backplateRadiusMm: S.radius, bladeTipRadiusMm: S.bladeOuter,
         bladeTipOverhangMm: S.bladeOuter - S.radius,
         backplateSegments, bladeRootAxialFrontMm: rootFront, bladeRootAxialRearMm: S.plate,
-        bladeRootEmbeddingMm: rr(.8), bladeRootMount: 'continuous-conical-hub-and-backplate' });
+        bladeRootEmbeddingMm: S.rootEmbedding, bladeRootMount: 'continuous-conical-hub-and-backplate',
+        radialScaleToPrevious:S.radialScale,dimensionSource:'smooth-casing-envelope' });
 
     // Both static cover disks are also removed from the physical model.
     // Both diffuser rows sit aft of their respective rotor disks. Clip each
     // curved vane to the narrowing casing while keeping the inner passage open.
     const diffuser = [];
-    for (let i = 0; i < 18; i++) diffuser.push(radialVane(S.diffuserInner, K.inner + .5,
-      (i + .35) * tau / 18, .10, rr(2.1), S.diffuserStart, S.diffuserEnd).intersect(caseLumen));
+    for (let i = 0; i < 18; i++) diffuser.push(radialVane(S.diffuserInner, S.diffuserOuter,
+      (i + .35) * tau / 18, .10, S.diffuserWidth, S.diffuserStart, S.diffuserEnd).intersect(caseLumen));
     add(`compressor-diffuser-${S.number}`, `第${S.number}级十八扩压静叶`, 'front', vaneSteel,
       union(diffuser), { ...metal, roughness: .34, clip: true, stationary: true, bladeCount: 18, stage: S.number,
         axialFrontMm: S.diffuserStart, axialRearMm: S.diffuserEnd,
-        axialGapBehindBackplateMm: S.diffuserStart - S.back });
+        axialGapBehindBackplateMm: S.diffuserStart - S.back,
+        innerRadiusMm:S.diffuserInner,outerRadiusAtFrontMm:innerAt(S.diffuserStart) });
   }
 
   // The complete eighteen-vane intermediate return assembly stays absent,
@@ -154,6 +145,8 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
     return new CS([points]).extrude(x1-x0).rotate([0,90,0]).translate([x0,0,0]);
   };
   for (const D of motors) {
+    const S=stages[D.number-1],shaftRadius=S.shaftRadius;
+    const rr=nominal=>nominal*K.inner/165*S.radialScale;
     const motorRadius = rr(33), bore = shaftRadius + .9;
     const capDepth=3*axialScale,bodyFront=D.front+capDepth,bodyRear=D.rear-capDepth;
     const at=(x,r,t)=>[x,r*Math.cos(t),r*Math.sin(t)];
@@ -227,7 +220,8 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
     const terminalSolid=union([terminalBody,...terminals.slice(1)]);
     add(`compressor-motor-${D.number}`,`第${D.number}级独立电机 · 中空定子壳与散热筋`,'front','#394b58',
       union(pieces).subtract(foot),{...metal,clip:true,stationary:true,stage:D.number,motorSizing:'schematic-only',
-        finish:'motor-stator-housing',supportCount:3,supportAxialCentreMm:D.support,inletGuideVaneCount:0});
+        finish:'motor-stator-housing',supportCount:3,supportAxialCentreMm:D.support,inletGuideVaneCount:0,
+        motorBodyRadiusMm:motorRadius,radialScaleToPrevious:S.radialScale});
     const details=[
       ['endcaps','银灰端盖、轴承座与内六角紧固件','#cbd6df',union(caps).subtract(union(capCuts)),'motor-machined-endcaps'],
       ['stator','叠片定子轭与齿','#59616a',union(statorPieces),'motor-laminated-steel'],
@@ -273,11 +267,12 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
   add('compressor-fasteners', '压气机装配法兰沉头紧固件', 'compressorCase', darkSteel,
     union(compressorScrews), { ...metal, clip: true });
   return { compressorStages: 2, compressorBladeCount: bladeCount, neckStart,
-    casingCurve:'monotone C1 Hermite; contraction from inlet with no level intermediate lands',
+    casingCurve:'single cubic smoothstep contraction; no intermediate shoulders or outlet neck',
     casingControlPoints:casingProfile.knots,casingTangents:casingProfile.tangents,
     casingContractionStartMm:casingProfile.contractionStart,
     casingBladeTipClearanceMm:casingProfile.bladeTipClearance,
-    casingRotorEnvelopes:casingProfile.rotorEnvelopes,
+    casingRotorEnvelopes:stages.map(S=>({stage:S.number,rear:S.plate+.15,radius:S.bladeOuter,
+      backplateRadius:S.radius,shaftRadius:S.shaftRadius,radialScale:S.radialScale})),
     driveArchitecture: 'independent-front-and-rear-motors', motorSizing: 'schematic-only', casingInside, stages,
     removedDiscSurfaces: ['compressor-shroud-1', 'compressor-return-diaphragm', 'compressor-shroud-2'],
     restoredBackplates: stages.map(S => ({ stage: S.number, front: S.plate, rear: S.back,

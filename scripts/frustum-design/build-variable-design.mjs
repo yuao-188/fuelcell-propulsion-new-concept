@@ -35,7 +35,7 @@ for(const s of P.stacks){
 }
 add('wiring-harness','沿机匣敷设线束与三级分支','wiring','#35454e',union(wirePieces),{clip:true,metallic:.06,roughness:.6});
 
-const report={schema:1,revision:'20261110-aft-hydrogen',units:'mm',
+const report={schema:1,revision:'20261110-independent-ports',units:'mm',
   dimensionSource:'new independent visual variant: axial lengths 300/250/220, gaps100; approximate diameters',
   scope:'illustrative hollow frustum stacks; lamella count is not a physical cell count',
   length:P.outerShell.rear,schematicStacks:3,
@@ -61,7 +61,12 @@ console.log('Collision pairs:',report.collisions.length);
 for(const [name,bore] of Object.entries(fluids.bores)){
   if(!['cathodeCircuit','anodeCircuit'].includes(name))continue;
   const components=bore.decompose();report.fluidChecks[name]={connectedComponents:components.length,obstructions:[]};
-  if(components.length!==1)report.errors.push(`${name}: disconnected (${components.length})`);
+  // The displayed cathode inlet and wet-exhaust pipes terminate at separate
+  // stack interfaces. Cell-internal passages are not represented by an
+  // external bypass joining those interfaces.
+  const expected=name==='cathodeCircuit'?2:1;
+  report.fluidChecks[name].expectedComponents=expected;
+  if(components.length!==expected)report.errors.push(`${name}: expected ${expected} separate networks, got ${components.length}`);
   components.forEach(s=>s.delete());const bb=bore.boundingBox();
   for(let i=0;i<parts.length;i++)if(overlap(box[i],bb)){
     const blocked=parts[i].solid.intersect(bore),volume=blocked.volume();blocked.delete();
@@ -72,12 +77,21 @@ for(const [name,bore] of Object.entries(fluids.bores)){
 const mixed=fluids.bores.cathodeCircuit.intersect(fluids.bores.anodeCircuit);
 report.fluidChecks.gasSeparationVolume=mixed.volume();mixed.delete();
 if(report.fluidChecks.gasSeparationVolume>.001)report.errors.push('Pressure media overlap');
+const cathodeBypass=fluids.bores.air.intersect(fluids.bores.cathode);
+report.fluidChecks.cathodeInletExhaustOverlap=cathodeBypass.volume();cathodeBypass.delete();
+if(report.fluidChecks.cathodeInletExhaustOverlap>.001)report.errors.push('Cathode inlet must not connect directly to exhaust');
+report.fluidChecks.interfaceIsolation=[];
+for(const check of fluids.isolationChecks??[]){
+  const common=check.a.intersect(check.b),volume=common.volume();common.delete();
+  report.fluidChecks.interfaceIsolation.push({name:check.name,volume});
+  if(volume>.001)report.errors.push(`${check.name}: direct pipe connection is not allowed`);
+}
 for(const join of fluids.junctionChecks??[]){const common=join.a.intersect(join.b),v=common.volume();common.delete();if(v<.00001)report.errors.push(`${join.name}: disconnected junction`);}
 report.fluidChecks.aftSupplyReturnOverlap=[];
-for(const join of fluids.junctionChecks.filter(j=>/hydrogen-port$/.test(j.name))){
-  const common=join.a.intersect(fluids.bores.return),volume=common.volume();common.delete();
-  report.fluidChecks.aftSupplyReturnOverlap.push({branch:join.name,volume});
-  if(volume>.001)report.errors.push(`${join.name}: aft supply bypasses into return`);
+for(const branch of fluids.aftSupplyBranches??[]){
+  const common=branch.bore.intersect(fluids.bores.return),volume=common.volume();common.delete();
+  report.fluidChecks.aftSupplyReturnOverlap.push({stage:branch.stage,volume});
+  if(volume>.001)report.errors.push(`stage-${branch.stage}: aft supply bypasses into return`);
 }
 await mkdir(resolve(root,'frustum-design/public'),{recursive:true});
 await writeFile(resolve(root,'frustum-design/verification.json'),JSON.stringify(report,null,2));
