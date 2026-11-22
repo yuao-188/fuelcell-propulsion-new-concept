@@ -188,12 +188,43 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
   const bodyFront = motor.front + capLength, bodyRear = motor.rear - capLength;
   const ribOuter = Math.min(P.motorHousing.inner - P.clearance * 4, motor.radius);
   const motorBodyRadius = Math.min(motor.radius * .96, ribOuter - 1);
+  // Subtract the same real axial passages from BOTH covers and the former
+  // solid motor barrel. The cover openings therefore look into connected air
+  // spaces, rather than stopping against a hidden solid cylinder. Alternating
+  // solid webs retain the shaft/central boss and the outer fastener ring.
+  const motorVentCount = 12, motorVentInner = motor.radius * .36;
+  const motorVentOuter = motor.radius * .70, motorVentHalfAngle = 10;
+  const motorVentCorner = motor.radius * .02;
+  const motorVentPoints = [], ventArcSteps = 16;
+  for (const [radius, reverse] of [[motorVentOuter, false], [motorVentInner, true]]) {
+    for (let j = 0; j <= ventArcSteps; j++) {
+      const t = (reverse ? ventArcSteps - j : j) / ventArcSteps;
+      const angle = (15 - motorVentHalfAngle + 2 * motorVentHalfAngle * t) * Math.PI / 180;
+      motorVentPoints.push([-radius * Math.sin(angle), radius * Math.cos(angle)]);
+    }
+  }
+  const motorVentSection = new CS([motorVentPoints])
+    .offset(-motorVentCorner, 'Round', 2, 32).offset(motorVentCorner, 'Round', 2, 32);
+  const motorVentTemplate = motorVentSection.extrude(motorLength + 2)
+    .rotate([0, 90, 0]).translate([motor.front - 1, 0, 0]);
+  const motorVentVoids = union(Array.from({ length: motorVentCount }, (_, i) =>
+    motorVentTemplate.rotate([i * 360 / motorVentCount, 0, 0])));
+  const motorVentilation = {
+    frontAndRearOpen: true, windowsPerCap: motorVentCount, axialPassageCount: motorVentCount,
+    passageFrontMm: motor.front, passageRearMm: motor.rear,
+    windowInnerRadiusMm: motorVentInner, windowOuterRadiusMm: motorVentOuter,
+    windowAngleDeg: 2 * motorVentHalfAngle, cornerRadiusMm: motorVentCorner,
+    totalOpeningAreaPerCapMm2: motorVentSection.area() * motorVentCount,
+    centralBossRadiusMm: motorVentInner, axialPassagesThroughBody: true,
+    geometryPurpose: 'schematic-open-motor-ventilation',
+  };
   const bodyPieces = [axisCylinder(bodyFront, bodyRear, motorBodyRadius), axisCylinder(fanRear, motor.rear, shaftRadius, 64)];
   for (let i = 0; i < 28; i++) {
     bodyPieces.push(sector(motor.front + motorLength * .20, motor.rear - motorLength * .20,
       motorBodyRadius - .7, ribOuter, i * 360 / 28 - .9, i * 360 / 28 + .9));
   }
-  add('main-motor', '主电机 · 纵向散热筋与传动轴', 'front', C.motor, union(bodyPieces), paint);
+  add('main-motor', '主电机 · 贯通通风腔、纵向散热筋与传动轴', 'front', C.motor,
+    union(bodyPieces).subtract(motorVentVoids), { ...paint, clip: true, ...motorVentilation });
 
   function motorCap(frontSide) {
     const lo = frontSide ? motor.front : bodyRear;
@@ -216,10 +247,12 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
         ? cylinder([lo - .05, y, z], [lo + boltHeight * .62, y, z], headRadius * .48, headRadius * .48, 6)
         : cylinder([hi - boltHeight * .62, y, z], [hi + .05, y, z], headRadius * .48, headRadius * .48, 6));
     }
-    return union([cap, ...heads]).subtract(union(sockets));
+    return union([cap, ...heads]).subtract(union([...sockets, motorVentVoids]));
   }
-  add('motor-front-cap', '主电机前端盖 · 十二枚内六角紧固件', 'front', paleSteel, motorCap(true), metal);
-  add('motor-rear-cap', '主电机后端盖 · 十二枚内六角紧固件', 'front', steel, motorCap(false), metal);
+  add('motor-front-cap', '主电机前通风端盖 · 十二个圆角窗与十二枚紧固件', 'front', paleSteel,
+    motorCap(true), { ...metal, clip: true, ...motorVentilation, capSide: 'front' });
+  add('motor-rear-cap', '主电机后通风端盖 · 十二个圆角窗与十二枚紧固件', 'front', steel,
+    motorCap(false), { ...metal, clip: true, ...motorVentilation, capSide: 'rear' });
 
   // A shaft collar outside the motor cap, with a true clearance bore. Its rear
   // face meets the cap; the shaft itself remains part of main-motor.
@@ -273,5 +306,5 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
   const compressor = buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCylinder, solidLathe, hollowLathe, add });
   void revolved;
   return { fanFront, fanRear, spinnerFront, spinnerRear: hubFront, spinnerLength: hubFront-spinnerFront, mainFanRadius: F.radius, fanBladeCount,
-    fanStatorCount: 18, statorFront, statorRear, intakeLiner, ...compressor };
+    fanStatorCount: 18, statorFront, statorRear, intakeLiner, mainMotorVentilation: motorVentilation, ...compressor };
 }

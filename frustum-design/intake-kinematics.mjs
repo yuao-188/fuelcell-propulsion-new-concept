@@ -180,11 +180,15 @@ const STYLES={
 
 /** Geometry-independent UI / validation information for one solved pose. */
 export function getIntakeKinematics(P, stageNumber, state={}) {
-  if(stageNumber!==2 && stageNumber!==3) throw new Error('Variable intake stage must be 2 or 3');
+  const eligibleStages=P.variableIntake?.stages??[];
+  if(!Number.isInteger(stageNumber)||!eligibleStages.includes(stageNumber)||stageNumber<2||stageNumber>P.stacks.length) {
+    throw new Error(`Variable intake stage ${stageNumber} is not enabled in parameters.variableIntake.stages`);
+  }
   const s=P.stacks[stageNumber-1],previous=P.stacks[stageNumber-2];
   const cfg=P.variableIntake??{};
-  const opening=clamp(state.opening??.55,0,1);
-  const pitchDeg=clamp(state.pitchDeg??0,-5,5),yawDeg=clamp(state.yawDeg??0,-5,5);
+  const opening=clamp(state.opening??cfg.defaultOpening??.55,0,1);
+  const maxDeflection=cfg.maxDeflectionDeg??5;
+  const pitchDeg=clamp(state.pitchDeg??0,-maxDeflection,maxDeflection),yawDeg=clamp(state.yawDeg??0,-maxDeflection,maxDeflection);
   // The complete hood reaches the preceding stage midpoint. Only its front
   // 90 mm articulates; the rest is a stationary duct. An explicit legacy anchor
   // remains available for old snapshots without baking coordinates into UI.

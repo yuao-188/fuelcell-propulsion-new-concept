@@ -8,45 +8,39 @@ import {buildDetailedMachinery} from './detailed-machinery.mjs';
 import {buildStraightShells} from './straight-shells.mjs';
 import {buildFrustumStacks} from './frustum-stacks.mjs';
 import {buildCompactFluidNetworks} from './compact-fluid-networks.mjs';
+import {buildSupportFrame} from './support-frame.mjs';
 import {getIntakeGeometry} from '../../frustum-design/intake-kinematics.mjs';
-import {stackRadiusAt} from '../../frustum-design/parameters.mjs';
 
 const root=resolve(import.meta.dirname,'../..'),ctx=await createKernel();
-const {M,P,C,parts,add,union,cylinder,tubePath,polar}=ctx;
+const {M,P,parts,add}=ctx,stackCount=P.stacks.length;
 console.log('Building pressure circuits and cell port seats...');
 const fluids=buildCompactFluidNetworks(ctx);
-console.log('Building three illustrative annular frustum stacks...');
-const stacks=buildFrustumStacks(ctx,fluids);
+console.log('Building support frame and annular frustum stacks...');
+const support=buildSupportFrame(ctx);
+const stacks=buildFrustumStacks(ctx,{...fluids,supportSeats:support.stackSeats});
 console.log('Building retained fan and extended compressor...');
 const machinery=buildDetailedMachinery(ctx);
 const shells=buildStraightShells(ctx,fluids.linerCutters);
 const pose={opening:P.variableIntake.defaultOpening,pitchDeg:0,yawDeg:0};
-for(const stage of [2,3])for(const g of getIntakeGeometry(P,stage,pose)){
+for(const stage of P.variableIntake.stages)for(const g of getIntakeGeometry(P,stage,pose)){
   const solid=M.ofMesh({numProp:3,vertProperties:new Float32Array(g.positions),triVerts:new Uint32Array(g.indices)});
   add(g.id,g.name??g.id,'variableIntake',g.color??'#a4b3bf',solid,
     {clip:true,stage,variableStage:stage,motionRole:g.role,finish:g.role,
       metallic:g.metallic??.85,roughness:g.roughness??.3});
 }
-// A single restrained external harness: split from the pressure lines in angle.
-const trunkRadius=390,wireAngle=315,wirePieces=[tubePath([polar(695,trunkRadius,wireAngle),polar(P.pump.rear,trunkRadius,wireAngle)],2.2)];
-for(const s of P.stacks){
-  const x=s.front+(s.rear-s.front)*.2;
-  wirePieces.push(tubePath([polar(x,trunkRadius,wireAngle),polar(x,stackRadiusAt(s,x)+1.2,wireAngle)],1.4));
-}
-add('wiring-harness','沿机匣敷设线束与三级分支','wiring','#35454e',union(wirePieces),{clip:true,metallic:.06,roughness:.6});
-
-const report={schema:1,revision:'20261110-independent-ports',units:'mm',
-  dimensionSource:'new independent visual variant: axial lengths 300/250/220, gaps100; approximate diameters',
+const report={schema:1,revision:'20261122-four-stack-frame',units:'mm',
+  dimensionSource:'first three stacks retained; fourth is a 1.10x geometric copy of the third, with 100 mm stage gaps',
   scope:'illustrative hollow frustum stacks; lamella count is not a physical cell count',
-  length:P.outerShell.rear,schematicStacks:3,
-  moduleCounts:[1,1,1],portCounts:Object.fromEntries(['air','hydrogen','return','cathode'].map(k=>[k,fluids.ports.filter(p=>p.fluid===k).length])),
-  ports:fluids.ports,stacks,machinery,shells,plumbing:fluids.checks,
-  variableIntakes:{stages:[2,3],petalsPerStage:24,pose,deflectionRangeDeg:[-5,5],
+  length:P.layoutRear,schematicStacks:stackCount,
+  moduleCounts:P.stacks.map(s=>s.modules),portCounts:Object.fromEntries(['air','hydrogen','return','cathode'].map(k=>[k,fluids.ports.filter(p=>p.fluid===k).length])),
+  ports:fluids.ports,stacks,machinery,shells,plumbing:fluids.checks,supportFrame:support.report,
+  variableIntakes:{stages:P.variableIntake.stages,petalsPerStage:24,pose,deflectionRangeDeg:[-5,5],
     articulation:'independent aperture and two-axis deflection; shared browser/validation solver'},
   parts:parts.length,broadPhasePairs:0,exactPairs:0,collisions:[],fluidChecks:{},errors:[]};
-assert.equal(stacks.length,3);assert.equal(report.length,1910);
-assert.deepEqual(stacks.map(s=>s.axialLength),[300,250,220]);
-for(const n of Object.values(report.portCounts))assert.equal(n,3);
+assert.equal(stacks.length,4);assert.equal(shells.length,380);
+assert.deepEqual(stacks.map(s=>s.axialLength),[300,250,220,242]);
+assert(stacks.slice(1).every((s,i)=>s.front-stacks[i].rear===100));
+for(const n of Object.values(report.portCounts))assert.equal(n,stackCount);
 const box=parts.map(p=>p.solid.boundingBox());
 const overlap=(a,b)=>[0,1,2].every(k=>a.max[k]>b.min[k]+1e-5&&b.max[k]>a.min[k]+1e-5);
 console.log('Checking exact material intersections...',parts.length);
@@ -107,7 +101,7 @@ for(const part of fluids.inspectionParts??[]){
   add(id,name,group,color,solid,extra);
 }
 const doc=new Document(),buffer=doc.createBuffer(),scene=doc.createScene('Hydrogen engine frustum variant');
-scene.setExtras({revision:report.revision,length:report.length,schematicStacks:3,countIsIllustrative:true});
+scene.setExtras({revision:report.revision,length:report.length,schematicStacks:stackCount,countIsIllustrative:true});
 const materials=new Map();
 for(const part of parts){
   const norm=part.solid.calculateNormals(0,35),data=norm.getMesh();
@@ -133,4 +127,4 @@ catch(error) {
   if(!['EPERM','EACCES'].includes(error.code))throw error;
   await copyFile(temporaryModel,modelTarget);await unlink(temporaryModel);
 }
-console.log(JSON.stringify({parts:parts.length,schematicStacks:3,exactPairs:report.exactPairs,collisions:0},null,2));
+console.log(JSON.stringify({parts:parts.length,schematicStacks:stackCount,exactPairs:report.exactPairs,collisions:0},null,2));

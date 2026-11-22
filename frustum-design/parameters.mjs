@@ -1,7 +1,9 @@
-// Dimensions in mm. User tables and clarification, 2026-11-09.
+// Dimensions in mm. Four-stack frame revision, user confirmation 2026-11-22.
 // Pipe diameters, small compressor drives, blade profiles and fasteners are schematic.
 export const parameters = {
   units: 'mm',
+  // Complete layout reference is separate from the retained front nacelle.
+  layoutRear: 2252,
   fan: { x: 130, front: 50, rear: 210, spinnerFront: 0, radius: 498, hubRadius: 100, blades: 16, stators: 18, tipAngleToAxisDeg: 66 },
   motor: { front: 245, rear: 438, radius: 150 },
   // Latest user sketch reallocates this shared bay: shorter intake, longer compressor.
@@ -17,22 +19,24 @@ export const parameters = {
     { front: 740, rear: 1040, inner: 70, outer: 192, rearInner: 40, rearOuter: 162, modules: 1 },
     { front: 1140, rear: 1390, inner: 88, outer: 212, rearInner: 58, rearOuter: 182, modules: 1 },
     { front: 1490, rear: 1710, inner: 110, outer: 232, rearInner: 80, rearOuter: 202, modules: 1 },
+    { front: 1810, rear: 2052, inner: 121, outer: 255.2, rearInner: 88, rearOuter: 222.2,
+      modules: 1, geometryScale: 1.1 },
   ],
   stackAppearance: { arrangement: 'schematic-concentric-frustum-lamellae', countIsIllustrative: true },
-  air: { outer: 18, inner: 14, end: 1826, branchOuter: 5, branchInner: 3.5,
+  air: { outer: 18, inner: 14, end: 2168, branchOuter: 5, branchInner: 3.5,
     exhaustHeaderRadius: 32, exhaustHeaderAngle: 90 },
   stackPorts: { frontOffset: 18, wetRearOffset: 18, feedRearOffset: 6, stubDepth: 4,
     airAngle: 0, wetAngle: 0, feedAngle: 45, returnAngle: 200 },
-  hydrogen: { outer: 4, inner: 2.5, inletX: 1876, headerRadius: 35, headerAngle: 135, rearOffset: 16,
+  hydrogen: { outer: 4, inner: 2.5, inletX: 2218, headerRadius: 35, headerAngle: 135, rearOffset: 16,
     returnHeaderRadius: 30, returnHeaderAngle: 225,
     aftHeating: { frontOffset: 22, rearOffset: 36, radialInset: 35, turnDegrees: 360,
-      outer: 3.3, inner: 2.1, stageStartAngles: [135,135,90],
+      outer: 3.3, inner: 2.1, stageStartAngles: [135,135,135,90],
       exitOffset: 46, exitRadialInset: 15, returnAngle: -35, boreClearance: 12, innerTurnOffset: 2 } },
-  pump: { front: 1776, rear: 1816, centerY: -65, centerZ: 70, radius: 20, bore: 2.5 },
-  outerShell: { front: 0, shoulder: 1710, rear: 1910, radius: 506, outletRadius: 476.2, wall: 6 },
+  pump: { front: 2118, rear: 2158, centerY: -65, centerZ: 70, radius: 20, bore: 2.5 },
+  outerShell: { front: 0, rear: 380, radius: 506, wall: 6 },
   // Only the short stator hub support remains; there is no overall inner shell.
   statorSupport: { front: 232, rear: 288, inner: 243, radius: 248 },
-  variableIntake: { stages: [2,3], petals: 24, activeLength: 90, frontAnchor: 'previous-midpoint', wall: 1.2,
+  variableIntake: { stages: [2,3,4], petals: 24, activeLength: 90, frontAnchor: 'previous-midpoint', wall: 1.2,
     minimumRadialOffset: 20, maximumRadialOffset: 60, maxDeflectionDeg: 5,
     defaultOpening: .55 },
   interstage: { axialGap: 100, wall: 1.2, linerClearance: .8, tailGuideLength: 131 },

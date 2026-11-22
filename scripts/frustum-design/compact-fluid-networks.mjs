@@ -1,5 +1,5 @@
 import {stackRadiusAt} from '../../frustum-design/parameters.mjs';
-/** Three tapered ring stacks: hollow, separate cathode and hydrogen circuits.
+/** Tapered ring stacks: hollow, separate cathode and hydrogen circuits.
  * Each circuit ends at its own short stack-wall interface. The stack-internal
  * reaction passages are deliberately omitted rather than joined by bypasses.
  */
@@ -14,6 +14,7 @@ export function buildCompactFluidNetworks(ctx) {
   const vmul = (a,k)=>a.map(v=>v*k);
   const norm = v=>Math.hypot(...v);
   const unit = v=>vmul(v,1/norm(v));
+  const stageCount=P.stacks.length, interstageCount=stageCount-1;
   const front = P.stacks[0], last = P.stacks.at(-1), H = P.hydrogen;
   function extend(points, amount=.14) {
     const pp=points.map(p=>[...p]);
@@ -69,14 +70,15 @@ export function buildCompactFluidNetworks(ctx) {
     // opening to a short inner-wall inlet. No internal feed-return rail exists.
     const heatingRadius=s.rearOuter-heating.radialInset;
     const heatingRear=s.rear+heating.rearOffset;
-    const heatingAngle=heating.stageStartAngles?.[i]??feedAngle;
+    const heatingAngle=heating.stageStartAngles?.[i]??(i===stageCount-1?90:feedAngle);
     const turnSamples=Math.ceil(heating.turnDegrees/5);
     const helix=Array.from({length:turnSamples+1},(_,j)=>{
       const f=j/turnSamples;
       return polar(feedHeaderX+(heatingRear-feedHeaderX)*f,heatingRadius,heatingAngle+heating.turnDegrees*f);
     });
-    // The third-stage entry is at 90 degrees so its radial leg clears the
-    // separate return-gas crossing at rear+13 mm, y=-65 mm.
+    // Only the last-stage entry turns to 90 degrees, downstream of the wet
+    // header's termination, to clear the tail return-gas crossing. Upstream
+    // entries stay at 135 degrees, clear of the continuing wet-exhaust header.
     const headerArc=heatingAngle===feedAngle?[polar(feedHeaderX,feedRadius,feedAngle)]:
       arcPoints(feedHeaderX,feedRadius,feedAngle,heatingAngle);
     const supplyLead=[...headerArc.slice(0,-1),...roundPath([headerArc.at(-1),helix[0],helix[1]],5)];
@@ -179,7 +181,7 @@ export function buildCompactFluidNetworks(ctx) {
     return ra+(rb-ra)*(smooth(n/steps)*(1-f)+smooth((n+1)/steps)*f);
   }
   function guideRadius(x) {
-    for(let k=0;k<2;k++){
+    for(let k=0;k<interstageCount;k++){
       const a=P.stacks[k],b=P.stacks[k+1],r0=a.rearOuter+P.interstage.wall,r1=b.inner-P.interstage.linerClearance;
       if(x>=a.rear&&x<=b.front)return sampledTransition(x,a.rear,b.front,r0,r1,32);
       if(x>b.front&&x<b.rear)return stackRadiusAt(b,x,'inner')-P.interstage.linerClearance;
@@ -192,12 +194,12 @@ export function buildCompactFluidNetworks(ctx) {
   // separate walls at the same axial station. A radius jump there is not a
   // physical sheet crossing and must not create a fictitious sealing collar.
   function guideZone(x) {
-    for(let k=0;k<2;k++){
+    for(let k=0;k<interstageCount;k++){
       const a=P.stacks[k],b=P.stacks[k+1];
       if(x>=a.rear&&x<=b.front)return k*2;
       if(x>b.front&&x<b.rear)return k*2+1;
     }
-    return x>=last.rear&&x<=last.rear+P.interstage.tailGuideLength?4:-1;
+    return x>=last.rear&&x<=last.rear+P.interstage.tailGuideLength?2*interstageCount:-1;
   }
   const gap=p=>{const r=guideRadius(p[0]);return r===null?null:Math.hypot(p[1],p[2])-r;};
   const used=[];
@@ -228,7 +230,7 @@ export function buildCompactFluidNetworks(ctx) {
   const anodeCircuit=union([bores.feed,bores.return,anode.gasBore,anode.drainBore,pumpBore]);
   const color={air:C.air,cathode:'#6aa5b7',feed:C.hydrogen,return:C.return};
   const groups={air:'air',cathode:'cathodeExhaust',feed:'hydrogen',return:'return'};
-  const titles={air:'阴极反应空气 · 中央主管与三级独立支路',cathode:'三级阴极湿尾气 · 独立除水回路',
+  const titles={air:`阴极反应空气 · 中央主管与${stageCount}级独立支路`,cathode:`${stageCount}级阴极湿尾气 · 独立除水回路`,
     feed:'中央供氢总管 · 堆后环绕与内缘后侧入口',return:'内缘前侧回氢 · 除水后循环'};
   const networkSolids={};
   for(const key of keys){
@@ -255,8 +257,9 @@ export function buildCompactFluidNetworks(ctx) {
   const linerCutters=union([...keys.flatMap(k=>networks[k].outer),anode.outer,cathode.outer,pumpOuter]);
   return {ports,stackCutters:stackCutters.map(a=>union(a)),linerCutters,inspectionParts,
     bores:{...bores,cathodeCircuit,anodeCircuit},junctionChecks,isolationChecks,aftSupplyBranches,
-    checks:{units:'mm',stages:componentChecks,portCounts:{air:3,cathode:3,hydrogen:3,return:3},
-      independentModules:3,pressureCircuitsSeparate:true,centralAir:{outerRadius:AIR.outer,innerRadius:AIR.inner,end:AIR.end},
+    checks:{units:'mm',stages:componentChecks,portCounts:Object.fromEntries(['air','cathode','hydrogen','return']
+        .map(medium=>[medium,ports.filter(p=>p.medium===medium).length])),
+      independentModules:stageCount,pressureCircuitsSeparate:true,centralAir:{outerRadius:AIR.outer,innerRadius:AIR.inner,end:AIR.end},
       hydrogenHeaders:{feedRadius,feedAngle,feedLocation:'stack central bore, outside air main',returnRadius:railRadius,returnAngle},sealedCoolingGuidePenetrations:seals,
       separators:[anode.check,cathode.check],independentDrainCount:2,cathodeTailGasOutlet:[tailOutlet,65,45],
       pump:{front:pumpFront,rear:pumpRear,centreYZ:pumpCentre,radius:pumpRadius},

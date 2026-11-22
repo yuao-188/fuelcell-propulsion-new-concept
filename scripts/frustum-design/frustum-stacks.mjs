@@ -3,12 +3,12 @@
  * These twenty concentric lamellae show the sloping layered form; they are not
  * the former physical cell count or a recalculated electrochemical design.
  */
-export function buildFrustumStacks(ctx, { stackCutters = [], linerCutters } = {}) {
+export function buildFrustumStacks(ctx, { stackCutters = [], linerCutters, supportSeats = [] } = {}) {
   const { P, C, union, cylinder, add } = ctx;
   const checks = [], layerCount = 20, segments = 192;
   const interpolate = (a, b, t) => a + (b - a) * t;
   for (const [index, stack] of P.stacks.entries()) {
-    const stage = index + 1, length = stack.rear - stack.front;
+    const stage = index + 1, length = stack.rear - stack.front, scale=stack.geometryScale??1;
     const widthFront = stack.outer - stack.inner;
     const widthRear = stack.rearOuter - stack.rearInner;
     if (!(length > 0 && widthFront > 0 && widthRear > 0 && stack.rearInner > 0))
@@ -28,15 +28,15 @@ export function buildFrustumStacks(ctx, { stackCutters = [], linerCutters } = {}
       const result = outer.subtract(inner); outer.delete(); inner.delete();
       return result;
     };
-    const nominalThickness = 4.9, layerFraction = nominalThickness / widthFront;
+    const nominalThickness = 4.9*scale, silverThickness=.65*scale, layerFraction = nominalThickness / widthFront;
     const pitchFraction = (1 - layerFraction) / (layerCount - 1);
     const graphite = [], laminations = [];
     for (let layer = 0; layer < layerCount; layer++) {
       const start = layer * pitchFraction;
       // A silver interlayer embedded between two dark faces gives continuous
       // black/silver diagonal stripes in an axial cut, and a dark outer cone.
-      const silverStart = start + 3.6 / widthFront;
-      const silverEnd = silverStart + .65 / widthFront;
+      const silverStart = start + 3.6*scale / widthFront;
+      const silverEnd = silverStart + silverThickness / widthFront;
       // Separate the differently coloured mating skins by a visible-scale
       // negligible relief. Coincident double-sided faces otherwise flicker
       // in WebGL even though the closed solids have no intersecting volume.
@@ -48,16 +48,17 @@ export function buildFrustumStacks(ctx, { stackCutters = [], linerCutters } = {}
     // Four small seating collars stay within the first and last lamellae.
     // They never bridge the open channels or cover an entire axial end face.
     const collars = [], collarPockets = [];
-    for (const x of [stack.front + 5, stack.rear - 7]) {
-      collars.push(band(x, x + 2, 0, 1.15 / widthFront));
-      collars.push(band(x, x + 2, 1 - 1.15 / widthFront, 1));
+    for (const x of [stack.front + 5*scale, stack.rear - 7*scale]) {
+      collars.push(band(x, x + 2*scale, 0, 1.15*scale / widthFront));
+      collars.push(band(x, x + 2*scale, 1 - 1.15*scale / widthFront, 1));
       // A small explicit seat relief avoids coincident cone facets producing
       // sliver intersections when exported at browser precision.
-      collarPockets.push(band(x - .025, x + 2.025, -.025 / widthFront, 1.175 / widthFront));
-      collarPockets.push(band(x - .025, x + 2.025, 1 - 1.175 / widthFront, 1 + .025 / widthFront));
+      collarPockets.push(band(x - .025, x + 2*scale+.025, -.025 / widthFront, (1.15*scale+.025) / widthFront));
+      collarPockets.push(band(x - .025, x + 2*scale+.025, 1 - (1.15*scale+.025) / widthFront, 1 + .025 / widthFront));
     }
     const collarSeats = union(collars), pockets = union(collarPockets), services = stackCutters[index];
-    const seatCuts = services ? union([pockets, services]) : pockets;
+    const seatInputs=[pockets,services,supportSeats[index]].filter(Boolean);
+    const seatCuts = seatInputs.length>1 ? union(seatInputs) : pockets;
     const rawGraphite = union(graphite), rawLaminations = union(laminations);
     const body = rawGraphite.subtract(seatCuts), foil = rawLaminations.subtract(seatCuts);
     const frameCutter = linerCutters ?? services;
@@ -78,7 +79,7 @@ export function buildFrustumStacks(ctx, { stackCutters = [], linerCutters } = {}
       rearInnerDiameter: 2 * stack.rearInner, rearOuterDiameter: 2 * stack.rearOuter,
       radialContraction: stack.outer - stack.rearOuter,
       slopeAngleDeg: Math.atan2(stack.outer - stack.rearOuter, length) * 180 / Math.PI,
-      frontLayerThickness: nominalThickness, silverLayerThickness: .65,
+      frontLayerThickness: nominalThickness, silverLayerThickness:silverThickness,
       frontOpenGap: (pitchFraction - layerFraction) * widthFront,
       rearOpenGap: (pitchFraction - layerFraction) * widthRear,
       axialEnds: 'open-concentric-sloping-channels', centreBore: 'open-front-to-rear',

@@ -10,7 +10,14 @@ import { parameters as P } from '../parameters.mjs';
 // @ts-expect-error The same deterministic solver is used in the GLB builder.
 import { getIntakeGeometry, getIntakeKinematics } from '../intake-kinematics.mjs';
 
-export type CameraView = 'perspective' | 'side' | 'front' | 'fan' | 'machinery' | 'compressor' | 'stacks' | 'cells' | 'stage1Pipes' | 'water' | 'intake2' | 'intake3';
+const MODEL_REVISION='20261122-four-stack-frame';
+const intakeStages:number[]=[...P.variableIntake.stages];
+const intakeStageForView=(view:CameraView)=>{
+  const stage=Number(view.startsWith('intake')?view.slice(6):0);
+  return intakeStages.includes(stage)?stage:0;
+};
+
+export type CameraView = 'perspective' | 'side' | 'front' | 'fan' | 'machinery' | 'compressor' | 'stacks' | 'cells' | 'stage1Pipes' | 'water' | 'intake2' | 'intake3' | 'intake4';
 export type IntakePose = { opening: number; pitchDeg: number; yawDeg: number };
 type IntakeGeometry = { id: string; positions: ArrayLike<number>; indices: ArrayLike<number> };
 
@@ -18,11 +25,11 @@ type Props = {
   viewMode: 'complete' | 'cutaway'; sectionDepth: number;
   cameraView: CameraView;
   compressorView: 'passage' | 'rotors';
-  showOuterShell: boolean; showVariableIntake: boolean; showInterstageGuide: boolean; showStacks: boolean;
+  showOuterShell: boolean; showSupportFrame: boolean; showVariableIntake: boolean; showInterstageGuide: boolean; showStacks: boolean;
   showIntake: boolean; showIntakeInner: boolean; showCompressorCase: boolean;
   showAir: boolean; showHydrogen: boolean; showReturn: boolean;
   showCathodeWater: boolean; showAnodeSeparator: boolean; showWiring: boolean; resetKey: number;
-  intake2: IntakePose; intake3: IntakePose;
+  intake2: IntakePose; intake3: IntakePose; intake4: IntakePose;
 };
 
 export default function ModelViewport(props: Props) {
@@ -119,15 +126,19 @@ export default function ModelViewport(props: Props) {
     const isFirstStageInspection=(mesh:THREE.Mesh)=>Boolean(mesh.userData.inspectionOnly)&&Number(mesh.userData.inspectionStage)===1;
     const variableMeshes = new Map<number, Map<string, THREE.Mesh>>();
     const priorIntake = new Map<number, string>();
+    // The front shroud is now a short independent component. Overall framing
+    // and initial cap extent follow the complete layout until the GLB loads.
+    const layoutRear=Number(P.layoutRear??Math.max(P.outerShell.rear,P.stacks.at(-1).rear,P.pump.rear,P.air.end));
+    const layoutFront=Math.min(P.outerShell.front,P.fan.spinnerFront);
     // Start from the confirmed core envelope, then replace it with the loaded
     // assembly bounds so raised flanges, lugs and service pipes stay in frame.
     const modelBounds=new THREE.Box3(
-      new THREE.Vector3(Math.min(P.outerShell.front,P.fan.spinnerFront),-P.outerShell.radius,-P.outerShell.radius),
-      new THREE.Vector3(P.outerShell.rear,P.outerShell.radius,P.outerShell.radius));
+      new THREE.Vector3(layoutFront,-P.outerShell.radius,-P.outerShell.radius),
+      new THREE.Vector3(layoutRear,P.outerShell.radius,P.outerShell.radius));
     const clipping=new THREE.Plane(new THREE.Vector3(0,0,-1),0);
     const sections:{source:THREE.Mesh; stencil:THREE.Group; cap:THREE.Mesh}[]=[];
-    const sectionLength=P.outerShell.rear-P.outerShell.front+220;
-    const sectionCenter=(P.outerShell.front+P.outerShell.rear)/2;
+    const sectionLength=layoutRear-layoutFront+220;
+    const sectionCenter=(layoutFront+layoutRear)/2;
     let capGeometry=new THREE.PlaneGeometry(sectionLength,P.outerShell.radius*2+160);
     let priorReset=-1,priorCamera='',priorMode='',priorDepth=-1,priorVisibility='';
     const inletFraming=(stage:number)=>{
@@ -138,10 +149,10 @@ export default function ModelViewport(props: Props) {
     };
     function fit() {
       const view=latest.current.cameraView;
-      const intakeStage=view==='intake2'?2:view==='intake3'?3:0;
+      const intakeStage=intakeStageForView(view);
       const direction=view==='side'?new THREE.Vector3(0,0,1):view==='front'?new THREE.Vector3(-1,0,0):view==='fan'?new THREE.Vector3(-1,.17,.5).normalize():view==='compressor'?(latest.current.compressorView==='rotors'?new THREE.Vector3(-1,.25,1.6).normalize():new THREE.Vector3(-.08,.08,1).normalize()):intakeStage?new THREE.Vector3(-.34,.25,1).normalize():view==='machinery'?new THREE.Vector3(.2,.18,1).normalize():view==='stage1Pipes'?new THREE.Vector3(.55,.22,1).normalize():view==='cells'?new THREE.Vector3(-.65,.3,1).normalize():view==='water'?new THREE.Vector3(.25,.2,1).normalize():new THREE.Vector3(-.52,.30,1).normalize();
-      const first=P.stacks[0],last=P.stacks[P.stacks.length-1],r=last.outer+35;
-      let box=view==='fan'?[[Math.min(-10,P.fan.spinnerFront-10),P.fan.rear+20],[-P.fan.radius-15,P.fan.radius+15],[-P.fan.radius-15,P.fan.radius+15]]:view==='compressor'?[[P.compressor.front-15,P.compressor.outlet+15],[-185,230],[-180,180]]:view==='machinery'?[[P.motorHousing.front-5,P.compressor.outlet+15],[-190,190],[-190,190]]:view==='stacks'?[[first.front-20,last.rear+20],[-r,r],[-r,r]]:view==='cells'?[[first.front-20,first.rear+20],[-first.outer-20,first.outer+20],[-first.outer-20,first.outer+20]]:view==='water'?[[last.rear+5,P.outerShell.rear-15],[-120,120],[-120,120]]:[[modelBounds.min.x-18,modelBounds.max.x+18],[modelBounds.min.y-20,modelBounds.max.y+20],[modelBounds.min.z-20,modelBounds.max.z+20]];
+      const first=P.stacks[0],last=P.stacks[P.stacks.length-1],r=Math.max(...P.stacks.map((stack:{outer:number})=>stack.outer))+35;
+      let box=view==='fan'?[[Math.min(-10,P.fan.spinnerFront-10),P.fan.rear+20],[-P.fan.radius-15,P.fan.radius+15],[-P.fan.radius-15,P.fan.radius+15]]:view==='compressor'?[[P.compressor.front-15,P.compressor.outlet+15],[-185,230],[-180,180]]:view==='machinery'?[[P.motorHousing.front-5,P.compressor.outlet+15],[-190,190],[-190,190]]:view==='stacks'?[[first.front-20,last.rear+20],[-r,r],[-r,r]]:view==='cells'?[[first.front-20,first.rear+20],[-first.outer-20,first.outer+20],[-first.outer-20,first.outer+20]]:view==='water'?[[last.rear+5,Math.max(last.rear+65,layoutRear-15)],[-120,120],[-120,120]]:[[modelBounds.min.x-18,modelBounds.max.x+18],[modelBounds.min.y-20,modelBounds.max.y+20],[modelBounds.min.z-20,modelBounds.max.z+20]];
       if(intakeStage) {
         // Include the complete inlet from the preceding stack's midpoint to
         // this stack: articulated lip, long duct and downstream attachment.
@@ -222,11 +233,15 @@ export default function ModelViewport(props: Props) {
       }
       priorIntake.set(stage,key);dirty=true;
     }
+    function updateIntakes(p:Props) {
+      const poses:Record<number,IntakePose>={2:p.intake2,3:p.intake3,4:p.intake4};
+      for(const stage of intakeStages)if(poses[stage])updateIntake(stage,poses[stage]);
+    }
     // Read-only numerical snapshots are enabled only for the local QA URL.
     // They prove each control changes the rendered buffers independently.
     const qaWindow=window as unknown as { __frustumDesignQA?: { snapshot: () => unknown } };
     const qaAccess={snapshot:()=>({
-      version:'20261110-independent-ports',loaded:Boolean(root),cameraView:latest.current.cameraView,
+      version:MODEL_REVISION,loaded:Boolean(root),cameraView:latest.current.cameraView,
       schematicStacks:meshes.filter(mesh=>/^stack-\d+-1$/.test(String(mesh.userData.id))).length,
       stackArrangement:P.stackAppearance.arrangement,countIsIllustrative:true,
       groups:meshes.reduce((result,mesh)=>{const group=String(mesh.userData.group);result[group]=(result[group]||0)+1;return result;},{} as Record<string,number>),
@@ -236,7 +251,7 @@ export default function ModelViewport(props: Props) {
         clippingPlanes:((mesh.material as THREE.MeshStandardMaterial).clippingPlanes??[]).map(plane=>({normal:plane.normal.toArray(),constant:plane.constant})),
       })),
       visibleCaps:sections.filter(section=>section.cap.visible).map(section=>section.source.userData.id),
-      intakes:Object.fromEntries([2,3].map(stage=>{
+      intakes:Object.fromEntries(intakeStages.map(stage=>{
         const parts=[...(variableMeshes.get(stage)?.values()??[])].map(mesh=>{
           const position=mesh.geometry.getAttribute('position') as THREE.BufferAttribute;
           const words=new Uint32Array(position.array.buffer,position.array.byteOffset,position.array.byteLength/4);
@@ -252,7 +267,7 @@ export default function ModelViewport(props: Props) {
       })),
     })};
     if(new URLSearchParams(location.search).get('qa')==='1')qaWindow.__frustumDesignQA=qaAccess;
-    const modelUrl=new URL('model.glb?v=20261110-independent-ports',document.baseURI);
+    const modelUrl=new URL(`model.glb?v=${MODEL_REVISION}`,document.baseURI);
     const modelRequest=new AbortController();
     const loadFailed=()=>{if(!cancelled)setStatus('模型加载失败，请刷新页面重试。');};
     // Read the binary directly. FileLoader's rewrapped progress stream can
@@ -273,7 +288,7 @@ export default function ModelViewport(props: Props) {
         if(item.userData.inspectionOnly)item.visible=false;
         if(item.userData.clip&&!item.userData.inspectionOnly)addSection(item,sections.length);
         const variableStage=Number(item.userData.variableStage);
-        if(variableStage===2||variableStage===3) {
+        if(intakeStages.includes(variableStage)) {
           if(!variableMeshes.has(variableStage))variableMeshes.set(variableStage,new Map());
           variableMeshes.get(variableStage)!.set(String(item.userData.id),item);
         }
@@ -294,7 +309,7 @@ export default function ModelViewport(props: Props) {
         label.point.copy(label.basePoint);label.point.y*=radialScale;label.point.z*=radialScale;
       }
       root.updateMatrixWorld(true);
-      updateIntake(2,latest.current.intake2);updateIntake(3,latest.current.intake3);
+      updateIntakes(latest.current);
       modelBounds.setFromObject(root);
       const assemblySize=modelBounds.getSize(new THREE.Vector3()),assemblyCenter=modelBounds.getCenter(new THREE.Vector3());
       const oldCapGeometry=capGeometry;
@@ -315,12 +330,12 @@ export default function ModelViewport(props: Props) {
     const observer=new ResizeObserver(resize);observer.observe(element);resize();
     const render=()=>{
       frame=requestAnimationFrame(render);const p=latest.current;
-      updateIntake(2,p.intake2);updateIntake(3,p.intake3);
+      updateIntakes(p);
       const cameraKey=`${p.cameraView}:${p.compressorView}`;
       const isolated=p.cameraView==='compressor', rotors=isolated&&p.compressorView==='rotors';
       const stackDetail=p.cameraView==='cells';
       const stage1Pipes=p.cameraView==='stage1Pipes';
-      const intakeStage=p.cameraView==='intake2'?2:p.cameraView==='intake3'?3:0;
+      const intakeStage=intakeStageForView(p.cameraView);
       const modeKey=`${p.viewMode}:${isolated}:${rotors}:${intakeStage}:${stackDetail}:${stage1Pipes}`;
       const cut=stage1Pipes||(p.viewMode==='cutaway'&&!rotors);
       if(priorReset!==p.resetKey||priorCamera!==cameraKey){fit();priorReset=p.resetKey;priorCamera=cameraKey;}
@@ -335,9 +350,9 @@ export default function ModelViewport(props: Props) {
         for(const {cap} of sections)cap.position.z=clipping.constant;
         priorMode=modeKey;priorDepth=p.sectionDepth;dirty=true;
       }
-      const visibility=[isolated,rotors,intakeStage,stackDetail,stage1Pipes,p.showOuterShell,p.showVariableIntake,p.showInterstageGuide,p.showStacks,p.showAir,p.showHydrogen,p.showReturn,p.showIntake,p.showIntakeInner,p.showCompressorCase,p.showCathodeWater,p.showAnodeSeparator,p.showWiring].join();
+      const visibility=[isolated,rotors,intakeStage,stackDetail,stage1Pipes,p.showOuterShell,p.showSupportFrame,p.showVariableIntake,p.showInterstageGuide,p.showStacks,p.showAir,p.showHydrogen,p.showReturn,p.showIntake,p.showIntakeInner,p.showCompressorCase,p.showCathodeWater,p.showAnodeSeparator,p.showWiring].join();
       if(priorVisibility!==visibility){
-        const visible:Record<string,boolean>={outerShell:p.showOuterShell,variableIntake:p.showVariableIntake,interstageGuide:p.showInterstageGuide,intakeOuter:p.showIntake,intakeInner:p.showIntakeInner,compressorCase:p.showCompressorCase,stacks:p.showStacks,air:p.showAir,hydrogen:p.showHydrogen,return:p.showReturn,anodeInternal:p.showHydrogen||p.showReturn,cathodeExhaust:p.showCathodeWater,cathodeSeparator:p.showCathodeWater,cathodeDrain:p.showCathodeWater,anodeSeparator:p.showAnodeSeparator,anodeDrain:p.showAnodeSeparator,wiring:p.showWiring};
+        const visible:Record<string,boolean>={outerShell:p.showOuterShell,supportFrame:p.showSupportFrame,variableIntake:p.showVariableIntake,interstageGuide:p.showInterstageGuide,intakeOuter:p.showIntake,intakeInner:p.showIntakeInner,compressorCase:p.showCompressorCase,stacks:p.showStacks,air:p.showAir,hydrogen:p.showHydrogen,return:p.showReturn,anodeInternal:p.showHydrogen||p.showReturn,cathodeExhaust:p.showCathodeWater,cathodeSeparator:p.showCathodeWater,cathodeDrain:p.showCathodeWater,anodeSeparator:p.showAnodeSeparator,anodeDrain:p.showAnodeSeparator,wiring:p.showWiring};
         meshes.forEach(mesh=>{
           const id=String(mesh.userData.id??'');
           if(mesh.userData.inspectionOnly) {
