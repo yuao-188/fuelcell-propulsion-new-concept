@@ -3,12 +3,13 @@ import { Box, Layers, MousePointer2, RotateCcw, SlidersHorizontal } from 'lucide
 import ModelViewport, { type CameraView, type IntakePose } from './ModelViewport';
 import './styles.css';
 
-type VisibilityKey = 'outerShell' | 'supportFrame' | 'variableIntake' | 'interstageGuide' | 'intake' | 'intakeInner' | 'compressorCase' | 'stacks' | 'air' | 'hydrogen' | 'return' | 'cathodeWater' | 'anodeSeparator' | 'motorHeatRecovery' | 'wiring';
+type VisibilityKey = 'outerShell' | 'frontMount' | 'supportFrame' | 'variableIntake' | 'interstageGuide' | 'intake' | 'intakeInner' | 'compressorCase' | 'stacks' | 'air' | 'hydrogen' | 'return' | 'cathodeWater' | 'anodeSeparator' | 'motorHeatRecovery' | 'wiring';
 type Visibility = Record<VisibilityKey, boolean>;
 const neutralIntake: IntakePose = { opening: .55, pitchDeg: 0, yawDeg: 0 };
 
 const initialVisibility: Visibility = {
   outerShell: true,
+  frontMount: true,
   supportFrame: true,
   variableIntake: true,
   interstageGuide: true,
@@ -151,6 +152,7 @@ export default function App() {
               cameraView={cameraView}
               compressorView={compressorView}
               showOuterShell={visibility.outerShell}
+              showFrontMount={visibility.frontMount}
               showSupportFrame={visibility.supportFrame}
               showVariableIntake={visibility.variableIntake}
               showInterstageGuide={visibility.interstageGuide}
@@ -287,7 +289,8 @@ export default function App() {
             <h3 id="structure-label">结构部件</h3>
             <div className="layer-list">
               <LayerToggle label="前段外壳" color="swatch-outer" checked={visibility.outerShell} onChange={() => toggleLayer('outerShell')} />
-              <LayerToggle label="承力框架" color="swatch-inner" checked={visibility.supportFrame} onChange={() => toggleLayer('supportFrame')} />
+              <LayerToggle label="前部动力安装节" color="swatch-inner" checked={visibility.frontMount} onChange={() => toggleLayer('frontMount')} />
+              <LayerToggle label="电堆安装节" color="swatch-inner" checked={visibility.supportFrame} onChange={() => toggleLayer('supportFrame')} />
               <LayerToggle label="可变进气罩" color="swatch-variable" checked={visibility.variableIntake} onChange={() => toggleLayer('variableIntake')} />
               <LayerToggle label="级间导流罩" color="swatch-inner" checked={visibility.interstageGuide} onChange={() => toggleLayer('interstageGuide')} />
               <LayerToggle label="引气外筒" color="swatch-intake" checked={visibility.intake} onChange={() => toggleLayer('intake')} />
@@ -308,8 +311,8 @@ export default function App() {
               <LayerToggle label="电机余热回路" color="swatch-coolant" checked={visibility.motorHeatRecovery} onChange={() => toggleLayer('motorHeatRecovery')} />
               <details className="heat-recovery-help">
                 <summary>余热回路如何工作</summary>
-                <p><strong>青色冷却液回路：</strong>冷却液在电机夹套内吸热，流到尾部预热器放热，再经循环泵返回夹套。</p>
-                <p><strong>绿色氢气管路：</strong>气态氢经过预热器受热，再进入供氢总管。两套流道隔壁换热，冷却液和氢气互不混合。</p>
+                <p><strong>青色冷却液回路：</strong>两根管线分别供液、回液。冷却液在电机夹套内吸热，流到二级电堆后侧、进气罩旁的预热器放热，再经循环泵返回夹套。</p>
+                <p><strong>绿色氢气管路：</strong>气态氢在预热器内受热后分成两路，分别供给一、二级和三、四级电堆。两套流道隔壁换热，冷却液和氢气互不混合。</p>
               </details>
               <LayerToggle label="电气线束" color="swatch-stack" checked={visibility.wiring} onChange={() => toggleLayer('wiring')} />
             </div>

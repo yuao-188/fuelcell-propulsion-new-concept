@@ -30,7 +30,7 @@ export function getCompressorCasingProfile(P) {
 }
 
 /** Two centrifugal stages on one shaft driven by the front compressor motor. */
-export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCylinder, solidLathe, hollowLathe, add }) {
+export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCylinder, solidLathe, hollowLathe, add }, frontInstallation) {
   const tau = Math.PI * 2, lerp = (a, b, t) => a + (b - a) * t;
   const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
   const metal = { metallic: .83, roughness: .27, finish: 'machined' };
@@ -287,7 +287,8 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
 
   const flangeDepth = 3 * axialScale, flangeGap = .04;
   const flangeSlots = [], compressorScrews = [];
-  for (const [i, x] of [K.front + axialScale, ax(619)].entries()) {
+  const detailFlanges=frontInstallation?[[1,ax(619)]]:[[0,K.front+axialScale],[1,ax(619)]];
+  for (const [i, x] of detailFlanges) {
     const profile = Array.from({ length: 9 }, (_, j) => {
       const q = x + flangeDepth * j / 8, inner = innerAt(q);
       const wall = lerp(P.air.outer - P.air.inner, K.outer - K.inner,
@@ -314,7 +315,7 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
       flange.subtract(union(headVoids)), { ...metal, clip: true });
   }
   add('compressor-casing', '双级离心压气机渐缩机匣', 'compressorCase', C.compressorCase ?? '#b6a77c',
-    casingWall.subtract(union(flangeSlots)),
+    casingWall.subtract(union(frontInstallation?[...flangeSlots,frontInstallation.compressorSeats]:flangeSlots)),
     { metallic: .64, roughness: .31, finish: 'satin-champagne-metal', clip: true, stages: 2 });
   add('compressor-fasteners', '压气机装配法兰沉头紧固件', 'compressorCase', darkSteel,
     union(compressorScrews), { ...metal, clip: true });

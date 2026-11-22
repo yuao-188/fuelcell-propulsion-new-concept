@@ -3,7 +3,7 @@ import {stackRadiusAt} from '../../frustum-design/parameters.mjs';
  * Each circuit ends at its own short stack-wall interface. The stack-internal
  * reaction passages are deliberately omitted rather than joined by bypasses.
  */
-export function buildCompactFluidNetworks(ctx, {preheatedGasBore}={}) {
+export function buildCompactFluidNetworks(ctx, heatRecovery) {
   const { M, P, C, union, cylinder, tubePath, roundPath, polar, add } = ctx;
   const keys = ['air','cathode','feed','return'];
   const networks = Object.fromEntries(keys.map(k=>[k,{outer:[],bores:[]}]));
@@ -51,7 +51,16 @@ export function buildCompactFluidNetworks(ctx, {preheatedGasBore}={}) {
   const returnEnd=last.rear+13,wetEnd=last.rear+11,tailOutlet=last.rear+170;
   const firstWet=front.rear-Q.wetRearOffset;
   const airMain=path('air',[[P.compressor.outlet,0,0],[AIR.end,0,0]],AIR.outer,AIR.inner);
-  const feedMain=path('feed',[polar(supplyStart-6,feedRadius,feedAngle),polar(H.inletX,feedRadius,feedAngle)],H.outer,H.inner,{blindStart:true});
+  const side=H.sideSupply,teeX=P.stacks[side.mountStage-1].rear+side.junctionOffset;
+  const recycleX=P.pump.rear+17;
+  const headerAt=x=>polar(x,feedRadius,feedAngle);
+  const feedFront=path('feed',[headerAt(supplyStart-6),headerAt(teeX)],H.outer,H.inner,{blindStart:true});
+  const feedRear=path('feed',[headerAt(teeX),headerAt(recycleX+5)],H.outer,H.inner,{blindEnd:true});
+  networks.feed.outer.push(heatRecovery.gasOuter,heatRecovery.ductSeat);
+  networks.feed.bores.push(heatRecovery.gasBore);
+  allPaths.push({key:'feed',points:heatRecovery.gasPoints,outer:H.outer,inner:H.inner});
+  junctionChecks.push({name:'preheater-to-stages-1-2',a:heatRecovery.gasBore,b:feedFront.bore},
+    {name:'preheater-to-stages-3-4',a:heatRecovery.gasBore,b:feedRear.bore});
   const returnMain=path('return',[polar(returnStart-6,railRadius,returnAngle),polar(returnEnd,railRadius,returnAngle)],H.outer,H.inner,{blindStart:true});
   const wetMain=path('cathode',[polar(firstWet-6,wetRadius,wetAngle),polar(wetEnd,wetRadius,wetAngle)],5.2,3.4,{blindStart:true});
 
@@ -106,6 +115,9 @@ export function buildCompactFluidNetworks(ctx, {preheatedGasBore}={}) {
     const feedRoute=[...supplyLead,...helix.slice(2,-2),...exitLead,...exitArc.slice(2,-2),
       ...inwardLead,...innerArc.slice(2,-2),...stubLead];
     const feedIn=path('feed',feedRoute,heating.outer,heating.inner,{stage:i});
+    const upstream=stage<=side.mountStage;
+    const supplyHeader=upstream?feedFront:feedRear;
+    const otherHeader=upstream?feedRear:feedFront;
     const returnOut=path('return',[polar(returnX,rootAt(returnX),Q.returnAngle),polar(returnX,railRadius,Q.returnAngle),
       ...arcPoints(returnX,railRadius,Q.returnAngle,returnAngle).slice(1)],3.3,2.1,{stage:i});
     port('air',stage,polar(airX,stackRadiusAt(s,airX,'inner'),Q.airAngle),polarDirection(Q.airAngle),AIR.branchInner,AIR.branchOuter);
@@ -114,13 +126,15 @@ export function buildCompactFluidNetworks(ctx, {preheatedGasBore}={}) {
     port('return',stage,polar(returnX,stackRadiusAt(s,returnX,'inner'),Q.returnAngle),polarDirection(Q.returnAngle,-1),2.1,3.3);
     junctionChecks.push({name:`stage-${stage}-air-header`,a:airMain.bore,b:airIn.bore},
       {name:`stage-${stage}-wet-header`,a:wetMain.bore,b:wetOut.bore},
-      {name:`stage-${stage}-hydrogen-header`,a:feedMain.bore,b:feedIn.bore},
+      {name:`stage-${stage}-hydrogen-header`,a:supplyHeader.bore,b:feedIn.bore},
       {name:`stage-${stage}-return-header`,a:returnMain.bore,b:returnOut.bore});
     isolationChecks.push({name:`stage-${stage}-air-vs-wet-exhaust`,a:airIn.bore,b:wetOut.bore},
-      {name:`stage-${stage}-feed-vs-return-interface`,a:feedIn.bore,b:returnOut.bore});
+      {name:`stage-${stage}-feed-vs-return-interface`,a:feedIn.bore,b:returnOut.bore},
+      {name:`stage-${stage}-vs-other-supply-branch`,a:feedIn.bore,b:otherHeader.bore});
     aftSupplyBranches.push({stage,bore:feedIn.bore});
     componentChecks.push({stage,airX,wetX,feedX,feedHeaderX,returnX,
       interfacesPerMedium:1,feedFace:'inner conical wall, rear',returnFace:'inner conical wall, front',
+      supplyGroup:upstream?'stages 1–2':'stages 3–4',
       interfaceAngles:{air:Q.airAngle,cathode:Q.wetAngle,feed:Q.feedAngle,return:Q.returnAngle},stubDepth:Q.stubDepth,
       aftSupplyTurn:{front:feedHeaderX,rear:heatingRear,radius:heatingRadius,
         degrees:heating.turnDegrees,startAngle:heatingAngle,outerRadius:heating.outer,innerRadius:heating.inner,
@@ -178,7 +192,7 @@ export function buildCompactFluidNetworks(ctx, {preheatedGasBore}={}) {
   add('pump','阳极循环泵 · 独立尾部腔内安装','pump',C.pump,pumpOuter.subtract(pumpBore),
     {clip:true,metallic:.55,roughness:.3});
   path('return',[anode.outlet,pumpAt(pumpFront)],H.outer,H.inner);
-  path('feed',[pumpAt(pumpRear),pumpAt(pumpRear+17),polar(pumpRear+17,feedRadius,feedAngle)],H.outer,H.inner,{round:7});
+  path('feed',[pumpAt(pumpRear),pumpAt(recycleX),headerAt(recycleX)],H.outer,H.inner,{round:7});
 
   // Locate every pressure-pipe crossing of the cooling collector/liner walls.
   // One integral collar straddles the sheet; subtracting its exact envelope from
@@ -233,16 +247,14 @@ export function buildCompactFluidNetworks(ctx, {preheatedGasBore}={}) {
     }
   }
   const bores=Object.fromEntries(keys.map(k=>[k,union(networks[k].bores)]));
-  const gasSupply=preheatedGasBore ? union([bores.feed,preheatedGasBore]) : bores.feed;
-  if(preheatedGasBore)junctionChecks.push({name:'preheater-to-supply-header',a:preheatedGasBore,b:feedMain.bore});
   isolationChecks.push({name:'air-header-vs-wet-exhaust-header',a:bores.air,b:bores.cathode},
     {name:'feed-vs-return-outside-circulation-pump',a:bores.feed,b:bores.return});
   const cathodeCircuit=union([bores.air,bores.cathode,cathode.gasBore,cathode.drainBore]);
-  const anodeCircuit=union([gasSupply,bores.return,anode.gasBore,anode.drainBore,pumpBore]);
+  const anodeCircuit=union([bores.feed,bores.return,anode.gasBore,anode.drainBore,pumpBore]);
   const color={air:C.air,cathode:'#6aa5b7',feed:C.hydrogen,return:C.return};
   const groups={air:'air',cathode:'cathodeExhaust',feed:'hydrogen',return:'return'};
   const titles={air:`阴极反应空气 · 中央主管与${stageCount}级独立支路`,cathode:`${stageCount}级阴极湿尾气 · 独立除水回路`,
-    feed:'中央供氢总管 · 堆后环绕与内缘后侧入口',return:'内缘前侧回氢 · 除水后循环'};
+    feed:'二级堆后侧进气 · 两路供氢与各级堆后环绕',return:'内缘前侧回氢 · 除水后循环'};
   const networkSolids={};
   for(const key of keys){
     const solid=union(networks[key].outer).subtract(key==='air'||key==='cathode'?cathodeCircuit:anodeCircuit);
@@ -271,7 +283,9 @@ export function buildCompactFluidNetworks(ctx, {preheatedGasBore}={}) {
     checks:{units:'mm',stages:componentChecks,portCounts:Object.fromEntries(['air','cathode','hydrogen','return']
         .map(medium=>[medium,ports.filter(p=>p.medium===medium).length])),
       independentModules:stageCount,pressureCircuitsSeparate:true,centralAir:{outerRadius:AIR.outer,innerRadius:AIR.inner,end:AIR.end},
-      hydrogenHeaders:{feedRadius,feedAngle,feedLocation:'stack central bore, outside air main',returnRadius:railRadius,returnAngle},sealedCoolingGuidePenetrations:seals,
+      hydrogenHeaders:{feedRadius,feedAngle,feedLocation:'stack central bore, outside air main',
+        sideInletStage:side.mountStage,teeX,branches:[[1,2],[3,4]],tailConnection:'anode recycle only',
+        returnRadius:railRadius,returnAngle},sealedCoolingGuidePenetrations:seals,
       separators:[anode.check,cathode.check],independentDrainCount:2,cathodeTailGasOutlet:[tailOutlet,65,45],
       pump:{front:pumpFront,rear:pumpRear,centreYZ:pumpCentre,radius:pumpRadius},
       internalChannelStatus:'independent interface stubs only; no external air-exhaust or feed-return stack bypass'}};

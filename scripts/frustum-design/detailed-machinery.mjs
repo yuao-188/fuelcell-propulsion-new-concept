@@ -27,7 +27,7 @@ export function fanBladeSections(F) {
  * This module does not write files or initialise Manifold. The caller supplies
  * the same modelling primitives and add() used by the complete assembly.
  */
-export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved, sector, add }, heatRecovery) {
+export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved, sector, add }, heatRecovery, frontInstallation) {
   const tau = Math.PI * 2;
   const lerp = (a, b, t) => a + (b - a) * t;
   const smooth = t => t * t * (3 - 2 * t);
@@ -286,6 +286,7 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
       [[x - .22, bodyRadius - .55], [x + .22, bodyRadius - .55]]));
   const outerIntakeCuts=[...housingHoles,...housingSeams];
   if(heatRecovery)outerIntakeCuts.push(heatRecovery.intakeSeats);
+  if(frontInstallation)outerIntakeCuts.push(frontInstallation.intakeSeats);
   add('motor-housing', '蓝色中空进气筒 · 薄壁口沿与端部螺孔', 'intakeOuter', C.intakeOuter ?? '#587c8e',
     housingWall.subtract(union(outerIntakeCuts)),
     { metallic: .68, roughness: .3, finish: 'satin-blue-metal', clip: true });
@@ -307,7 +308,7 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
         rearOpen: true, radialContraction: I.radialContraction });
   }
 
-  const compressor = buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCylinder, solidLathe, hollowLathe, add });
+  const compressor = buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCylinder, solidLathe, hollowLathe, add },frontInstallation);
   void revolved;
   return { fanFront, fanRear, spinnerFront, spinnerRear: hubFront, spinnerLength: hubFront-spinnerFront, mainFanRadius: F.radius, fanBladeCount,
     fanStatorCount: 18, statorFront, statorRear, intakeLiner, mainMotorVentilation: motorVentilation, ...compressor };

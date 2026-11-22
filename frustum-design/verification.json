@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "revision": "20261122-three-rail-forward-stacks",
+  "revision": "20261122-dual-mount-split-hydrogen",
   "units": "mm",
   "dimensionSource": "four stacks shifted 40 mm toward the fan, with 100 mm stage gaps",
   "scope": "illustrative hollow frustum stacks; lamella count is not a physical cell count",
@@ -1565,6 +1565,7 @@
         "interfacesPerMedium": 1,
         "feedFace": "inner conical wall, rear",
         "returnFace": "inner conical wall, front",
+        "supplyGroup": "stages 1–2",
         "interfaceAngles": {
           "air": 0,
           "cathode": 0,
@@ -1595,6 +1596,7 @@
         "interfacesPerMedium": 1,
         "feedFace": "inner conical wall, rear",
         "returnFace": "inner conical wall, front",
+        "supplyGroup": "stages 1–2",
         "interfaceAngles": {
           "air": 0,
           "cathode": 0,
@@ -1625,6 +1627,7 @@
         "interfacesPerMedium": 1,
         "feedFace": "inner conical wall, rear",
         "returnFace": "inner conical wall, front",
+        "supplyGroup": "stages 3–4",
         "interfaceAngles": {
           "air": 0,
           "cathode": 0,
@@ -1655,6 +1658,7 @@
         "interfacesPerMedium": 1,
         "feedFace": "inner conical wall, rear",
         "returnFace": "inner conical wall, front",
+        "supplyGroup": "stages 3–4",
         "interfaceAngles": {
           "air": 0,
           "cathode": 0,
@@ -1693,10 +1697,33 @@
       "feedRadius": 35,
       "feedAngle": 135,
       "feedLocation": "stack central bore, outside air main",
+      "sideInletStage": 2,
+      "teeX": 1412,
+      "branches": [
+        [
+          1,
+          2
+        ],
+        [
+          3,
+          4
+        ]
+      ],
+      "tailConnection": "anode recycle only",
       "returnRadius": 30,
       "returnAngle": 225
     },
     "sealedCoolingGuidePenetrations": [
+      {
+        "medium": "feed",
+        "centre": [
+          1412,
+          -94.14584031789366,
+          94.14584031789366
+        ],
+        "outerRadius": 5.2,
+        "length": 5
+      },
       {
         "medium": "air",
         "centre": [
@@ -1874,28 +1901,38 @@
   "supportFrame": {
     "railRadius": 370,
     "railInnerRadius": 355,
-    "railFront": 380,
-    "straightStart": 635,
-    "straightEnd": 2092,
-    "rearMount": 2080,
+    "railFront": 700,
+    "railRear": 2012,
     "railCount": 3,
     "railAngles": [
       0,
       120,
       240
     ],
-    "rearRing": {
-      "front": 2072,
-      "rear": 2088,
+    "installationSegment": "stacks",
+    "frontCasingConnection": false,
+    "rearLoadRing": false,
+    "loadRing": {
+      "centreX": 1350,
+      "front": 1336,
+      "rear": 1364,
       "inner": 355,
       "outer": 385
     },
-    "rearEarAngles": [
-      150,
-      210
-    ],
-    "rearEarRadius": 400,
+    "aircraftMounts": {
+      "angles": [
+        0,
+        120,
+        240
+      ],
+      "radialEnd": 465,
+      "tubeOuter": 16,
+      "tubeInner": 10,
+      "flangeRadius": 30,
+      "flangeThickness": 8
+    },
     "wireAngle": 240,
+    "wireMountBypass": 7.5,
     "cradles": [
       {
         "stage": 1,
@@ -1963,6 +2000,36 @@
       }
     ]
   },
+  "frontInstallation": {
+    "independentOfStackRails": true,
+    "armCount": 3,
+    "armAnglesDeg": [
+      30,
+      150,
+      270
+    ],
+    "fanAttachmentPlane": 380,
+    "fanRingInnerRadius": 500,
+    "fanRingOuterRadius": 525,
+    "blueFlange": [
+      470,
+      479.85
+    ],
+    "goldFlange": [
+      480.15,
+      490
+    ],
+    "jointOuterRadius": 195,
+    "jointBoltCount": 12,
+    "fanBoltCount": 24,
+    "realThroughBores": true,
+    "blueBore": 165,
+    "compressorBoreFollowsCasing": true,
+    "freeCoolantSectorDeg": [
+      90,
+      135
+    ]
+  },
   "motorHeatRecovery": {
     "jacket": [
       294,
@@ -1979,14 +2046,23 @@
     ],
     "railAngle": 120,
     "pump": [
-      1962,
-      1985
+      1200,
+      1223
     ],
     "preheater": [
-      2028,
-      2070
+      1372,
+      1404
     ],
-    "hydrogenBend": 2188,
+    "hydrogenInlet": [
+      1350,
+      2.7554552980815446e-14,
+      450
+    ],
+    "supplyTee": [
+      1412,
+      -24.74873734152916,
+      24.748737341529164
+    ],
     "hydrogenInletPhase": "gas downstream of external vaporizer",
     "flow": "motor jacket → coolant line → separated heat exchanger → circulation pump → jacket"
   },
@@ -2008,9 +2084,9 @@
     ],
     "articulation": "independent aperture and two-axis deflection; shared browser/validation solver"
   },
-  "parts": 107,
-  "broadPhasePairs": 5671,
-  "exactPairs": 845,
+  "parts": 113,
+  "broadPhasePairs": 6328,
+  "exactPairs": 828,
   "collisions": [],
   "fluidChecks": {
     "cathodeCircuit": {
@@ -2043,11 +2119,19 @@
         "volume": 0
       },
       {
+        "name": "stage-1-vs-other-supply-branch",
+        "volume": 0
+      },
+      {
         "name": "stage-2-air-vs-wet-exhaust",
         "volume": 0
       },
       {
         "name": "stage-2-feed-vs-return-interface",
+        "volume": 0
+      },
+      {
+        "name": "stage-2-vs-other-supply-branch",
         "volume": 0
       },
       {
@@ -2059,11 +2143,19 @@
         "volume": 0
       },
       {
+        "name": "stage-3-vs-other-supply-branch",
+        "volume": 0
+      },
+      {
         "name": "stage-4-air-vs-wet-exhaust",
         "volume": 0
       },
       {
         "name": "stage-4-feed-vs-return-interface",
+        "volume": 0
+      },
+      {
+        "name": "stage-4-vs-other-supply-branch",
         "volume": 0
       },
       {

@@ -9,6 +9,7 @@ import {buildStraightShells} from './straight-shells.mjs';
 import {buildFrustumStacks} from './frustum-stacks.mjs';
 import {buildCompactFluidNetworks} from './compact-fluid-networks.mjs';
 import {buildSupportFrame} from './support-frame.mjs';
+import {buildFrontInstallation} from './front-installation.mjs';
 import {buildMotorHeatRecovery} from './motor-heat-recovery.mjs';
 import {getIntakeGeometry} from '../../frustum-design/intake-kinematics.mjs';
 
@@ -16,26 +17,31 @@ const root=resolve(import.meta.dirname,'../..'),ctx=await createKernel();
 const {M,P,parts,add}=ctx,stackCount=P.stacks.length;
 console.log('Building the motor heat recovery loop and pressure circuits...');
 const heatRecovery=buildMotorHeatRecovery(ctx);
-const fluids=buildCompactFluidNetworks(ctx,{preheatedGasBore:heatRecovery.gasBore});
+const fluids=buildCompactFluidNetworks(ctx,heatRecovery);
 console.log('Building support frame and annular frustum stacks...');
 const support=buildSupportFrame(ctx);
 const stacks=buildFrustumStacks(ctx,fluids);
 console.log('Building retained fan and extended compressor...');
-const machinery=buildDetailedMachinery(ctx,heatRecovery);
+const frontInstallation=buildFrontInstallation(ctx);
+const machinery=buildDetailedMachinery(ctx,heatRecovery,frontInstallation);
 const shells=buildStraightShells(ctx,fluids.linerCutters);
 const pose={opening:P.variableIntake.defaultOpening,pitchDeg:0,yawDeg:0};
 for(const stage of P.variableIntake.stages)for(const g of getIntakeGeometry(P,stage,pose)){
-  const solid=M.ofMesh({numProp:3,vertProperties:new Float32Array(g.positions),triVerts:new Uint32Array(g.indices)});
+  const raw=M.ofMesh({numProp:3,vertProperties:new Float32Array(g.positions),triVerts:new Uint32Array(g.indices)});
+  const fixedGeometry=stage===P.hydrogen.sideSupply.mountStage+1&&g.role==='duct';
+  const solid=fixedGeometry?raw.subtract(heatRecovery.ductSeat):raw;
+  if(fixedGeometry)raw.delete();
   add(g.id,g.name??g.id,'variableIntake',g.color??'#a4b3bf',solid,
-    {clip:true,stage,variableStage:stage,motionRole:g.role,finish:g.role,
+    {clip:true,stage,variableStage:stage,motionRole:g.role,finish:g.role,fixedGeometry,
       metallic:g.metallic??.85,roughness:g.roughness??.3});
 }
-const report={schema:1,revision:'20261122-three-rail-forward-stacks',units:'mm',
+const report={schema:1,revision:'20261122-dual-mount-split-hydrogen',units:'mm',
   dimensionSource:'four stacks shifted 40 mm toward the fan, with 100 mm stage gaps',
   scope:'illustrative hollow frustum stacks; lamella count is not a physical cell count',
   length:P.layoutRear,schematicStacks:stackCount,stackForwardShift:P.stackForwardShift,
   moduleCounts:P.stacks.map(s=>s.modules),portCounts:Object.fromEntries(['air','hydrogen','return','cathode'].map(k=>[k,fluids.ports.filter(p=>p.fluid===k).length])),
   ports:fluids.ports,stacks,machinery,shells,plumbing:fluids.checks,supportFrame:support.report,
+  frontInstallation:frontInstallation.verification,
   motorHeatRecovery:heatRecovery.check,
   variableIntakes:{stages:P.variableIntake.stages,petalsPerStage:24,pose,deflectionRangeDeg:[-5,5],
     articulation:'independent aperture and two-axis deflection; shared browser/validation solver'},
@@ -43,6 +49,12 @@ const report={schema:1,revision:'20261122-three-rail-forward-stacks',units:'mm',
 assert.equal(stacks.length,4);assert.equal(shells.length,380);
 assert.deepEqual(stacks.map(s=>s.front),[700,1100,1450,1770]);
 assert.equal(support.report.railAngles.length,3);
+const frontMountParts=parts.filter(p=>p.group==='frontMount');
+const stackMountParts=parts.filter(p=>p.group==='supportFrame');
+assert(frontMountParts.length&&stackMountParts.length);
+assert(Math.max(...frontMountParts.map(p=>p.solid.boundingBox().max[0]))<
+  Math.min(...stackMountParts.map(p=>p.solid.boundingBox().min[0])),
+  'The two mounting assemblies must stay independently supported.');
 assert.deepEqual(stacks.map(s=>s.axialLength),[300,250,220,242]);
 assert(stacks.slice(1).every((s,i)=>s.front-stacks[i].rear===100));
 for(const n of Object.values(report.portCounts))assert.equal(n,stackCount);

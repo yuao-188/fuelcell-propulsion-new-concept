@@ -10,7 +10,7 @@ import { parameters as P } from '../parameters.mjs';
 // @ts-expect-error The same deterministic solver is used in the GLB builder.
 import { getIntakeGeometry, getIntakeKinematics } from '../intake-kinematics.mjs';
 
-const MODEL_REVISION='20261122-three-rail-forward-stacks';
+const MODEL_REVISION='20261122-dual-mount-split-hydrogen';
 const intakeStages:number[]=[...P.variableIntake.stages];
 const intakeStageForView=(view:CameraView)=>{
   const stage=Number(view.startsWith('intake')?view.slice(6):0);
@@ -25,7 +25,7 @@ type Props = {
   viewMode: 'complete' | 'cutaway'; sectionDepth: number;
   cameraView: CameraView;
   compressorView: 'passage' | 'rotors';
-  showOuterShell: boolean; showSupportFrame: boolean; showVariableIntake: boolean; showInterstageGuide: boolean; showStacks: boolean;
+  showOuterShell: boolean; showFrontMount: boolean; showSupportFrame: boolean; showVariableIntake: boolean; showInterstageGuide: boolean; showStacks: boolean;
   showIntake: boolean; showIntakeInner: boolean; showCompressorCase: boolean;
   showAir: boolean; showHydrogen: boolean; showReturn: boolean;
   showCathodeWater: boolean; showAnodeSeparator: boolean; showMotorHeatRecovery: boolean; showWiring: boolean; resetKey: number;
@@ -218,7 +218,9 @@ export default function ModelViewport(props: Props) {
       const shape=getIntakeGeometry(P,stage,pose) as IntakeGeometry[];
       for(const part of shape) {
         const source=stageMeshes.get(part.id);
-        if(!source)continue;
+        // Fixed ducts may include offline-cut pipe openings that the kinematics
+        // solver does not reproduce. Keep their loaded geometry and stencils.
+        if(!source||source.userData.fixedGeometry===true)continue;
         // Preserve the same closed-surface topology as the offline builder.
         // Replacing geometry also replaces BOTH winding-stencil geometries;
         // otherwise the material cap would remain at the previous inlet pose.
@@ -362,9 +364,9 @@ export default function ModelViewport(props: Props) {
         for(const {cap} of sections)cap.position.z=clipping.constant;
         priorMode=modeKey;priorDepth=p.sectionDepth;dirty=true;
       }
-      const visibility=[isolated,rotors,intakeStage,stackDetail,stage1Pipes,p.showOuterShell,p.showSupportFrame,p.showVariableIntake,p.showInterstageGuide,p.showStacks,p.showAir,p.showHydrogen,p.showReturn,p.showIntake,p.showIntakeInner,p.showCompressorCase,p.showCathodeWater,p.showAnodeSeparator,p.showMotorHeatRecovery,p.showWiring].join();
+      const visibility=[isolated,rotors,intakeStage,stackDetail,stage1Pipes,p.showOuterShell,p.showFrontMount,p.showSupportFrame,p.showVariableIntake,p.showInterstageGuide,p.showStacks,p.showAir,p.showHydrogen,p.showReturn,p.showIntake,p.showIntakeInner,p.showCompressorCase,p.showCathodeWater,p.showAnodeSeparator,p.showMotorHeatRecovery,p.showWiring].join();
       if(priorVisibility!==visibility){
-        const visible:Record<string,boolean>={outerShell:p.showOuterShell,supportFrame:p.showSupportFrame,variableIntake:p.showVariableIntake,interstageGuide:p.showInterstageGuide,intakeOuter:p.showIntake,intakeInner:p.showIntakeInner,compressorCase:p.showCompressorCase,stacks:p.showStacks,air:p.showAir,hydrogen:p.showHydrogen,return:p.showReturn,anodeInternal:p.showHydrogen||p.showReturn,cathodeExhaust:p.showCathodeWater,cathodeSeparator:p.showCathodeWater,cathodeDrain:p.showCathodeWater,anodeSeparator:p.showAnodeSeparator,anodeDrain:p.showAnodeSeparator,motorHeatRecovery:p.showMotorHeatRecovery,wiring:p.showWiring};
+        const visible:Record<string,boolean>={outerShell:p.showOuterShell,frontMount:p.showFrontMount,supportFrame:p.showSupportFrame,variableIntake:p.showVariableIntake,interstageGuide:p.showInterstageGuide,intakeOuter:p.showIntake,intakeInner:p.showIntakeInner,compressorCase:p.showCompressorCase,stacks:p.showStacks,air:p.showAir,hydrogen:p.showHydrogen,return:p.showReturn,anodeInternal:p.showHydrogen||p.showReturn,cathodeExhaust:p.showCathodeWater,cathodeSeparator:p.showCathodeWater,cathodeDrain:p.showCathodeWater,anodeSeparator:p.showAnodeSeparator,anodeDrain:p.showAnodeSeparator,motorHeatRecovery:p.showMotorHeatRecovery,wiring:p.showWiring};
         meshes.forEach(mesh=>{
           const id=String(mesh.userData.id??'');
           if(mesh.userData.inspectionOnly) {
