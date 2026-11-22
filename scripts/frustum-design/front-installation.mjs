@@ -10,6 +10,7 @@ export function buildFrontInstallation(ctx) {
   // Equal 60-degree spacing; the offset leaves the coolant leads between the
   // 80/140-degree struts instead of centring a strut on the 120-degree route.
   const armAngles=Array.from({length:6},(_,i)=>20+60*i);
+  const armFacingWidthMm=[28,18];
   const curve=getCompressorCasingProfile(P);
   const outerAt=x=>{
     const r=curve.innerAt(x),ratio=(r-P.air.inner)/(P.compressor.inner-P.air.inner);
@@ -82,10 +83,9 @@ export function buildFrontInstallation(ctx) {
       // The load-path centreline is straight between its two flange seats.
       // Only the streamlined section thickness/chord varies along the span.
       const x=shellRear+4+(seam-3-shellRear-4)*t;
-      // Narrow facing width and a rounded leading edge / tapered trailing
-      // edge. The longer midspan chord remains wholly between the end seats;
-      // both root axial envelopes still match the existing flange surfaces.
-      const hx=3.8-1.2*t+7.2*Math.sin(Math.PI*t)**2,hz=5-1.5*t;
+      // Keep the rounded leading edge, tapered trailing edge and axial seats.
+      const hx=3.8-1.2*t+7.2*Math.sin(Math.PI*t)**2;
+      const hz=(armFacingWidthMm[0]+(armFacingWidthMm[1]-armFacingWidthMm[0])*t)/2;
       for(const [u,side]of sectionSamples){
         const thickness=Math.max(0,.2969*Math.sqrt(u)-.126*u-.3516*u*u+.2843*u**3-.1036*u**4);
         vertices.push(x+(2*u-1)*hx,r,side*hz*10*thickness);
@@ -116,7 +116,7 @@ export function buildFrontInstallation(ctx) {
     .subtract(union([blueRaw,goldRaw,gasketRaw,...outerHoles]));
   emit('front-installation-frame','前涵道独立安装环与六根流线型斜承力臂','#b6c3cc',frame,
     'machined-aluminium',{armAnglesDeg:armAngles,armCount:armAngles.length,front:shellRear,rear:seam,
-      armSection:'rounded-leading-edge-tapered-trailing-edge',armCenterline:'straight',armFacingWidthMm:[10,7],
+      armSection:'rounded-leading-edge-tapered-trailing-edge',armCenterline:'straight',armFacingWidthMm,
       armPitchDeg:60,independentOfStackRails:true});
   emit('front-installation-intake-flange','蓝色引气机匣后安装法兰',C.intakeOuter??'#477f9d',blue,'satin-blue-metal');
   emit('front-installation-compressor-flange','金色压气机前安装法兰',C.compressorCase??'#c9a34b',gold,'satin-champagne-metal');
@@ -126,7 +126,7 @@ export function buildFrontInstallation(ctx) {
   emit('front-installation-nuts','双机匣法兰六角螺母','#aebdc7',union(nuts),'machined-fastener');
   return {intakeSeats,compressorSeats,verification:{
     independentOfStackRails:true,armCount:armAngles.length,armAnglesDeg:armAngles,
-    armPitchDeg:60,armFacingWidthMm:[10,7],armSection:'streamlined-solid-strut',armCenterline:'straight',
+    armPitchDeg:60,armFacingWidthMm,armSection:'streamlined-solid-strut',armCenterline:'straight',
     fanAttachmentPlane:shellRear,fanRingInnerRadius:shellBore,fanRingOuterRadius:flangeOuter,
     blueFlange:[seam-10,seam-.15],goldFlange:[seam+.15,seam+10],jointOuterRadius:jointRadius,
     jointBoltCount:12,fanBoltCount:24,realThroughBores:true,blueBore:P.motorHousing.inner,

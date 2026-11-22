@@ -35,7 +35,7 @@ for(const stage of P.variableIntake.stages)for(const g of getIntakeGeometry(P,st
     {clip:true,stage,variableStage:stage,motionRole:g.role,finish:g.role,fixedGeometry,
       metallic:g.metallic??.85,roughness:g.roughness??.3});
 }
-const report={schema:1,revision:'20261123-straight-stack-rails-six-front-struts',units:'mm',
+const report={schema:1,revision:'20261123-restored-front-strut-thickness',units:'mm',
   dimensionSource:'four stacks shifted 40 mm toward the fan, with 100 mm stage gaps',
   scope:'illustrative hollow frustum stacks; lamella count is not a physical cell count',
   length:P.layoutRear,schematicStacks:stackCount,stackForwardShift:P.stackForwardShift,

@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "revision": "20261123-straight-stack-rails-six-front-struts",
+  "revision": "20261123-restored-front-strut-thickness",
   "units": "mm",
   "dimensionSource": "four stacks shifted 40 mm toward the fan, with 100 mm stage gaps",
   "scope": "illustrative hollow frustum stacks; lamella count is not a physical cell count",
@@ -2051,8 +2051,8 @@
     ],
     "armPitchDeg": 60,
     "armFacingWidthMm": [
-      10,
-      7
+      28,
+      18
     ],
     "armSection": "streamlined-solid-strut",
     "armCenterline": "straight",
