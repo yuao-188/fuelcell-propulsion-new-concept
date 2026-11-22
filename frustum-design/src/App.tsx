@@ -3,7 +3,7 @@ import { Box, Layers, MousePointer2, RotateCcw, SlidersHorizontal } from 'lucide
 import ModelViewport, { type CameraView, type IntakePose } from './ModelViewport';
 import './styles.css';
 
-type VisibilityKey = 'outerShell' | 'supportFrame' | 'variableIntake' | 'interstageGuide' | 'intake' | 'intakeInner' | 'compressorCase' | 'stacks' | 'air' | 'hydrogen' | 'return' | 'cathodeWater' | 'anodeSeparator' | 'wiring';
+type VisibilityKey = 'outerShell' | 'supportFrame' | 'variableIntake' | 'interstageGuide' | 'intake' | 'intakeInner' | 'compressorCase' | 'stacks' | 'air' | 'hydrogen' | 'return' | 'cathodeWater' | 'anodeSeparator' | 'motorHeatRecovery' | 'wiring';
 type Visibility = Record<VisibilityKey, boolean>;
 const neutralIntake: IntakePose = { opening: .55, pitchDeg: 0, yawDeg: 0 };
 
@@ -21,6 +21,7 @@ const initialVisibility: Visibility = {
   return: true,
   cathodeWater: true,
   anodeSeparator: true,
+  motorHeatRecovery: true,
   wiring: true,
 };
 
@@ -162,6 +163,7 @@ export default function App() {
               showReturn={visibility.return}
               showCathodeWater={visibility.cathodeWater}
               showAnodeSeparator={visibility.anodeSeparator}
+              showMotorHeatRecovery={visibility.motorHeatRecovery}
               showWiring={visibility.wiring}
               intake2={intake2}
               intake3={intake3}
@@ -303,6 +305,7 @@ export default function App() {
               <LayerToggle label="回氢管路" color="swatch-return" checked={visibility.return} onChange={() => toggleLayer('return')} />
               <LayerToggle label="阴极尾气与排水" color="swatch-inner" checked={visibility.cathodeWater} onChange={() => toggleLayer('cathodeWater')} />
               <LayerToggle label="阳极气水分离器" color="swatch-return" checked={visibility.anodeSeparator} onChange={() => toggleLayer('anodeSeparator')} />
+              <LayerToggle label="电机余热回路" color="swatch-coolant" checked={visibility.motorHeatRecovery} onChange={() => toggleLayer('motorHeatRecovery')} />
               <LayerToggle label="电气线束" color="swatch-stack" checked={visibility.wiring} onChange={() => toggleLayer('wiring')} />
             </div>
           </section>

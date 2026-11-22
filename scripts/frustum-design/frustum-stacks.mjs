@@ -3,7 +3,7 @@
  * These twenty concentric lamellae show the sloping layered form; they are not
  * the former physical cell count or a recalculated electrochemical design.
  */
-export function buildFrustumStacks(ctx, { stackCutters = [], linerCutters, supportSeats = [] } = {}) {
+export function buildFrustumStacks(ctx, { stackCutters = [], linerCutters } = {}) {
   const { P, C, union, cylinder, add } = ctx;
   const checks = [], layerCount = 20, segments = 192;
   const interpolate = (a, b, t) => a + (b - a) * t;
@@ -57,8 +57,7 @@ export function buildFrustumStacks(ctx, { stackCutters = [], linerCutters, suppo
       collarPockets.push(band(x - .025, x + 2*scale+.025, 1 - (1.15*scale+.025) / widthFront, 1 + .025 / widthFront));
     }
     const collarSeats = union(collars), pockets = union(collarPockets), services = stackCutters[index];
-    const seatInputs=[pockets,services,supportSeats[index]].filter(Boolean);
-    const seatCuts = seatInputs.length>1 ? union(seatInputs) : pockets;
+    const seatCuts = services ? union([pockets,services]) : pockets;
     const rawGraphite = union(graphite), rawLaminations = union(laminations);
     const body = rawGraphite.subtract(seatCuts), foil = rawLaminations.subtract(seatCuts);
     const frameCutter = linerCutters ?? services;

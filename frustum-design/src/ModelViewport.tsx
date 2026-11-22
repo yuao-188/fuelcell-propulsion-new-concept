@@ -10,7 +10,7 @@ import { parameters as P } from '../parameters.mjs';
 // @ts-expect-error The same deterministic solver is used in the GLB builder.
 import { getIntakeGeometry, getIntakeKinematics } from '../intake-kinematics.mjs';
 
-const MODEL_REVISION='20261122-four-stack-frame';
+const MODEL_REVISION='20261122-common-shaft-heat-recovery';
 const intakeStages:number[]=[...P.variableIntake.stages];
 const intakeStageForView=(view:CameraView)=>{
   const stage=Number(view.startsWith('intake')?view.slice(6):0);
@@ -28,7 +28,7 @@ type Props = {
   showOuterShell: boolean; showSupportFrame: boolean; showVariableIntake: boolean; showInterstageGuide: boolean; showStacks: boolean;
   showIntake: boolean; showIntakeInner: boolean; showCompressorCase: boolean;
   showAir: boolean; showHydrogen: boolean; showReturn: boolean;
-  showCathodeWater: boolean; showAnodeSeparator: boolean; showWiring: boolean; resetKey: number;
+  showCathodeWater: boolean; showAnodeSeparator: boolean; showMotorHeatRecovery: boolean; showWiring: boolean; resetKey: number;
   intake2: IntakePose; intake3: IntakePose; intake4: IntakePose;
 };
 
@@ -60,12 +60,13 @@ export default function ModelViewport(props: Props) {
     callouts.setAttribute('class','compressor-callouts');callouts.setAttribute('aria-hidden','true');
     element.appendChild(callouts);
     const compressorX=(x:number)=>P.compressor.front+(x-480)*(P.compressor.outlet-P.compressor.front)/210;
-    const anchors:[string,number[],number,boolean,number,'motor'|'rotor'|'diffuser'|'backplate'][]=[
-      ['一级驱动电机',[compressorX(497),24,-16],.24,false,1,'motor'],
-      ['一级离心叶轮',[compressorX(536.638),99.8717715,-14.3679942],.40,false,1,'rotor'],
-      ['一级扩压静叶',[compressorX(559.5),151.548,-32.53],.56,false,1,'diffuser'],
-      ['一级背盘',[compressorX(546.5),100,-18],.72,false,1,'backplate'],
-      ['二级驱动电机',[compressorX(636.5),24,-16],.24,true,2,'motor'],
+    const anchors:[string,number[],number,boolean,number,'motor'|'shaft'|'bearing'|'rotor'|'diffuser'|'backplate'][]=[
+      ['压气机驱动电机',[compressorX(497),20,-12],.18,false,1,'motor'],
+      ['一级离心叶轮',[compressorX(536.638),99.8717715,-14.3679942],.34,false,1,'rotor'],
+      ['一级扩压静叶',[compressorX(559.5),151.548,-32.53],.50,false,1,'diffuser'],
+      ['一级背盘',[compressorX(546.5),100,-18],.66,false,1,'backplate'],
+      ['共用传动轴',[602,5,-3],.82,false,0,'shaft'],
+      ['后轴承座',[673,14,-8],.24,true,0,'bearing'],
       ['二级离心叶轮',[compressorX(601.584),76.428834,-8.627901],.40,true,2,'rotor'],
       ['二级扩压静叶',[compressorX(624),122.831,-28.079],.56,true,2,'diffuser'],
       ['二级背盘',[compressorX(613.5),80,-15],.72,true,2,'backplate'],
@@ -293,9 +294,20 @@ export default function ModelViewport(props: Props) {
           variableMeshes.get(variableStage)!.set(String(item.userData.id),item);
         }
       });
-      // Keep the established axial label stations while following each
-      // compressor stage's exported radial dimensions after casing changes.
+      // Drive components provide world-coordinate anchors of their own.
+      // Only blade rows and disks inherit the matching stage's radial scale.
       for(const label of calloutItems) {
+        if(label.kind==='motor'||label.kind==='shaft'||label.kind==='bearing') {
+          const driveIds={motor:'compressor-motor-1',shaft:'compressor-common-shaft',bearing:'compressor-rear-bearing-support'};
+          const driveId=driveIds[label.kind];
+          const part=meshes.find(mesh=>mesh.userData.id===driveId);
+          const anchor=part?.userData.labelAnchorMm;
+          label.point.copy(label.basePoint);
+          if(Array.isArray(anchor)&&anchor.length===3&&anchor.every(value=>typeof value==='number'&&Number.isFinite(value))) {
+            label.point.fromArray(anchor);
+          }
+          continue;
+        }
         const rotor=meshes.find(mesh=>mesh.userData.id===`compressor-rotor-${label.stage}`);
         let radialScale=Number(rotor?.userData.radialScaleToPrevious??1);
         if(!Number.isFinite(radialScale)||radialScale<=0)radialScale=1;
@@ -350,9 +362,9 @@ export default function ModelViewport(props: Props) {
         for(const {cap} of sections)cap.position.z=clipping.constant;
         priorMode=modeKey;priorDepth=p.sectionDepth;dirty=true;
       }
-      const visibility=[isolated,rotors,intakeStage,stackDetail,stage1Pipes,p.showOuterShell,p.showSupportFrame,p.showVariableIntake,p.showInterstageGuide,p.showStacks,p.showAir,p.showHydrogen,p.showReturn,p.showIntake,p.showIntakeInner,p.showCompressorCase,p.showCathodeWater,p.showAnodeSeparator,p.showWiring].join();
+      const visibility=[isolated,rotors,intakeStage,stackDetail,stage1Pipes,p.showOuterShell,p.showSupportFrame,p.showVariableIntake,p.showInterstageGuide,p.showStacks,p.showAir,p.showHydrogen,p.showReturn,p.showIntake,p.showIntakeInner,p.showCompressorCase,p.showCathodeWater,p.showAnodeSeparator,p.showMotorHeatRecovery,p.showWiring].join();
       if(priorVisibility!==visibility){
-        const visible:Record<string,boolean>={outerShell:p.showOuterShell,supportFrame:p.showSupportFrame,variableIntake:p.showVariableIntake,interstageGuide:p.showInterstageGuide,intakeOuter:p.showIntake,intakeInner:p.showIntakeInner,compressorCase:p.showCompressorCase,stacks:p.showStacks,air:p.showAir,hydrogen:p.showHydrogen,return:p.showReturn,anodeInternal:p.showHydrogen||p.showReturn,cathodeExhaust:p.showCathodeWater,cathodeSeparator:p.showCathodeWater,cathodeDrain:p.showCathodeWater,anodeSeparator:p.showAnodeSeparator,anodeDrain:p.showAnodeSeparator,wiring:p.showWiring};
+        const visible:Record<string,boolean>={outerShell:p.showOuterShell,supportFrame:p.showSupportFrame,variableIntake:p.showVariableIntake,interstageGuide:p.showInterstageGuide,intakeOuter:p.showIntake,intakeInner:p.showIntakeInner,compressorCase:p.showCompressorCase,stacks:p.showStacks,air:p.showAir,hydrogen:p.showHydrogen,return:p.showReturn,anodeInternal:p.showHydrogen||p.showReturn,cathodeExhaust:p.showCathodeWater,cathodeSeparator:p.showCathodeWater,cathodeDrain:p.showCathodeWater,anodeSeparator:p.showAnodeSeparator,anodeDrain:p.showAnodeSeparator,motorHeatRecovery:p.showMotorHeatRecovery,wiring:p.showWiring};
         meshes.forEach(mesh=>{
           const id=String(mesh.userData.id??'');
           if(mesh.userData.inspectionOnly) {

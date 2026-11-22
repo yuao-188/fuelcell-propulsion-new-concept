@@ -29,7 +29,7 @@ export function getCompressorCasingProfile(P) {
     contractionStart:K.front,bladeTipClearance,diffuserOuterEdges:'seated-to-casing'};
 }
 
-/** Two independently driven centrifugal stages. All drive sizes are schematic. */
+/** Two centrifugal stages on one shaft driven by the front compressor motor. */
 export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCylinder, solidLathe, hollowLathe, add }) {
   const tau = Math.PI * 2, lerp = (a, b, t) => a + (b - a) * t;
   const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
@@ -37,6 +37,7 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
   const steel = '#dce6ed', darkSteel = '#526673', paleSteel = '#b2bec6', vaneSteel = '#718794';
   const K = P.compressor, axialScale = (K.outlet - K.front) / 210;
   const ax = nominal => K.front + (nominal - 480) * axialScale;
+  const layoutX = x => K.front + (x - 480) * (K.outlet - K.front) / 260;
   const rr = nominal => nominal * K.inner / 165;
   const casingProfile=getCompressorCasingProfile(P);
   const {neckStart,innerAt,inside:casingInside,outside:casingOutside}=casingProfile;
@@ -80,7 +81,7 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
       hubStart: ax(576), hubShoulder: ax(584), shaftFront: ax(611), shaftRear: ax(638),
       diffuserStart: ax(secondStage.diffuserFront), diffuserEnd: ax(secondStage.diffuserRear), diffuserInner: rr(secondStage.diffuserInner) },
   ].map(S=>{
-    // Radial dimensions of each independent machine follow the local casing.
+    // Radial dimensions of each centrifugal stage follow the local casing.
     // Account for the blade's actual 0.15 mm aft extension and the disk's rear
     // face separately; neither is clipped against the casing to hide a clash.
     const radialScale=(innerAt(S.plate+.15)-casingProfile.bladeTipClearance)/S.bladeOuter;
@@ -97,12 +98,27 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
   });
   const bladeCount = K.bladesPerStage;
   const backplateSegments = K.backplateSegments;
+  const sharedRotorId = 'compressor-common-rotor';
+  const commonShaft = {
+    id: 'compressor-common-shaft', front: stages[0].shaftFront, rear: layoutX(681),
+    frontRadius: stages[0].shaftRadius, rearRadius: stages[1].shaftRadius,
+    transitionFront: stages[0].back, transitionRear: layoutX(590),
+    labelAnchorMm: [layoutX(602), stages[1].shaftRadius * .8, 0],
+  };
+  const shaftSolid = solidLathe([
+    [commonShaft.front, commonShaft.frontRadius],
+    [commonShaft.transitionFront, commonShaft.frontRadius],
+    [commonShaft.transitionRear, commonShaft.rearRadius],
+    [commonShaft.rear, commonShaft.rearRadius],
+  ]);
+  add(commonShaft.id, '单电机两级压气机共用传动轴', 'front', steel, shaftSolid,
+    { ...metal, clip: true, finish: 'motor-rotor-steel', rotor: sharedRotorId,
+      sharedRotorId, sharedByStages: [1, 2], ...commonShaft });
   for (const S of stages) {
     // Both stages' working blades extend beyond their matching rear disks.
     // The supported blade bottoms embed 0.15 mm into the corresponding disk.
     const rootFront = S.plate - S.heightIn, rootInner = S.eye * .69 - S.rootEmbedding;
-    const rotor = [axisCylinder(S.shaftFront, S.shaftRear, S.shaftRadius, 64),
-      axisCylinder(S.plate, S.back, S.radius, backplateSegments),
+    const rotor = [axisCylinder(S.plate, S.back, S.radius, backplateSegments),
       solidLathe([[S.hubStart, S.shaftRadius * 1.15], [S.hubShoulder, S.eye * .69], [S.plate, S.eye]])];
     // The extended inner strips lie inside the original cone at their root,
     // then emerge exactly on its surface. They join along the full axial root
@@ -110,12 +126,15 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
     for (let i = 0; i < bladeCount; i++) rotor.push(radialVane(S.bladeInner, S.bladeOuter, i * tau / bladeCount,
       -.52, S.bladeWidth, 0, S.plate, t => lerp(S.heightIn, S.heightOut, t), rootInner));
     add(`compressor-rotor-${S.number}`, `第${S.number}级十八叶离心叶轮与后背盘`, 'front', steel,
-      union(rotor), { ...metal, roughness: .21, clip: true, rotor: `compressor-${S.number}`, bladeCount,
+      // Cut the actual shaft solid to form a matching seat without duplicate
+      // shaft material or overlapping independently generated bore polygons.
+      union(rotor).subtract(shaftSolid), { ...metal, roughness: .21, clip: true, rotor: sharedRotorId, sharedRotorId, bladeCount,
         stage: S.number, backplate: true, shroud: false, backplateRadiusMm: S.radius, bladeTipRadiusMm: S.bladeOuter,
         bladeTipOverhangMm: S.bladeOuter - S.radius,
         backplateSegments, bladeRootAxialFrontMm: rootFront, bladeRootAxialRearMm: S.plate,
         bladeRootEmbeddingMm: S.rootEmbedding, bladeRootMount: 'continuous-conical-hub-and-backplate',
-        radialScaleToPrevious:S.radialScale,dimensionSource:'smooth-casing-envelope' });
+        radialScaleToPrevious:S.radialScale,dimensionSource:'smooth-casing-envelope',
+        shaftSeat:'matching-common-shaft-bore',shaftSeatRadiusMm:S.shaftRadius });
 
     // Both static cover disks are also removed from the physical model.
     // Both diffuser rows sit aft of their respective rotor disks. Clip each
@@ -133,11 +152,11 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
   // The complete eighteen-vane intermediate return assembly stays absent,
   // along with its former central diaphragm and the two stationary covers.
 
-  // Restore the original first motor position and its three fine radial rods.
+  // Retain the front motor and its three radial mounts. The former rear motor,
+  // winding, terminal assembly and tail cone are replaced by a compact bearing.
   // There are no inlet guide blades or interstage return guide blades.
   // These are packaging placeholders, not validated power-rated motor models.
-  const motors = [{ number: 1, front: ax(484), rear: ax(510), support: ax(492) },
-    { number: 2, front: ax(624), rear: ax(649), support: ax(634) }];
+  const motors = [{ number: 1, front: ax(484), rear: ax(510), support: ax(492) }];
   const driveSector=(x0,x1,ri,ro,a,b)=>{
     const points=[],steps=8;
     for(let j=0;j<=steps;j++){const t=lerp(a,b,j/steps);points.push([-ro*Math.sin(t),ro*Math.cos(t)]);}
@@ -158,8 +177,6 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
       const t=fin*tau/16;
       pieces.push(cylinder(at(bodyFront+1.5,motorRadius+.2,t),at(bodyRear-1.5,motorRadius+.2,t),rr(.7),rr(.7),12));
     }
-    if(D.number===2)pieces.push(solidLathe([[D.rear+.025,motorRadius],[ax(662),.25]])
-      .subtract(solidLathe([[D.rear-.1,rr(30.5)],[ax(662)-1.8,.1]])));
     for (let i = 0; i < 3; i++) {
       const angle = i * tau / 3;
       const p = r => [D.support, r * Math.cos(angle), r * Math.sin(angle)];
@@ -204,7 +221,7 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
       copper.push(coilTube(loop,rr(.85)));
     }
     const rotor=axisCylinder(bodyFront+.6,bodyRear-.6,rr(18.8),96)
-      .subtract(axisCylinder(bodyFront+.5,bodyRear-.5,shaftRadius,64));
+      .subtract(shaftSolid);
     // A small curved terminal seat and two short insulated leads stay tucked
     // against the barrel, clear of its three radial mounts and end caps.
     const terminalX=bodyFront+4,terminalAngle=Math.PI/3;
@@ -218,20 +235,55 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
     }
     const terminalBody=foot.subtract(union(terminalBores));
     const terminalSolid=union([terminalBody,...terminals.slice(1)]);
-    add(`compressor-motor-${D.number}`,`第${D.number}级独立电机 · 中空定子壳与散热筋`,'front','#394b58',
+    add(`compressor-motor-${D.number}`,'两级压气机共用驱动电机 · 中空定子壳与散热筋','front','#394b58',
       union(pieces).subtract(foot),{...metal,clip:true,stationary:true,stage:D.number,motorSizing:'schematic-only',
         finish:'motor-stator-housing',supportCount:3,supportAxialCentreMm:D.support,inletGuideVaneCount:0,
-        motorBodyRadiusMm:motorRadius,radialScaleToPrevious:S.radialScale});
+        motorBodyRadiusMm:motorRadius,radialScaleToPrevious:S.radialScale,
+        drivenStages:[1,2],labelAnchorMm:[(D.front+D.rear)/2,motorRadius*.75,-motorRadius*.5]});
     const details=[
       ['endcaps','银灰端盖、轴承座与内六角紧固件','#cbd6df',union(caps).subtract(union(capCuts)),'motor-machined-endcaps'],
       ['stator','叠片定子轭与齿','#59616a',union(statorPieces),'motor-laminated-steel'],
       ['windings','十二组铜色绕组','#b96d3e',union(copper),'motor-copper-windings'],
-      ['rotor','中央转子环与短轴配合套','#9caebb',rotor,'motor-rotor-steel'],
+      ['rotor','中央转子环与共用轴配合套','#9caebb',rotor,'motor-rotor-steel'],
       ['terminals','接线座与双短线束','#263039',terminalSolid,'motor-insulated-terminals'],
     ];
     for(const [suffix,label,color,solid,finish]of details)add(`compressor-drive-${D.number}-${suffix}`,
-      `第${D.number}级电机 · ${label}`,'front',color,solid,{...metal,clip:true,stage:D.number,finish,motorSizing:'schematic-only'});
+      `压气机共用电机 · ${label}`,'front',color,solid,{...metal,clip:true,stage:D.number,finish,motorSizing:'schematic-only',
+        ...(suffix==='rotor'?{rotor:sharedRotorId,sharedRotorId,shaftSeat:'matching-common-shaft-bore'}:{})});
   }
+
+  // Bored stationary carrier and a shaft-seated rotating sleeve leave a real
+  // journal clearance. Three narrow mounts meet the casing's inner surface;
+  // there is no disk across the passage or motor at the rear of stage two.
+  const rearBearing = {
+    id:'compressor-rear-bearing-support',front:layoutX(668),rear:layoutX(678),
+    supportX:layoutX(673),outerRadius:rr(11.5),boreRadius:stages[1].shaftRadius+rr(.8),
+    sleeveOuterRadius:stages[1].shaftRadius+rr(.775),supportCount:3,supportRadius:rr(1.2),
+    labelAnchorMm:[layoutX(673),rr(10),-rr(4)],
+  };
+  const bearingHousing = hollowLathe([
+    [rearBearing.front,rearBearing.outerRadius-rr(.7)],
+    [rearBearing.front+1,rearBearing.outerRadius],
+    [rearBearing.rear-1,rearBearing.outerRadius],
+    [rearBearing.rear,rearBearing.outerRadius-rr(.7)],
+  ],[[rearBearing.front,rearBearing.boreRadius],[rearBearing.rear,rearBearing.boreRadius]]);
+  const bearingMounts=[];
+  for(let i=0;i<rearBearing.supportCount;i++){
+    const angle=i*tau/rearBearing.supportCount;
+    const point=r=>[rearBearing.supportX,r*Math.cos(angle),r*Math.sin(angle)];
+    bearingMounts.push(cylinder(point(rearBearing.outerRadius-rr(.5)),point(K.inner+1),
+      rearBearing.supportRadius,rearBearing.supportRadius,24).intersect(caseLumen));
+  }
+  add(rearBearing.id,'压气机后轴承支座与三根细支撑','front',paleSteel,
+    union([bearingHousing,...bearingMounts]),{...metal,clip:true,stationary:true,
+      finish:'motor-machined-endcaps',...rearBearing,
+      axialGapAfterDiffuserMm:rearBearing.front-stages[1].diffuserEnd,
+      journalRadialClearanceMm:rearBearing.boreRadius-rearBearing.sleeveOuterRadius});
+  add('compressor-rear-bearing-inner-race','压气机后轴承随轴内圈','front',steel,
+    axisCylinder(rearBearing.front+1,rearBearing.rear-1,rearBearing.sleeveOuterRadius,128).subtract(shaftSolid),
+    {...metal,clip:true,finish:'motor-rotor-steel',rotor:sharedRotorId,sharedRotorId,
+      shaftSeat:'matching-common-shaft-bore',shaftSeatRadiusMm:stages[1].shaftRadius,
+      outerRadiusMm:rearBearing.sleeveOuterRadius});
 
   const flangeDepth = 3 * axialScale, flangeGap = .04;
   const flangeSlots = [], compressorScrews = [];
@@ -273,7 +325,8 @@ export function buildTwoStageCompressor({ M, CS, P, C, union, cylinder, axisCyli
     casingBladeTipClearanceMm:casingProfile.bladeTipClearance,
     casingRotorEnvelopes:stages.map(S=>({stage:S.number,rear:S.plate+.15,radius:S.bladeOuter,
       backplateRadius:S.radius,shaftRadius:S.shaftRadius,radialScale:S.radialScale})),
-    driveArchitecture: 'independent-front-and-rear-motors', motorSizing: 'schematic-only', casingInside, stages,
+    driveArchitecture:'single-motor-common-shaft',compressorMotorCount:1,sharedRotorId,
+    commonShaft,rearBearing,motorSizing:'schematic-only',casingInside,stages,
     removedDiscSurfaces: ['compressor-shroud-1', 'compressor-return-diaphragm', 'compressor-shroud-2'],
     restoredBackplates: stages.map(S => ({ stage: S.number, front: S.plate, rear: S.back,
       radius: S.radius, segments: backplateSegments })),

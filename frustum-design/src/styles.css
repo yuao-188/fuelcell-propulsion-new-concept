@@ -150,6 +150,7 @@ h1 { font-size: 21px; font-weight: 600; line-height: 1.4; letter-spacing: 0.5px;
 .swatch-air { background: #438ed0; border: 1px solid #357dbe; }
 .swatch-hydrogen { background: #258763; border: 1px solid #207554; }
 .swatch-return { background: #b4d2b8; border: 1px solid #8bab90; }
+.swatch-coolant { background: #3e9ba4; border: 1px solid #33858e; }
 .layer-copy { display: flex; flex-direction: column; gap: 3px; flex: 1; }
 .layer-label { color: #87959b; font-size: 12px; transition: color 130ms; }
 .is-visible .layer-label { color: #536770; }

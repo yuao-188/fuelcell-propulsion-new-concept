@@ -3,7 +3,7 @@ import {stackRadiusAt} from '../../frustum-design/parameters.mjs';
  * Each circuit ends at its own short stack-wall interface. The stack-internal
  * reaction passages are deliberately omitted rather than joined by bypasses.
  */
-export function buildCompactFluidNetworks(ctx) {
+export function buildCompactFluidNetworks(ctx, {preheatedGasBore}={}) {
   const { M, P, C, union, cylinder, tubePath, roundPath, polar, add } = ctx;
   const keys = ['air','cathode','feed','return'];
   const networks = Object.fromEntries(keys.map(k=>[k,{outer:[],bores:[]}]));
@@ -224,10 +224,12 @@ export function buildCompactFluidNetworks(ctx) {
     }
   }
   const bores=Object.fromEntries(keys.map(k=>[k,union(networks[k].bores)]));
+  const gasSupply=preheatedGasBore ? union([bores.feed,preheatedGasBore]) : bores.feed;
+  if(preheatedGasBore)junctionChecks.push({name:'preheater-to-supply-header',a:preheatedGasBore,b:feedMain.bore});
   isolationChecks.push({name:'air-header-vs-wet-exhaust-header',a:bores.air,b:bores.cathode},
     {name:'feed-vs-return-outside-circulation-pump',a:bores.feed,b:bores.return});
   const cathodeCircuit=union([bores.air,bores.cathode,cathode.gasBore,cathode.drainBore]);
-  const anodeCircuit=union([bores.feed,bores.return,anode.gasBore,anode.drainBore,pumpBore]);
+  const anodeCircuit=union([gasSupply,bores.return,anode.gasBore,anode.drainBore,pumpBore]);
   const color={air:C.air,cathode:'#6aa5b7',feed:C.hydrogen,return:C.return};
   const groups={air:'air',cathode:'cathodeExhaust',feed:'hydrogen',return:'return'};
   const titles={air:`阴极反应空气 · 中央主管与${stageCount}级独立支路`,cathode:`${stageCount}级阴极湿尾气 · 独立除水回路`,

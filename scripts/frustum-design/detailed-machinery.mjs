@@ -27,7 +27,7 @@ export function fanBladeSections(F) {
  * This module does not write files or initialise Manifold. The caller supplies
  * the same modelling primitives and add() used by the complete assembly.
  */
-export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved, sector, add }) {
+export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved, sector, add }, heatRecovery) {
   const tau = Math.PI * 2;
   const lerp = (a, b, t) => a + (b - a) * t;
   const smooth = t => t * t * (3 - 2 * t);
@@ -223,8 +223,9 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
     bodyPieces.push(sector(motor.front + motorLength * .20, motor.rear - motorLength * .20,
       motorBodyRadius - .7, ribOuter, i * 360 / 28 - .9, i * 360 / 28 + .9));
   }
-  add('main-motor', '主电机 · 贯通通风腔、纵向散热筋与传动轴', 'front', C.motor,
-    union(bodyPieces).subtract(motorVentVoids), { ...paint, clip: true, ...motorVentilation });
+  const motorCuts=heatRecovery ? union([motorVentVoids,heatRecovery.casingCut]) : motorVentVoids;
+  add('main-motor', '主电机 · 贯通通风腔、外壳与传动轴', 'front', C.motor,
+    union(bodyPieces).subtract(motorCuts), { ...paint, clip: true, ...motorVentilation });
 
   function motorCap(frontSide) {
     const lo = frontSide ? motor.front : bodyRear;
@@ -283,8 +284,10 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
   const housingSeams = [H.front + landLength * 2, H.rear - landLength * 2].map(x =>
     hollowLathe([[x - .22, bodyRadius + .1], [x + .22, bodyRadius + .1]],
       [[x - .22, bodyRadius - .55], [x + .22, bodyRadius - .55]]));
+  const outerIntakeCuts=[...housingHoles,...housingSeams];
+  if(heatRecovery)outerIntakeCuts.push(heatRecovery.intakeSeats);
   add('motor-housing', '蓝色中空进气筒 · 薄壁口沿与端部螺孔', 'intakeOuter', C.intakeOuter ?? '#587c8e',
-    housingWall.subtract(union([...housingHoles, ...housingSeams])),
+    housingWall.subtract(union(outerIntakeCuts)),
     { metallic: .68, roughness: .3, finish: 'satin-blue-metal', clip: true });
   add('intake-fasteners', '引气外壳口沿沉头紧固件', 'intakeOuter', darkSteel, union(intakeScrews),
     { ...metal, clip: true });
@@ -298,7 +301,8 @@ export function buildDetailedMachinery({ M, CS, P, C, union, cylinder, revolved,
     const layout = getIntakeLinerLayout(P);
     const liner = hollowLathe(layout.outside, layout.inside);
     intakeLiner = layout.verification;
-    add('intake-inner-shell', '引气内壳 · 圆滑内收开口尾缘', 'intakeInner', C.intakeInner ?? '#355565', liner,
+    add('intake-inner-shell', '引气内壳 · 圆滑内收开口尾缘', 'intakeInner', C.intakeInner ?? '#355565',
+      heatRecovery ? liner.subtract(heatRecovery.intakeSeats) : liner,
       { metallic: .7, roughness: .32, finish: 'satin-blue-metal', clip: true,
         rearOpen: true, radialContraction: I.radialContraction });
   }

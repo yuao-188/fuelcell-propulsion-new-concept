@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "revision": "20261122-four-stack-frame",
+  "revision": "20261122-common-shaft-heat-recovery",
   "units": "mm",
   "dimensionSource": "first three stacks retained; fourth is a 1.10x geometric copy of the third, with 100 mm stage gaps",
   "scope": "illustrative hollow frustum stacks; lamella count is not a physical cell count",
@@ -348,8 +348,8 @@
       "axialEnds": "open-concentric-sloping-channels",
       "centreBore": "open-front-to-rear",
       "serviceSeats": true,
-      "bodyVolume": 18292460.161192227,
-      "foilVolume": 2647250.367556446
+      "bodyVolume": 18319429.226848252,
+      "foilVolume": 2654350.934257599
     },
     {
       "stage": 2,
@@ -374,8 +374,8 @@
       "axialEnds": "open-concentric-sloping-channels",
       "centreBore": "open-front-to-rear",
       "serviceSeats": true,
-      "bodyVolume": 17742582.389198396,
-      "foilVolume": 2562715.312307307
+      "bodyVolume": 17770722.257197123,
+      "foilVolume": 2569384.3915158063
     },
     {
       "stage": 3,
@@ -400,8 +400,8 @@
       "axialEnds": "open-concentric-sloping-channels",
       "centreBore": "open-front-to-rear",
       "serviceSeats": true,
-      "bodyVolume": 18044099.20159703,
-      "foilVolume": 2602135.1420930773
+      "bodyVolume": 18074412.222341873,
+      "foilVolume": 2608764.263776763
     },
     {
       "stage": 4,
@@ -426,8 +426,8 @@
       "axialEnds": "open-concentric-sloping-channels",
       "centreBore": "open-front-to-rear",
       "serviceSeats": true,
-      "bodyVolume": 24045162.577291682,
-      "foilVolume": 3490179.34727793
+      "bodyVolume": 24083710.564013857,
+      "foilVolume": 3498687.190454613
     }
   ],
   "machinery": {
@@ -511,7 +511,39 @@
         "radialScale": 0.4481281193017335
       }
     ],
-    "driveArchitecture": "independent-front-and-rear-motors",
+    "driveArchitecture": "single-motor-common-shaft",
+    "compressorMotorCount": 1,
+    "sharedRotorId": "compressor-common-rotor",
+    "commonShaft": {
+      "id": "compressor-common-shaft",
+      "front": 488.6666666666667,
+      "rear": 681,
+      "frontRadius": 9.87135170876318,
+      "rearRadius": 5.545585476358952,
+      "transitionFront": 565.4285714285714,
+      "transitionRear": 590,
+      "labelAnchorMm": [
+        602,
+        4.436468381087162,
+        0
+      ]
+    },
+    "rearBearing": {
+      "id": "compressor-rear-bearing-support",
+      "front": 668,
+      "rear": 678,
+      "supportX": 673,
+      "outerRadius": 11.5,
+      "boreRadius": 6.345585476358952,
+      "sleeveOuterRadius": 6.320585476358953,
+      "supportCount": 3,
+      "supportRadius": 1.2,
+      "labelAnchorMm": [
+        673,
+        10,
+        -4
+      ]
+    },
     "motorSizing": "schematic-only",
     "casingInside": [
       [
@@ -1859,7 +1891,11 @@
           105,
           255
         ],
-        "webSectorDegrees": 4.4
+        "inwardWebs": false,
+        "strapSectorDegrees": 4.4,
+        "strapInnerOffset": 0.05,
+        "strapOuterOffset": 1.1,
+        "supportArrangement": "external-conical-straps-and-collars"
       },
       {
         "stage": 2,
@@ -1870,7 +1906,11 @@
           105,
           255
         ],
-        "webSectorDegrees": 4.4
+        "inwardWebs": false,
+        "strapSectorDegrees": 4.4,
+        "strapInnerOffset": 0.05,
+        "strapOuterOffset": 1.1,
+        "supportArrangement": "external-conical-straps-and-collars"
       },
       {
         "stage": 3,
@@ -1881,7 +1921,11 @@
           105,
           255
         ],
-        "webSectorDegrees": 4.4
+        "inwardWebs": false,
+        "strapSectorDegrees": 4.4,
+        "strapInnerOffset": 0.05,
+        "strapOuterOffset": 1.1,
+        "supportArrangement": "external-conical-straps-and-collars"
       },
       {
         "stage": 4,
@@ -1892,9 +1936,40 @@
           105,
           255
         ],
-        "webSectorDegrees": 4.4
+        "inwardWebs": false,
+        "strapSectorDegrees": 4.4,
+        "strapInnerOffset": 0.05,
+        "strapOuterOffset": 1.2100000000000002,
+        "supportArrangement": "external-conical-straps-and-collars"
       }
     ]
+  },
+  "motorHeatRecovery": {
+    "jacket": [
+      294,
+      411
+    ],
+    "jacketRadii": [
+      144,
+      150
+    ],
+    "turnCount": 2,
+    "feedThroughs": [
+      300,
+      405
+    ],
+    "railAngle": 105,
+    "pump": [
+      2002,
+      2025
+    ],
+    "preheater": [
+      2068,
+      2110
+    ],
+    "hydrogenBend": 2228,
+    "hydrogenInletPhase": "gas downstream of external vaporizer",
+    "flow": "motor jacket → coolant line → separated heat exchanger → circulation pump → jacket"
   },
   "variableIntakes": {
     "stages": [
@@ -1914,9 +1989,9 @@
     ],
     "articulation": "independent aperture and two-axis deflection; shared browser/validation solver"
   },
-  "parts": 104,
-  "broadPhasePairs": 5356,
-  "exactPairs": 742,
+  "parts": 107,
+  "broadPhasePairs": 5671,
+  "exactPairs": 814,
   "collisions": [],
   "fluidChecks": {
     "cathodeCircuit": {
@@ -1928,6 +2003,14 @@
       "connectedComponents": 1,
       "obstructions": [],
       "expectedComponents": 1
+    },
+    "motorCoolant": {
+      "connectedComponents": 1,
+      "obstructions": [],
+      "expectedComponents": 1,
+      "uncontainedVolume": 0,
+      "anodeCircuitOverlap": 0,
+      "cathodeCircuitOverlap": 0
     },
     "gasSeparationVolume": 0,
     "cathodeInletExhaustOverlap": 0,

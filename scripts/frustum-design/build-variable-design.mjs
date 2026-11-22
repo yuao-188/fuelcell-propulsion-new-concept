@@ -9,17 +9,19 @@ import {buildStraightShells} from './straight-shells.mjs';
 import {buildFrustumStacks} from './frustum-stacks.mjs';
 import {buildCompactFluidNetworks} from './compact-fluid-networks.mjs';
 import {buildSupportFrame} from './support-frame.mjs';
+import {buildMotorHeatRecovery} from './motor-heat-recovery.mjs';
 import {getIntakeGeometry} from '../../frustum-design/intake-kinematics.mjs';
 
 const root=resolve(import.meta.dirname,'../..'),ctx=await createKernel();
 const {M,P,parts,add}=ctx,stackCount=P.stacks.length;
-console.log('Building pressure circuits and cell port seats...');
-const fluids=buildCompactFluidNetworks(ctx);
+console.log('Building the motor heat recovery loop and pressure circuits...');
+const heatRecovery=buildMotorHeatRecovery(ctx);
+const fluids=buildCompactFluidNetworks(ctx,{preheatedGasBore:heatRecovery.gasBore});
 console.log('Building support frame and annular frustum stacks...');
 const support=buildSupportFrame(ctx);
-const stacks=buildFrustumStacks(ctx,{...fluids,supportSeats:support.stackSeats});
+const stacks=buildFrustumStacks(ctx,fluids);
 console.log('Building retained fan and extended compressor...');
-const machinery=buildDetailedMachinery(ctx);
+const machinery=buildDetailedMachinery(ctx,heatRecovery);
 const shells=buildStraightShells(ctx,fluids.linerCutters);
 const pose={opening:P.variableIntake.defaultOpening,pitchDeg:0,yawDeg:0};
 for(const stage of P.variableIntake.stages)for(const g of getIntakeGeometry(P,stage,pose)){
@@ -28,12 +30,13 @@ for(const stage of P.variableIntake.stages)for(const g of getIntakeGeometry(P,st
     {clip:true,stage,variableStage:stage,motionRole:g.role,finish:g.role,
       metallic:g.metallic??.85,roughness:g.roughness??.3});
 }
-const report={schema:1,revision:'20261122-four-stack-frame',units:'mm',
+const report={schema:1,revision:'20261122-common-shaft-heat-recovery',units:'mm',
   dimensionSource:'first three stacks retained; fourth is a 1.10x geometric copy of the third, with 100 mm stage gaps',
   scope:'illustrative hollow frustum stacks; lamella count is not a physical cell count',
   length:P.layoutRear,schematicStacks:stackCount,
   moduleCounts:P.stacks.map(s=>s.modules),portCounts:Object.fromEntries(['air','hydrogen','return','cathode'].map(k=>[k,fluids.ports.filter(p=>p.fluid===k).length])),
   ports:fluids.ports,stacks,machinery,shells,plumbing:fluids.checks,supportFrame:support.report,
+  motorHeatRecovery:heatRecovery.check,
   variableIntakes:{stages:P.variableIntake.stages,petalsPerStage:24,pose,deflectionRangeDeg:[-5,5],
     articulation:'independent aperture and two-axis deflection; shared browser/validation solver'},
   parts:parts.length,broadPhasePairs:0,exactPairs:0,collisions:[],fluidChecks:{},errors:[]};
@@ -52,8 +55,12 @@ for(let i=0;i<parts.length;i++)for(let j=i+1;j<parts.length;j++){
   if(volume>.001)report.collisions.push({a:parts[i].id,b:parts[j].id,volume});
 }
 console.log('Collision pairs:',report.collisions.length);
-for(const [name,bore] of Object.entries(fluids.bores)){
-  if(!['cathodeCircuit','anodeCircuit'].includes(name))continue;
+const circuits={
+  cathodeCircuit:fluids.bores.cathodeCircuit,
+  anodeCircuit:fluids.bores.anodeCircuit,
+  motorCoolant:heatRecovery.coolantBore,
+};
+for(const [name,bore] of Object.entries(circuits)){
   const components=bore.decompose();report.fluidChecks[name]={connectedComponents:components.length,obstructions:[]};
   // The displayed cathode inlet and wet-exhaust pipes terminate at separate
   // stack interfaces. Cell-internal passages are not represented by an
@@ -67,6 +74,15 @@ for(const [name,bore] of Object.entries(fluids.bores)){
     if(volume>.001)report.fluidChecks[name].obstructions.push({part:parts[i].id,volume});
   }
   if(report.fluidChecks[name].obstructions.length)report.errors.push(`${name}: obstruction`);
+}
+const waterOutside=heatRecovery.coolantBore.subtract(heatRecovery.coolantEnvelope);
+report.fluidChecks.motorCoolant.uncontainedVolume=waterOutside.volume();waterOutside.delete();
+if(report.fluidChecks.motorCoolant.uncontainedVolume>.001)report.errors.push('Motor coolant is not fully contained');
+for(const name of ['anodeCircuit','cathodeCircuit']){
+  const intersection=heatRecovery.coolantBore.intersect(circuits[name]);
+  const volume=intersection.volume();intersection.delete();
+  report.fluidChecks.motorCoolant[`${name}Overlap`]=volume;
+  if(volume>.001)report.errors.push(`Motor coolant intersects ${name}`);
 }
 const mixed=fluids.bores.cathodeCircuit.intersect(fluids.bores.anodeCircuit);
 report.fluidChecks.gasSeparationVolume=mixed.volume();mixed.delete();
