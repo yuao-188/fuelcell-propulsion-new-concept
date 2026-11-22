@@ -1,25 +1,56 @@
 import {stackRadiusAt} from '../../frustum-design/parameters.mjs';
 
+/** Shared centerline for rails, external service lines and their mounting feet. */
+export function getSupportFrameLayout(P) {
+  const S=P.supportFrame??{},stacks=P.stacks;
+  const [s1,s2,s3,s4]=stacks;
+  const angles=S.railAngles??[0,120,240],railDepth=S.railDepth??30,railWidth=S.railWidth??24;
+  const railFront=S.railFront??s1.front,railRear=S.railRear??stacks.at(-1).rear;
+  const railProfile=(S.railProfile??[
+    [railFront,305],[s1.front+80,305],[s1.rear-40,312],
+    [s2.front+60,312],[s2.rear-70,317],[s2.rear+22,317],
+    [s3.front+30,320],[s3.front+90,326],[s3.rear+10,326],
+    [s4.front-10,318],[railRear,318],
+  ]).map(p=>[...p]);
+  if(railProfile.some(([x,r],i)=>!Number.isFinite(x+r)||r<=railDepth/2||i>0&&x<=railProfile[i-1][0]))
+    throw new Error('Support rail profile must have increasing axial stations and positive clear radii');
+  const railCenterRadiusAt=x=>{
+    if(x<=railProfile[0][0])return railProfile[0][1];
+    for(let i=1;i<railProfile.length;i++)if(x<=railProfile[i][0]){
+      const [a,ra]=railProfile[i-1],[b,rb]=railProfile[i];return ra+(rb-ra)*(x-a)/(b-a);
+    }
+    return railProfile.at(-1)[1];
+  };
+  const loadFrameX=S.loadFrameX??s2.rear,loadFrameWidth=S.loadFrameWidth??28;
+  const loadRingRadius=railCenterRadiusAt(loadFrameX);
+  return {angles,railDepth,railWidth,railFront,railRear,railProfile,railCenterRadiusAt,
+    loadFrameX,loadFrameWidth,loadRingRadius,loadRingInner:loadRingRadius-railDepth/2,
+    loadRingOuter:loadRingRadius+railDepth/2};
+}
+
 /** Independent four-stack frame: three rails, external cradles and aircraft mounts. */
 export function buildSupportFrame(ctx) {
   const {M,P,union,cylinder,sector,polar,tubePath,roundPath,add}=ctx;
   const S=P.supportFrame??{};
-  const angles=S.railAngles??[0,120,240],railRadius=S.railRadius??370;
-  const railDepth=S.railDepth??30,railWidth=S.railWidth??24;
-  const railFront=S.railFront??P.stacks[0].front;
-  const railRear=S.railRear??P.stacks.at(-1).rear;
-  const loadFrameX=S.loadFrameX??P.stacks[1].rear,loadFrameWidth=S.loadFrameWidth??28;
-  const mountAngles=S.mountAngles??angles,mountRadius=S.mountRadius??465;
+  const layout=getSupportFrameLayout(P);
+  const {angles,railDepth,railWidth,railFront,railRear,railProfile,railCenterRadiusAt,
+    loadFrameX,loadFrameWidth,loadRingInner,loadRingOuter}=layout;
+  const mountAngles=S.mountAngles??angles,mountRadius=S.mountRadius??loadRingOuter+80;
   const mountTubeOuter=S.mountTubeOuter??16,mountTubeInner=S.mountTubeInner??10;
   const mountFlangeRadius=S.mountFlangeRadius??30,mountFlangeThickness=S.mountFlangeThickness??8;
   const box=(size,point)=>M.cube(size,true).translate(point);
   const localBox=(x,r,t,length,depth,width,angle)=>
     box([length,depth,width],[x,r,t]).rotate([angle,0,0]);
-  const railPieces=angles.map(a=>localBox((railFront+railRear)/2,railRadius,0,
-    railRear-railFront,railDepth,railWidth,a));
+  const railClip=box([railRear-railFront,1200,1200],[(railFront+railRear)/2,0,0]);
+  const railPieces=angles.map(angle=>{
+    const slices=railProfile.map(([x,r])=>localBox(x,r,0,.02,railDepth,railWidth,angle));
+    const spans=slices.slice(1).map((slice,i)=>M.hull([slices[i],slice]));
+    const joined=union(spans),rail=joined.intersect(railClip);
+    [...slices,...spans,joined].forEach(solid=>solid.delete());return rail;
+  });
+  railClip.delete();
   // The load ring belongs to the stack installation alone. Its open bore
   // clears the intake sweep; none of these rails reach the front fan casing.
-  const loadRingInner=railRadius-railDepth/2,loadRingOuter=railRadius+railDepth/2;
   const loadRing=cylinder([loadFrameX-loadFrameWidth/2,0,0],[loadFrameX+loadFrameWidth/2,0,0],loadRingOuter,loadRingOuter,192)
     .subtract(cylinder([loadFrameX-loadFrameWidth/2-.1,0,0],[loadFrameX+loadFrameWidth/2+.1,0,0],loadRingInner,loadRingInner,192));
   const mountPieces=[],mountBores=[],mountBoltHoles=[];
@@ -70,9 +101,10 @@ export function buildSupportFrame(ctx) {
     const strapCone=strapOuter.subtract(strapInner);
     strapOuter.delete();strapInner.delete();
     const braces=[],ties=[],slots=[];
+    const foreRailRadius=railCenterRadiusAt(fore),frontCollarOuter=radius(fore)+bandDepth;
     for(const angle of angles){
-      const near=radius(fore)+bandDepth-2;
-      braces.push(localBox(fore,(near+railRadius)/2,0,2*bandHalf,railRadius-near,20,angle));
+      const near=frontCollarOuter-2;
+      braces.push(localBox(fore,(near+foreRailRadius)/2,0,2*bandHalf,foreRailRadius-near,20,angle));
       // A broad angular cutter keeps the 192-facet conical inner face intact,
       // instead of introducing a chord that could enter the stack material.
       const wedge=sector(strapLo-.1,strapHi+.1,
@@ -93,6 +125,8 @@ export function buildSupportFrame(ctx) {
       '#a6b5be',cradle,{...finish,stage});
     cradles.push({
       stage,frontSeat:fore,rearSeat:aft,slotLength:8*scale+5.2,
+      railCenterRadius:foreRailRadius,frontBraceSpan:foreRailRadius-railDepth/2-frontCollarOuter,
+      frontBraceRadialBounds:[frontCollarOuter-2,foreRailRadius],
       mountAngles:angles,inwardWebs:false,
       strapSectorDegrees:4.4,strapInnerOffset,strapOuterOffset,
       supportArrangement:'external-conical-straps-and-collars',
@@ -100,20 +134,21 @@ export function buildSupportFrame(ctx) {
     strapCone.delete();
   }
 
-  const wireAngle=angles.at(-1),wireRadius=railRadius+22,wireStart=railFront+8;
+  const wireAngle=angles.at(-1),wireStart=railFront+8,wireEnd=railRear-8;
+  const wireRadiusAt=x=>railCenterRadiusAt(x)+22;
   // The loom walks around the radial mounting tube instead of crossing either
   // of its walls. The outer radius also keeps it clear of the load-ring rim.
   const wireMountBypass=7.5;
-  const wirePath=[polar(wireStart,wireRadius,wireAngle),
-    polar(loadFrameX-42,wireRadius,wireAngle),
-    polar(loadFrameX-28,wireRadius,wireAngle+wireMountBypass),
-    polar(loadFrameX+28,wireRadius,wireAngle+wireMountBypass),
-    polar(loadFrameX+42,wireRadius,wireAngle),
-    polar(railRear-8,wireRadius,wireAngle)];
+  const wireAngleAt=x=>wireAngle+wireMountBypass*Math.max(0,Math.min(1,
+    (x-(loadFrameX-42))/14,((loadFrameX+42)-x)/14));
+  const wireStations=[...new Set([wireStart,wireEnd,...railProfile.map(p=>p[0]),
+    loadFrameX-42,loadFrameX-28,loadFrameX+28,loadFrameX+42])]
+    .filter(x=>x>=wireStart&&x<=wireEnd).sort((a,b)=>a-b);
+  const wirePath=wireStations.map(x=>polar(x,wireRadiusAt(x),wireAngleAt(x)));
   const mainWire=tubePath(roundPath(wirePath,6),2.2);
   const leads=[],clips=[];
   for(const s of P.stacks){
-    const x=s.front+27;
+    const x=s.front+27,wireRadius=wireRadiusAt(x),railRadius=railCenterRadiusAt(x);
     const points=Array.from({length:6},(_,i)=>polar(x,wireRadius,wireAngle+i*1.2));
     points.push(polar(x,stackRadiusAt(s,x)+1.4,wireAngle+6));
     leads.push(tubePath(roundPath(points,5),1.4));
@@ -126,9 +161,11 @@ export function buildSupportFrame(ctx) {
   const wiring=union([mainWire,...leads]);
   add('wiring-harness','沿右纵梁夹持的电气线束','wiring','#35454e',wiring,
     {clip:true,metallic:.06,roughness:.6});
-  add('wiring-frame-clips','纵梁线束卡箍','wiring','#84949e',union(clips).subtract(wiring),finish);
+  add('wiring-frame-clips','纵梁线束卡箍','wiring','#84949e',union(clips).subtract(union([wiring,frame])),finish);
 
-  return {report:{railRadius,railInnerRadius:railRadius-railDepth/2,
+  return {report:{railProfile,railDepth,railWidth,
+    railInnerRadiusMin:Math.min(...railProfile.map(p=>p[1]))-railDepth/2,
+    railOuterRadiusMax:Math.max(...railProfile.map(p=>p[1]))+railDepth/2,
     railFront,railRear,railCount:angles.length,railAngles:angles,installationSegment:'stacks',
     frontCasingConnection:false,rearLoadRing:false,
     loadRing:{centreX:loadFrameX,front:loadFrameX-loadFrameWidth/2,rear:loadFrameX+loadFrameWidth/2,

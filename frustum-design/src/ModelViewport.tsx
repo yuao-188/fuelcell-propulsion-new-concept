@@ -10,7 +10,7 @@ import { parameters as P } from '../parameters.mjs';
 // @ts-expect-error The same deterministic solver is used in the GLB builder.
 import { getIntakeGeometry, getIntakeKinematics } from '../intake-kinematics.mjs';
 
-const MODEL_REVISION='20261122-dual-mount-split-hydrogen';
+const MODEL_REVISION='20261122-compact-stack-frame-six-front-struts';
 const intakeStages:number[]=[...P.variableIntake.stages];
 const intakeStageForView=(view:CameraView)=>{
   const stage=Number(view.startsWith('intake')?view.slice(6):0);

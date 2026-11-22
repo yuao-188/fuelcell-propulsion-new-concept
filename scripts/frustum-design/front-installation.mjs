@@ -1,13 +1,15 @@
 import { getCompressorCasingProfile } from './two-stage-compressor.mjs';
 
-/** Open three-arm front load path; independent of the downstream stack rails. */
+/** Open six-strut front load path; independent of the downstream stack rails. */
 export function buildFrontInstallation(ctx) {
   const {P,C,M,CS,union,cylinder,polar,add}=ctx;
   const seam=P.compressor.front, shellRear=P.outerShell.rear;
   const shellBore=P.outerShell.radius-P.outerShell.wall;
   const flangeOuter=P.outerShell.radius+19, outerBoltRadius=P.outerShell.radius+12;
   const jointRadius=P.motorHousing.outer+23, jointBoltRadius=jointRadius-11;
-  const armAngles=[30,150,270];
+  // Equal 60-degree spacing; the offset leaves the coolant leads between the
+  // 80/140-degree struts instead of centring a strut on the 120-degree route.
+  const armAngles=Array.from({length:6},(_,i)=>20+60*i);
   const curve=getCompressorCasingProfile(P);
   const outerAt=x=>{
     const r=curve.innerAt(x),ratio=(r-P.air.inner)/(P.compressor.inner-P.air.inner);
@@ -71,15 +73,22 @@ export function buildFrontInstallation(ctx) {
   const outerRing=ring(shellRear,shellRear+8,flangeOuter,shellBore,192);
 
   function arm(angle){
-    const vertices=[],triangles=[],steps=16,perimeter=8;
+    const vertices=[],triangles=[],steps=20,chordSteps=24,perimeter=chordSteps*2;
+    const sectionSamples=[];
+    for(let j=0;j<=chordSteps;j++)sectionSamples.push([(1-Math.cos(j*Math.PI/chordSteps))/2,1]);
+    for(let j=chordSteps-1;j>0;j--)sectionSamples.push([(1-Math.cos(j*Math.PI/chordSteps))/2,-1]);
     for(let i=0;i<=steps;i++){
       const t=i/steps,r=(shellBore+3)+(jointRadius-2-shellBore-3)*t;
       const bow=t+.045*Math.sin(Math.PI*t);
       const x=shellRear+4+(seam-3-shellRear-4)*bow;
-      const hx=3.8-1.2*t,hz=14-5*t,chamfer=.9;
-      const section=[[-hx+chamfer,-hz],[hx-chamfer,-hz],[hx,-hz+chamfer],
-        [hx,hz-chamfer],[hx-chamfer,hz],[-hx+chamfer,hz],[-hx,hz-chamfer],[-hx,-hz+chamfer]];
-      for(const [dx,z]of section)vertices.push(x+dx,r,z);
+      // Narrow facing width and a rounded leading edge / tapered trailing
+      // edge. The longer midspan chord remains wholly between the end seats;
+      // both root axial envelopes still match the existing flange surfaces.
+      const hx=3.8-1.2*t+7.2*Math.sin(Math.PI*t)**2,hz=5-1.5*t;
+      for(const [u,side]of sectionSamples){
+        const thickness=Math.max(0,.2969*Math.sqrt(u)-.126*u-.3516*u*u+.2843*u**3-.1036*u**4);
+        vertices.push(x+(2*u-1)*hx,r,side*hz*10*thickness);
+      }
     }
     for(let k=0;k<steps;k++)for(let j=0;j<perimeter;j++){
       const a=k*perimeter+j,b=k*perimeter+(j+1)%perimeter,c=b+perimeter,d=a+perimeter;
@@ -104,8 +113,10 @@ export function buildFrontInstallation(ctx) {
   // curved seat. Subtract its whole unperforated envelope, avoiding tiny slivers.
   const frame=union([outerRing,...armAngles.map(arm)])
     .subtract(union([blueRaw,goldRaw,gasketRaw,...outerHoles]));
-  emit('front-installation-frame','前涵道独立安装环与三根渐缩斜承力臂','#b6c3cc',frame,
-    'machined-aluminium',{armAnglesDeg:armAngles,armCount:3,front:shellRear,rear:seam,independentOfStackRails:true});
+  emit('front-installation-frame','前涵道独立安装环与六根流线型斜承力臂','#b6c3cc',frame,
+    'machined-aluminium',{armAnglesDeg:armAngles,armCount:armAngles.length,front:shellRear,rear:seam,
+      armSection:'rounded-leading-edge-tapered-trailing-edge',armFacingWidthMm:[10,7],
+      armPitchDeg:60,independentOfStackRails:true});
   emit('front-installation-intake-flange','蓝色引气机匣后安装法兰',C.intakeOuter??'#477f9d',blue,'satin-blue-metal');
   emit('front-installation-compressor-flange','金色压气机前安装法兰',C.compressorCase??'#c9a34b',gold,'satin-champagne-metal');
   emit('front-installation-gasket','双机匣对接密封垫','#465158',gasket,'dark-gasket');
@@ -113,7 +124,8 @@ export function buildFrontInstallation(ctx) {
   emit('front-installation-washers','安装架与双法兰垫圈','#d6dfe4',union(washers),'machined-aluminium');
   emit('front-installation-nuts','双机匣法兰六角螺母','#aebdc7',union(nuts),'machined-fastener');
   return {intakeSeats,compressorSeats,verification:{
-    independentOfStackRails:true,armCount:3,armAnglesDeg:armAngles,
+    independentOfStackRails:true,armCount:armAngles.length,armAnglesDeg:armAngles,
+    armPitchDeg:60,armFacingWidthMm:[10,7],armSection:'streamlined-solid-strut',
     fanAttachmentPlane:shellRear,fanRingInnerRadius:shellBore,fanRingOuterRadius:flangeOuter,
     blueFlange:[seam-10,seam-.15],goldFlange:[seam+.15,seam+10],jointOuterRadius:jointRadius,
     jointBoltCount:12,fanBoltCount:24,realThroughBores:true,blueBore:P.motorHousing.inner,

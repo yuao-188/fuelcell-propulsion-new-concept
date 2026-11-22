@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "revision": "20261122-dual-mount-split-hydrogen",
+  "revision": "20261122-compact-stack-frame-six-front-struts",
   "units": "mm",
   "dimensionSource": "four stacks shifted 40 mm toward the fan, with 100 mm stage gaps",
   "scope": "illustrative hollow frustum stacks; lamella count is not a physical cell count",
@@ -1718,8 +1718,8 @@
         "medium": "feed",
         "centre": [
           1412,
-          -94.14584031789366,
-          94.14584031789366
+          -94.14584031752864,
+          94.14584031752867
         ],
         "outerRadius": 5.2,
         "length": 5
@@ -1899,8 +1899,56 @@
     "internalChannelStatus": "independent interface stubs only; no external air-exhaust or feed-return stack bypass"
   },
   "supportFrame": {
-    "railRadius": 370,
-    "railInnerRadius": 355,
+    "railProfile": [
+      [
+        700,
+        305
+      ],
+      [
+        780,
+        305
+      ],
+      [
+        960,
+        312
+      ],
+      [
+        1160,
+        312
+      ],
+      [
+        1280,
+        317
+      ],
+      [
+        1372,
+        317
+      ],
+      [
+        1480,
+        320
+      ],
+      [
+        1540,
+        326
+      ],
+      [
+        1680,
+        326
+      ],
+      [
+        1760,
+        318
+      ],
+      [
+        2012,
+        318
+      ]
+    ],
+    "railDepth": 30,
+    "railWidth": 24,
+    "railInnerRadiusMin": 290,
+    "railOuterRadiusMax": 341,
     "railFront": 700,
     "railRear": 2012,
     "railCount": 3,
@@ -1916,8 +1964,8 @@
       "centreX": 1350,
       "front": 1336,
       "rear": 1364,
-      "inner": 355,
-      "outer": 385
+      "inner": 302,
+      "outer": 332
     },
     "aircraftMounts": {
       "angles": [
@@ -1925,7 +1973,7 @@
         120,
         240
       ],
-      "radialEnd": 465,
+      "radialEnd": 412,
       "tubeOuter": 16,
       "tubeInner": 10,
       "flangeRadius": 30,
@@ -1939,6 +1987,12 @@
         "frontSeat": 712,
         "rearSeat": 988,
         "slotLength": 13.2,
+        "railCenterRadius": 305,
+        "frontBraceSpan": 91.19999999999999,
+        "frontBraceRadialBounds": [
+          196.8,
+          305
+        ],
         "mountAngles": [
           0,
           120,
@@ -1955,6 +2009,12 @@
         "frontSeat": 1112,
         "rearSeat": 1338,
         "slotLength": 13.2,
+        "railCenterRadius": 312,
+        "frontBraceSpan": 78.44,
+        "frontBraceRadialBounds": [
+          216.56,
+          312
+        ],
         "mountAngles": [
           0,
           120,
@@ -1971,6 +2031,12 @@
         "frontSeat": 1462,
         "rearSeat": 1658,
         "slotLength": 13.2,
+        "railCenterRadius": 319.5,
+        "frontBraceSpan": 66.13636363636363,
+        "frontBraceRadialBounds": [
+          236.36363636363637,
+          319.5
+        ],
         "mountAngles": [
           0,
           120,
@@ -1987,6 +2053,12 @@
         "frontSeat": 1783.2,
         "rearSeat": 1998.8,
         "slotLength": 14,
+        "railCenterRadius": 318,
+        "frontBraceSpan": 40.80000000000001,
+        "frontBraceRadialBounds": [
+          260.2,
+          318
+        ],
         "mountAngles": [
           0,
           120,
@@ -2002,12 +2074,21 @@
   },
   "frontInstallation": {
     "independentOfStackRails": true,
-    "armCount": 3,
+    "armCount": 6,
     "armAnglesDeg": [
-      30,
-      150,
-      270
+      20,
+      80,
+      140,
+      200,
+      260,
+      320
     ],
+    "armPitchDeg": 60,
+    "armFacingWidthMm": [
+      10,
+      7
+    ],
+    "armSection": "streamlined-solid-strut",
     "fanAttachmentPlane": 380,
     "fanRingInnerRadius": 500,
     "fanRingOuterRadius": 525,
@@ -2055,8 +2136,8 @@
     ],
     "hydrogenInlet": [
       1350,
-      2.7554552980815446e-14,
-      450
+      2.4309238963074962e-14,
+      397
     ],
     "supplyTee": [
       1412,
@@ -2086,7 +2167,7 @@
   },
   "parts": 113,
   "broadPhasePairs": 6328,
-  "exactPairs": 828,
+  "exactPairs": 844,
   "collisions": [],
   "fluidChecks": {
     "cathodeCircuit": {
