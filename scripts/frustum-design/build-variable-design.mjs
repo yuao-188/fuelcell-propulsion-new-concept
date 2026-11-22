@@ -35,7 +35,7 @@ for(const stage of P.variableIntake.stages)for(const g of getIntakeGeometry(P,st
     {clip:true,stage,variableStage:stage,motionRole:g.role,finish:g.role,fixedGeometry,
       metallic:g.metallic??.85,roughness:g.roughness??.3});
 }
-const report={schema:1,revision:'20261122-compact-stack-frame-six-front-struts',units:'mm',
+const report={schema:1,revision:'20261123-straight-stack-rails-six-front-struts',units:'mm',
   dimensionSource:'four stacks shifted 40 mm toward the fan, with 100 mm stage gaps',
   scope:'illustrative hollow frustum stacks; lamella count is not a physical cell count',
   length:P.layoutRear,schematicStacks:stackCount,stackForwardShift:P.stackForwardShift,
@@ -49,7 +49,10 @@ const report={schema:1,revision:'20261122-compact-stack-frame-six-front-struts',
 assert.equal(stacks.length,4);assert.equal(shells.length,380);
 assert.deepEqual(stacks.map(s=>s.front),[700,1100,1450,1770]);
 assert.equal(support.report.railAngles.length,3);
+assert.equal(support.report.railProfile.length,2);
+assert.equal(support.report.railProfile[0][1],support.report.railProfile[1][1]);
 assert.equal(frontInstallation.verification.armCount,6);
+assert.equal(frontInstallation.verification.armCenterline,'straight');
 const frontMountParts=parts.filter(p=>p.group==='frontMount');
 const stackMountParts=parts.filter(p=>p.group==='supportFrame');
 assert(frontMountParts.length&&stackMountParts.length);

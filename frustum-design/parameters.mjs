@@ -39,7 +39,7 @@ export const parameters = {
       exitOffset: 46, exitRadialInset: 15, returnAngle: -35, boreClearance: 12, innerTurnOffset: 2 } },
   pump: { front: shiftDownstream(2118), rear: shiftDownstream(2158), centerY: -65, centerZ: 70, radius: 20, bore: 2.5 },
   outerShell: { front: 0, rear: 380, radius: 506, wall: 6 },
-  supportFrame: { railAngles: [0,120,240], railDepth: 30, railWidth: 24,
+  supportFrame: { railAngles: [0,120,240], railRadius: 321, loadRingRadius: 317, railDepth: 30, railWidth: 24,
     mountRadius: 412 },
   // Only the short stator hub support remains; there is no overall inner shell.
   statorSupport: { front: 232, rear: 288, inner: 243, radius: 248 },

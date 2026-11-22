@@ -6,7 +6,7 @@ export function buildMotorHeatRecovery(ctx) {
   const group='motorHeatRecovery';
   const shellFinish={clip:true,metallic:.75,roughness:.32,finish:'machined-aluminium'};
   const pipeFinish={clip:true,metallic:.44,roughness:.34};
-  const {angles,railProfile,railCenterRadiusAt,railWidth,loadRingOuter}=getSupportFrameLayout(P);
+  const {angles,railCenterRadiusAt,railWidth,loadRingOuter}=getSupportFrameLayout(P);
   const sideAngle=angles[1],c=Math.cos(sideAngle*Math.PI/180),s=Math.sin(sideAngle*Math.PI/180);
   const H=P.hydrogen,side=H.sideSupply,sideX=P.stacks[side.mountStage-1].rear;
   const junctionX=sideX+side.junctionOffset;
@@ -27,17 +27,16 @@ export function buildMotorHeatRecovery(ctx) {
     return polar(inletX+(outletX-inletX)*t,coilRadius,inletAngle+(720+outletAngle-inletAngle)*t);
   });
 
-  // Follow the same rail stations as the frame, keeping both lines outside
-  // the moving inlet envelope. Peel outward before crossing to the preheater.
+  // Follow the straight rail alongside the inlet envelope, then turn outward
+  // before crossing to the preheater.
   const railStart=710,peelX=sideX-76;
-  const coolingRailStations=[railStart,...railProfile.map(([x])=>x).filter(x=>x>railStart&&x<peelX),peelX];
   const lineOffset=railWidth/2+13;
   const railAt=(x,t)=>local(x,railCenterRadiusAt(x),t);
   const coolInRadius=loadRingOuter+38,coolOutRadius=loadRingOuter+34;
   function lead(x,angle,offset,hxRadius,hxOffset) {
     return [
       polar(x,coilRadius,angle),polar(x,185,angle),polar(423,185,angle),
-      local(470,216,offset),...coolingRailStations.map(x=>railAt(x,offset)),
+      local(470,216,offset),railAt(railStart,offset),railAt(peelX,offset),
       local(sideX-46,loadRingOuter+40,offset),hxLocal(sideX-26,hxRadius,hxOffset),hxLocal(hxFront+4,hxRadius,hxOffset),
     ];
   }

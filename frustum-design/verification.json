@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "revision": "20261122-compact-stack-frame-six-front-struts",
+  "revision": "20261123-straight-stack-rails-six-front-struts",
   "units": "mm",
   "dimensionSource": "four stacks shifted 40 mm toward the fan, with 100 mm stage gaps",
   "scope": "illustrative hollow frustum stacks; lamella count is not a physical cell count",
@@ -1899,56 +1899,22 @@
     "internalChannelStatus": "independent interface stubs only; no external air-exhaust or feed-return stack bypass"
   },
   "supportFrame": {
+    "railShape": "straight-axis-parallel",
+    "railRadius": 321,
     "railProfile": [
       [
         700,
-        305
-      ],
-      [
-        780,
-        305
-      ],
-      [
-        960,
-        312
-      ],
-      [
-        1160,
-        312
-      ],
-      [
-        1280,
-        317
-      ],
-      [
-        1372,
-        317
-      ],
-      [
-        1480,
-        320
-      ],
-      [
-        1540,
-        326
-      ],
-      [
-        1680,
-        326
-      ],
-      [
-        1760,
-        318
+        321
       ],
       [
         2012,
-        318
+        321
       ]
     ],
     "railDepth": 30,
     "railWidth": 24,
-    "railInnerRadiusMin": 290,
-    "railOuterRadiusMax": 341,
+    "railInnerRadiusMin": 306,
+    "railOuterRadiusMax": 336,
     "railFront": 700,
     "railRear": 2012,
     "railCount": 3,
@@ -1987,11 +1953,11 @@
         "frontSeat": 712,
         "rearSeat": 988,
         "slotLength": 13.2,
-        "railCenterRadius": 305,
-        "frontBraceSpan": 91.19999999999999,
+        "railCenterRadius": 321,
+        "frontBraceSpan": 107.19999999999999,
         "frontBraceRadialBounds": [
           196.8,
-          305
+          321
         ],
         "mountAngles": [
           0,
@@ -2009,11 +1975,11 @@
         "frontSeat": 1112,
         "rearSeat": 1338,
         "slotLength": 13.2,
-        "railCenterRadius": 312,
-        "frontBraceSpan": 78.44,
+        "railCenterRadius": 321,
+        "frontBraceSpan": 87.44,
         "frontBraceRadialBounds": [
           216.56,
-          312
+          321
         ],
         "mountAngles": [
           0,
@@ -2031,11 +1997,11 @@
         "frontSeat": 1462,
         "rearSeat": 1658,
         "slotLength": 13.2,
-        "railCenterRadius": 319.5,
-        "frontBraceSpan": 66.13636363636363,
+        "railCenterRadius": 321,
+        "frontBraceSpan": 67.63636363636363,
         "frontBraceRadialBounds": [
           236.36363636363637,
-          319.5
+          321
         ],
         "mountAngles": [
           0,
@@ -2053,11 +2019,11 @@
         "frontSeat": 1783.2,
         "rearSeat": 1998.8,
         "slotLength": 14,
-        "railCenterRadius": 318,
-        "frontBraceSpan": 40.80000000000001,
+        "railCenterRadius": 321,
+        "frontBraceSpan": 43.80000000000001,
         "frontBraceRadialBounds": [
           260.2,
-          318
+          321
         ],
         "mountAngles": [
           0,
@@ -2089,6 +2055,7 @@
       7
     ],
     "armSection": "streamlined-solid-strut",
+    "armCenterline": "straight",
     "fanAttachmentPlane": 380,
     "fanRingInnerRadius": 500,
     "fanRingOuterRadius": 525,
@@ -2167,7 +2134,7 @@
   },
   "parts": 113,
   "broadPhasePairs": 6328,
-  "exactPairs": 844,
+  "exactPairs": 837,
   "collisions": [],
   "fluidChecks": {
     "cathodeCircuit": {

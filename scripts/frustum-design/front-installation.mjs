@@ -79,8 +79,9 @@ export function buildFrontInstallation(ctx) {
     for(let j=chordSteps-1;j>0;j--)sectionSamples.push([(1-Math.cos(j*Math.PI/chordSteps))/2,-1]);
     for(let i=0;i<=steps;i++){
       const t=i/steps,r=(shellBore+3)+(jointRadius-2-shellBore-3)*t;
-      const bow=t+.045*Math.sin(Math.PI*t);
-      const x=shellRear+4+(seam-3-shellRear-4)*bow;
+      // The load-path centreline is straight between its two flange seats.
+      // Only the streamlined section thickness/chord varies along the span.
+      const x=shellRear+4+(seam-3-shellRear-4)*t;
       // Narrow facing width and a rounded leading edge / tapered trailing
       // edge. The longer midspan chord remains wholly between the end seats;
       // both root axial envelopes still match the existing flange surfaces.
@@ -115,7 +116,7 @@ export function buildFrontInstallation(ctx) {
     .subtract(union([blueRaw,goldRaw,gasketRaw,...outerHoles]));
   emit('front-installation-frame','前涵道独立安装环与六根流线型斜承力臂','#b6c3cc',frame,
     'machined-aluminium',{armAnglesDeg:armAngles,armCount:armAngles.length,front:shellRear,rear:seam,
-      armSection:'rounded-leading-edge-tapered-trailing-edge',armFacingWidthMm:[10,7],
+      armSection:'rounded-leading-edge-tapered-trailing-edge',armCenterline:'straight',armFacingWidthMm:[10,7],
       armPitchDeg:60,independentOfStackRails:true});
   emit('front-installation-intake-flange','蓝色引气机匣后安装法兰',C.intakeOuter??'#477f9d',blue,'satin-blue-metal');
   emit('front-installation-compressor-flange','金色压气机前安装法兰',C.compressorCase??'#c9a34b',gold,'satin-champagne-metal');
@@ -125,7 +126,7 @@ export function buildFrontInstallation(ctx) {
   emit('front-installation-nuts','双机匣法兰六角螺母','#aebdc7',union(nuts),'machined-fastener');
   return {intakeSeats,compressorSeats,verification:{
     independentOfStackRails:true,armCount:armAngles.length,armAnglesDeg:armAngles,
-    armPitchDeg:60,armFacingWidthMm:[10,7],armSection:'streamlined-solid-strut',
+    armPitchDeg:60,armFacingWidthMm:[10,7],armSection:'streamlined-solid-strut',armCenterline:'straight',
     fanAttachmentPlane:shellRear,fanRingInnerRadius:shellBore,fanRingOuterRadius:flangeOuter,
     blueFlange:[seam-10,seam-.15],goldFlange:[seam+.15,seam+10],jointOuterRadius:jointRadius,
     jointBoltCount:12,fanBoltCount:24,realThroughBores:true,blueBore:P.motorHousing.inner,
