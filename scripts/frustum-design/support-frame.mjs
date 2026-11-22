@@ -1,10 +1,13 @@
 import {stackRadiusAt} from '../../frustum-design/parameters.mjs';
 
-/** Open structural frame with two shared rails and removable stack cradles. */
+/** Open structural frame with three shared rails and external stack cradles. */
 export function buildSupportFrame(ctx) {
   const {M,P,union,cylinder,sector,polar,tubePath,roundPath,add}=ctx;
-  const angles=[105,255],railRadius=370,railDepth=30,railWidth=24;
-  const railFront=P.outerShell.rear,straightStart=635,straightEnd=P.stacks.at(-1).rear+80;
+  const S=P.supportFrame??{};
+  const angles=S.railAngles??[0,120,240],railRadius=S.railRadius??370;
+  const railDepth=S.railDepth??30,railWidth=S.railWidth??24;
+  const railFront=P.outerShell.rear,straightStart=S.straightStart??635;
+  const straightEnd=P.stacks.at(-1).rear+(S.tailExtension??80);
   const rearMount=straightEnd-12;
   const box=(size,point)=>M.cube(size,true).translate(point);
   const localBox=(x,r,t,length,depth,width,angle)=>
@@ -22,22 +25,22 @@ export function buildSupportFrame(ctx) {
     [455,495,24,railWidth],[590,391,railDepth,railWidth],
     [straightStart,railRadius,railDepth,railWidth],[straightEnd,railRadius,railDepth,railWidth],
   ],a));
-  // The aft crossmember passes below the collectors and the drainage lines.
-  const railCenters=angles.map(a=>polar(rearMount,railRadius,a));
-  const rearFootY=-236;
-  const crossmember=[
-    ...railCenters.map(([,y,z])=>box([16,y-rearFootY+15,17],[rearMount,(y+rearFootY-15)/2,z])),
-    box([16,16,railCenters[0][2]-railCenters[1][2]+17],[rearMount,rearFootY,0]),
-  ];
-  const rearEars=[-100,100].map(z=>{
-    const p=x=>[x,rearFootY-20,z];
+  // One open aft ring joins all three rails outside the central equipment.
+  // Lower mounting eyes overlap the ring itself, without an inward crossbar.
+  const rearRingInner=railRadius-railDepth/2,rearRingOuter=railRadius+railDepth/2;
+  const rearRing=cylinder([rearMount-8,0,0],[rearMount+8,0,0],rearRingOuter,rearRingOuter,192)
+    .subtract(cylinder([rearMount-8.1,0,0],[rearMount+8.1,0,0],rearRingInner,rearRingInner,192));
+  const rearEarAngles=[150,210],rearEarRadius=rearRingOuter+15;
+  const rearEars=rearEarAngles.map(angle=>{
+    const p=x=>polar(x,rearEarRadius,angle);
     const eye=cylinder(p(rearMount-7),p(rearMount+7),21,21,48);
     const hole=cylinder(p(rearMount-8),p(rearMount+8),8,8,32);
     return eye.subtract(hole);
   });
-  const frame=clipEnds(union([...railPieces,...crossmember,...rearEars]),railFront,straightEnd);
+  const frame=clipEnds(union([...railPieces,rearRing,...rearEars]),railFront,straightEnd);
   const finish={clip:true,metallic:.78,roughness:.33,finish:'machined-aluminium'};
-  add('stack-frame-main','双纵梁与后安装节','supportFrame','#667986',frame,finish);
+  add('stack-frame-main','三纵梁与后环形安装节','supportFrame','#667986',frame,
+    {...finish,railCount:angles.length,railAngles:angles});
 
   const cradles=[];
   for(const [index,s] of P.stacks.entries()){
@@ -96,7 +99,7 @@ export function buildSupportFrame(ctx) {
     strapCone.delete();
   }
 
-  const wireAngle=angles[1],wireRadius=railRadius+22,wireStart=straightStart+15;
+  const wireAngle=angles.at(-1),wireRadius=railRadius+22,wireStart=straightStart+15;
   const mainWire=tubePath([polar(wireStart,wireRadius,wireAngle),
     polar(rearMount-12,wireRadius,wireAngle)],2.2);
   const leads=[],clips=[];
@@ -117,5 +120,7 @@ export function buildSupportFrame(ctx) {
   add('wiring-frame-clips','纵梁线束卡箍','wiring','#84949e',union(clips).subtract(wiring),finish);
 
   return {report:{railRadius,railInnerRadius:railRadius-railDepth/2,
-    railFront,straightStart,straightEnd,rearMount,railAngles:angles,cradles}};
+    railFront,straightStart,straightEnd,rearMount,railCount:angles.length,railAngles:angles,
+    rearRing:{front:rearMount-8,rear:rearMount+8,inner:rearRingInner,outer:rearRingOuter},
+    rearEarAngles,rearEarRadius,wireAngle,cradles}};
 }

@@ -60,7 +60,16 @@ export function buildCompactFluidNetworks(ctx, {preheatedGasBore}={}) {
     const airX=s.front+Q.frontOffset, wetX=s.rear-Q.wetRearOffset;
     const feedX=s.rear-Q.feedRearOffset,feedHeaderX=s.rear+heating.frontOffset,returnX=s.front+Q.frontOffset;
     const rootAt=x=>stackRadiusAt(s,x,'inner')+Q.stubDepth;
-    const airIn=path('air',[[airX,0,0],polar(airX,rootAt(airX),Q.airAngle)],AIR.branchOuter,AIR.branchInner,{stage:i});
+    // The first stack now slips over the narrow compressor discharge. Tap
+    // the trunk beyond the case and follow the bore wall back to its front port.
+    const tapX=Math.max(airX,P.compressor.outlet+10);
+    const airRoute=[[tapX,0,0]];
+    if(tapX>airX){
+      const returnRadius=stackRadiusAt(s,tapX,'inner')-AIR.branchOuter-3*P.clearance;
+      airRoute.push(polar(tapX,returnRadius,Q.airAngle),polar(airX,returnRadius,Q.airAngle));
+    }
+    airRoute.push(polar(airX,rootAt(airX),Q.airAngle));
+    const airIn=path('air',airRoute,AIR.branchOuter,AIR.branchInner,{stage:i,round:airRoute.length>2?5:0});
     const wetOut=path('cathode',[polar(wetX,rootAt(wetX),Q.wetAngle),polar(wetX,wetRadius,Q.wetAngle),
       ...arcPoints(wetX,wetRadius,Q.wetAngle,wetAngle).slice(1)],5.2,3.4,{stage:i});
     // The central header feeds one serial, open-ended helical turn behind each

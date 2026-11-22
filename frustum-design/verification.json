@@ -1,11 +1,12 @@
 {
   "schema": 1,
-  "revision": "20261122-common-shaft-heat-recovery",
+  "revision": "20261122-three-rail-forward-stacks",
   "units": "mm",
-  "dimensionSource": "first three stacks retained; fourth is a 1.10x geometric copy of the third, with 100 mm stage gaps",
+  "dimensionSource": "four stacks shifted 40 mm toward the fan, with 100 mm stage gaps",
   "scope": "illustrative hollow frustum stacks; lamella count is not a physical cell count",
-  "length": 2252,
+  "length": 2212,
   "schematicStacks": 4,
+  "stackForwardShift": 40,
   "moduleCounts": [
     1,
     1,
@@ -26,7 +27,7 @@
       "stage": 1,
       "module": 1,
       "position": [
-        758,
+        718,
         68.2,
         0
       ],
@@ -45,7 +46,7 @@
       "stage": 1,
       "module": 1,
       "position": [
-        1022,
+        982,
         41.8,
         0
       ],
@@ -64,7 +65,7 @@
       "stage": 1,
       "module": 1,
       "position": [
-        1034,
+        994,
         28.708535316173833,
         28.70853531617383
       ],
@@ -83,7 +84,7 @@
       "stage": 1,
       "module": 1,
       "position": [
-        758,
+        718,
         -64.08703673759896,
         -23.325773774810603
       ],
@@ -102,7 +103,7 @@
       "stage": 2,
       "module": 1,
       "position": [
-        1158,
+        1118,
         85.84,
         0
       ],
@@ -121,7 +122,7 @@
       "stage": 2,
       "module": 1,
       "position": [
-        1372,
+        1332,
         60.16,
         0
       ],
@@ -140,7 +141,7 @@
       "stage": 2,
       "module": 1,
       "position": [
-        1384,
+        1344,
         41.521310191274075,
         41.52131019127407
       ],
@@ -159,7 +160,7 @@
       "stage": 2,
       "module": 1,
       "position": [
-        1158,
+        1118,
         -80.66321456826238,
         -29.359009103075397
       ],
@@ -178,7 +179,7 @@
       "stage": 3,
       "module": 1,
       "position": [
-        1508,
+        1468,
         107.54545454545455,
         0
       ],
@@ -197,7 +198,7 @@
       "stage": 3,
       "module": 1,
       "position": [
-        1692,
+        1652,
         82.45454545454545,
         0
       ],
@@ -216,7 +217,7 @@
       "stage": 3,
       "module": 1,
       "position": [
-        1704,
+        1664,
         57.14708440680371,
         57.14708440680369
       ],
@@ -235,7 +236,7 @@
       "stage": 3,
       "module": 1,
       "position": [
-        1508,
+        1468,
         -101.05967003542997,
         -36.782711777660545
       ],
@@ -254,7 +255,7 @@
       "stage": 4,
       "module": 1,
       "position": [
-        1828,
+        1788,
         118.54545454545455,
         0
       ],
@@ -273,7 +274,7 @@
       "stage": 4,
       "module": 1,
       "position": [
-        2034,
+        1994,
         90.45454545454545,
         0
       ],
@@ -292,7 +293,7 @@
       "stage": 4,
       "module": 1,
       "position": [
-        2046,
+        2006,
         62.80393865629608,
         62.803938656296076
       ],
@@ -311,7 +312,7 @@
       "stage": 4,
       "module": 1,
       "position": [
-        1828,
+        1788,
         -111.39628886407496,
         -40.5449333542429
       ],
@@ -332,8 +333,8 @@
       "countIsIllustrative": true,
       "arrangement": "schematic-concentric-frustum-lamellae",
       "illustrativeLayerCount": 20,
-      "front": 740,
-      "rear": 1040,
+      "front": 700,
+      "rear": 1000,
       "axialLength": 300,
       "frontInnerDiameter": 140,
       "frontOuterDiameter": 384,
@@ -349,7 +350,7 @@
       "centreBore": "open-front-to-rear",
       "serviceSeats": true,
       "bodyVolume": 18319429.226848252,
-      "foilVolume": 2654350.934257599
+      "foilVolume": 2654350.9342575986
     },
     {
       "stage": 2,
@@ -358,8 +359,8 @@
       "countIsIllustrative": true,
       "arrangement": "schematic-concentric-frustum-lamellae",
       "illustrativeLayerCount": 20,
-      "front": 1140,
-      "rear": 1390,
+      "front": 1100,
+      "rear": 1350,
       "axialLength": 250,
       "frontInnerDiameter": 176,
       "frontOuterDiameter": 424,
@@ -375,7 +376,7 @@
       "centreBore": "open-front-to-rear",
       "serviceSeats": true,
       "bodyVolume": 17770722.257197123,
-      "foilVolume": 2569384.3915158063
+      "foilVolume": 2569384.391515807
     },
     {
       "stage": 3,
@@ -384,8 +385,8 @@
       "countIsIllustrative": true,
       "arrangement": "schematic-concentric-frustum-lamellae",
       "illustrativeLayerCount": 20,
-      "front": 1490,
-      "rear": 1710,
+      "front": 1450,
+      "rear": 1670,
       "axialLength": 220,
       "frontInnerDiameter": 220,
       "frontOuterDiameter": 464,
@@ -400,8 +401,8 @@
       "axialEnds": "open-concentric-sloping-channels",
       "centreBore": "open-front-to-rear",
       "serviceSeats": true,
-      "bodyVolume": 18074412.222341873,
-      "foilVolume": 2608764.263776763
+      "bodyVolume": 18074412.22234187,
+      "foilVolume": 2608764.2637767596
     },
     {
       "stage": 4,
@@ -410,8 +411,8 @@
       "countIsIllustrative": true,
       "arrangement": "schematic-concentric-frustum-lamellae",
       "illustrativeLayerCount": 20,
-      "front": 1810,
-      "rear": 2052,
+      "front": 1770,
+      "rear": 2012,
       "axialLength": 242,
       "frontInnerDiameter": 242,
       "frontOuterDiameter": 510.4,
@@ -426,8 +427,8 @@
       "axialEnds": "open-concentric-sloping-channels",
       "centreBore": "open-front-to-rear",
       "serviceSeats": true,
-      "bodyVolume": 24083710.564013857,
-      "foilVolume": 3498687.190454613
+      "bodyVolume": 24083710.56401374,
+      "foilVolume": 3498687.1904545412
     }
   ],
   "machinery": {
@@ -1473,9 +1474,9 @@
       {
         "from": 1,
         "to": 2,
-        "front": 1040,
-        "contractionEnd": 1140,
-        "rear": 1390,
+        "front": 1000,
+        "contractionEnd": 1100,
+        "rear": 1350,
         "radialStart": 163.2,
         "radialEnd": 87.2,
         "linerRearRadius": 57.2,
@@ -1487,9 +1488,9 @@
       {
         "from": 2,
         "to": 3,
-        "front": 1390,
-        "contractionEnd": 1490,
-        "rear": 1710,
+        "front": 1350,
+        "contractionEnd": 1450,
+        "rear": 1670,
         "radialStart": 183.2,
         "radialEnd": 109.2,
         "linerRearRadius": 79.2,
@@ -1501,9 +1502,9 @@
       {
         "from": 3,
         "to": 4,
-        "front": 1710,
-        "contractionEnd": 1810,
-        "rear": 2052,
+        "front": 1670,
+        "contractionEnd": 1770,
+        "rear": 2012,
         "radialStart": 203.2,
         "radialEnd": 120.2,
         "linerRearRadius": 87.2,
@@ -1515,22 +1516,22 @@
     ],
     "cavities": [
       {
-        "front": 1140,
-        "rear": 1390,
+        "front": 1100,
+        "rear": 1350,
         "innerRadius": 56,
         "frontInnerRadius": 86,
         "rearInnerRadius": 56
       },
       {
-        "front": 1490,
-        "rear": 1710,
+        "front": 1450,
+        "rear": 1670,
         "innerRadius": 78,
         "frontInnerRadius": 108,
         "rearInnerRadius": 78
       },
       {
-        "front": 1810,
-        "rear": 2052,
+        "front": 1770,
+        "rear": 2012,
         "innerRadius": 86,
         "frontInnerRadius": 119,
         "rearInnerRadius": 86
@@ -1556,11 +1557,11 @@
     "stages": [
       {
         "stage": 1,
-        "airX": 758,
-        "wetX": 1022,
-        "feedX": 1034,
-        "feedHeaderX": 1062,
-        "returnX": 758,
+        "airX": 718,
+        "wetX": 982,
+        "feedX": 994,
+        "feedHeaderX": 1022,
+        "returnX": 718,
         "interfacesPerMedium": 1,
         "feedFace": "inner conical wall, rear",
         "returnFace": "inner conical wall, front",
@@ -1572,8 +1573,8 @@
         },
         "stubDepth": 4,
         "aftSupplyTurn": {
-          "front": 1062,
-          "rear": 1076,
+          "front": 1022,
+          "rear": 1036,
           "radius": 127,
           "degrees": 360,
           "startAngle": 135,
@@ -1586,11 +1587,11 @@
       },
       {
         "stage": 2,
-        "airX": 1158,
-        "wetX": 1372,
-        "feedX": 1384,
-        "feedHeaderX": 1412,
-        "returnX": 1158,
+        "airX": 1118,
+        "wetX": 1332,
+        "feedX": 1344,
+        "feedHeaderX": 1372,
+        "returnX": 1118,
         "interfacesPerMedium": 1,
         "feedFace": "inner conical wall, rear",
         "returnFace": "inner conical wall, front",
@@ -1602,8 +1603,8 @@
         },
         "stubDepth": 4,
         "aftSupplyTurn": {
-          "front": 1412,
-          "rear": 1426,
+          "front": 1372,
+          "rear": 1386,
           "radius": 147,
           "degrees": 360,
           "startAngle": 135,
@@ -1616,11 +1617,11 @@
       },
       {
         "stage": 3,
-        "airX": 1508,
-        "wetX": 1692,
-        "feedX": 1704,
-        "feedHeaderX": 1732,
-        "returnX": 1508,
+        "airX": 1468,
+        "wetX": 1652,
+        "feedX": 1664,
+        "feedHeaderX": 1692,
+        "returnX": 1468,
         "interfacesPerMedium": 1,
         "feedFace": "inner conical wall, rear",
         "returnFace": "inner conical wall, front",
@@ -1632,8 +1633,8 @@
         },
         "stubDepth": 4,
         "aftSupplyTurn": {
-          "front": 1732,
-          "rear": 1746,
+          "front": 1692,
+          "rear": 1706,
           "radius": 167,
           "degrees": 360,
           "startAngle": 135,
@@ -1646,11 +1647,11 @@
       },
       {
         "stage": 4,
-        "airX": 1828,
-        "wetX": 2034,
-        "feedX": 2046,
-        "feedHeaderX": 2074,
-        "returnX": 1828,
+        "airX": 1788,
+        "wetX": 1994,
+        "feedX": 2006,
+        "feedHeaderX": 2034,
+        "returnX": 1788,
         "interfacesPerMedium": 1,
         "feedFace": "inner conical wall, rear",
         "returnFace": "inner conical wall, front",
@@ -1662,8 +1663,8 @@
         },
         "stubDepth": 4,
         "aftSupplyTurn": {
-          "front": 2074,
-          "rear": 2088,
+          "front": 2034,
+          "rear": 2048,
           "radius": 187.2,
           "degrees": 360,
           "startAngle": 90,
@@ -1686,7 +1687,7 @@
     "centralAir": {
       "outerRadius": 18,
       "innerRadius": 14,
-      "end": 2168
+      "end": 2128
     },
     "hydrogenHeaders": {
       "feedRadius": 35,
@@ -1699,7 +1700,7 @@
       {
         "medium": "air",
         "centre": [
-          1158,
+          1118,
           85.04000000062211,
           0
         ],
@@ -1709,7 +1710,7 @@
       {
         "medium": "cathode",
         "centre": [
-          1372,
+          1332,
           59.35999999876049,
           0
         ],
@@ -1719,7 +1720,7 @@
       {
         "medium": "feed",
         "centre": [
-          1384,
+          1344,
           40.95562476687801,
           40.955624766878
         ],
@@ -1729,7 +1730,7 @@
       {
         "medium": "return",
         "centre": [
-          1158,
+          1118,
           -79.91146047113656,
           -29.085392988233938
         ],
@@ -1739,7 +1740,7 @@
       {
         "medium": "air",
         "centre": [
-          1508,
+          1468,
           106.74545454550602,
           0
         ],
@@ -1749,7 +1750,7 @@
       {
         "medium": "cathode",
         "centre": [
-          1692,
+          1652,
           81.65454545464482,
           0
         ],
@@ -1759,7 +1760,7 @@
       {
         "medium": "feed",
         "centre": [
-          1704,
+          1664,
           56.58139898154196,
           56.581398981541945
         ],
@@ -1769,7 +1770,7 @@
       {
         "medium": "return",
         "centre": [
-          1508,
+          1468,
           -100.30791593809118,
           -36.509095662741565
         ],
@@ -1779,7 +1780,7 @@
       {
         "medium": "air",
         "centre": [
-          1828,
+          1788,
           117.74545454528356,
           0
         ],
@@ -1789,7 +1790,7 @@
       {
         "medium": "cathode",
         "centre": [
-          2034,
+          1994,
           89.65454545582632,
           0
         ],
@@ -1799,7 +1800,7 @@
       {
         "medium": "feed",
         "centre": [
-          2046,
+          2006,
           62.23825323103434,
           62.23825323103433
         ],
@@ -1809,7 +1810,7 @@
       {
         "medium": "return",
         "centre": [
-          1828,
+          1788,
           -110.64453476639451,
           -40.27131723919957
         ],
@@ -1820,34 +1821,34 @@
     "separators": [
       {
         "key": "anode",
-        "front": 2078,
-        "rear": 2108,
+        "front": 2038,
+        "rear": 2068,
         "centre": [
-          2093,
+          2053,
           -65,
           70
         ],
         "radius": 18,
         "baffles": 2,
         "drainOutlet": [
-          2222,
+          2182,
           -114,
           70
         ]
       },
       {
         "key": "cathode",
-        "front": 2088,
-        "rear": 2138,
+        "front": 2048,
+        "rear": 2098,
         "centre": [
-          2113,
+          2073,
           65,
           45
         ],
         "radius": 20,
         "baffles": 2,
         "drainOutlet": [
-          2222,
+          2182,
           14,
           45
         ]
@@ -1855,13 +1856,13 @@
     ],
     "independentDrainCount": 2,
     "cathodeTailGasOutlet": [
-      2222,
+      2182,
       65,
       45
     ],
     "pump": {
-      "front": 2118,
-      "rear": 2158,
+      "front": 2078,
+      "rear": 2118,
       "centreYZ": [
         -65,
         70
@@ -1875,21 +1876,36 @@
     "railInnerRadius": 355,
     "railFront": 380,
     "straightStart": 635,
-    "straightEnd": 2132,
-    "rearMount": 2120,
+    "straightEnd": 2092,
+    "rearMount": 2080,
+    "railCount": 3,
     "railAngles": [
-      105,
-      255
+      0,
+      120,
+      240
     ],
+    "rearRing": {
+      "front": 2072,
+      "rear": 2088,
+      "inner": 355,
+      "outer": 385
+    },
+    "rearEarAngles": [
+      150,
+      210
+    ],
+    "rearEarRadius": 400,
+    "wireAngle": 240,
     "cradles": [
       {
         "stage": 1,
-        "frontSeat": 752,
-        "rearSeat": 1028,
+        "frontSeat": 712,
+        "rearSeat": 988,
         "slotLength": 13.2,
         "mountAngles": [
-          105,
-          255
+          0,
+          120,
+          240
         ],
         "inwardWebs": false,
         "strapSectorDegrees": 4.4,
@@ -1899,12 +1915,13 @@
       },
       {
         "stage": 2,
-        "frontSeat": 1152,
-        "rearSeat": 1378,
+        "frontSeat": 1112,
+        "rearSeat": 1338,
         "slotLength": 13.2,
         "mountAngles": [
-          105,
-          255
+          0,
+          120,
+          240
         ],
         "inwardWebs": false,
         "strapSectorDegrees": 4.4,
@@ -1914,12 +1931,13 @@
       },
       {
         "stage": 3,
-        "frontSeat": 1502,
-        "rearSeat": 1698,
+        "frontSeat": 1462,
+        "rearSeat": 1658,
         "slotLength": 13.2,
         "mountAngles": [
-          105,
-          255
+          0,
+          120,
+          240
         ],
         "inwardWebs": false,
         "strapSectorDegrees": 4.4,
@@ -1929,12 +1947,13 @@
       },
       {
         "stage": 4,
-        "frontSeat": 1823.2,
-        "rearSeat": 2038.8,
+        "frontSeat": 1783.2,
+        "rearSeat": 1998.8,
         "slotLength": 14,
         "mountAngles": [
-          105,
-          255
+          0,
+          120,
+          240
         ],
         "inwardWebs": false,
         "strapSectorDegrees": 4.4,
@@ -1958,16 +1977,16 @@
       300,
       405
     ],
-    "railAngle": 105,
+    "railAngle": 120,
     "pump": [
-      2002,
-      2025
+      1962,
+      1985
     ],
     "preheater": [
-      2068,
-      2110
+      2028,
+      2070
     ],
-    "hydrogenBend": 2228,
+    "hydrogenBend": 2188,
     "hydrogenInletPhase": "gas downstream of external vaporizer",
     "flow": "motor jacket → coolant line → separated heat exchanger → circulation pump → jacket"
   },
@@ -1991,7 +2010,7 @@
   },
   "parts": 107,
   "broadPhasePairs": 5671,
-  "exactPairs": 814,
+  "exactPairs": 845,
   "collisions": [],
   "fluidChecks": {
     "cathodeCircuit": {

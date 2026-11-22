@@ -4,7 +4,10 @@ export function buildMotorHeatRecovery(ctx) {
   const group='motorHeatRecovery';
   const shellFinish={clip:true,metallic:.75,roughness:.32,finish:'machined-aluminium'};
   const pipeFinish={clip:true,metallic:.44,roughness:.34};
-  const sideAngle=105,c=Math.cos(sideAngle*Math.PI/180),s=Math.sin(sideAngle*Math.PI/180);
+  const {railAngles,railRadius}=P.supportFrame;
+  const sideAngle=railAngles[1],c=Math.cos(sideAngle*Math.PI/180),s=Math.sin(sideAngle*Math.PI/180);
+  const lastRear=P.stacks.at(-1).rear;
+  const hxFront=lastRear+16,hxRear=lastRear+58;
   const local=(x,r,t=0)=>[x,r*c-t*s,r*s+t*c];
   const box=(x,r,t,l,d,w)=>M.cube([l,d,w],true).translate([x,r,t]).rotate([sideAngle,0,0]);
   const axial=(lo,hi,r,n=96)=>cylinder([lo,0,0],[hi,0,0],r,r,n);
@@ -13,7 +16,7 @@ export function buildMotorHeatRecovery(ctx) {
   const jacketBlank=axial(jacketFront,jacketRear,jacketOuter)
     .subtract(axial(jacketFront-.1,jacketRear+.1,jacketInner));
   const coilRadius=(jacketInner+jacketOuter)/2,coilPassageRadius=1.55;
-  const inletX=300,outletX=405,inletAngle=94,outletAngle=116;
+  const inletX=300,outletX=405,inletAngle=sideAngle-11,outletAngle=sideAngle+11;
   const helix=Array.from({length:97},(_,i)=>{
     const t=i/96;
     return polar(inletX+(outletX-inletX)*t,coilRadius,inletAngle+(720+outletAngle-inletAngle)*t);
@@ -24,13 +27,13 @@ export function buildMotorHeatRecovery(ctx) {
   function lead(x,angle,offset,hxRadius,hxOffset) {
     return [
       polar(x,coilRadius,angle),polar(x,185,angle),polar(423,185,angle),
-      local(470,213,offset),local(645,370,offset),local(2034,370,offset),
-      local(2060,hxRadius,hxOffset),local(2072,hxRadius,hxOffset),
+      local(470,213,offset),local(645,railRadius,offset),local(lastRear-18,railRadius,offset),
+      local(hxFront-8,hxRadius,hxOffset),local(hxFront+4,hxRadius,hxOffset),
     ];
   }
   const inletLeg=lead(inletX,inletAngle,-25,337,-11);
   const outletLeg=lead(outletX,outletAngle,25,327,11);
-  const coolantTube=roundPath([...outletLeg,local(2101,327,11),local(2102,337,-11),
+  const coolantTube=roundPath([...outletLeg,local(hxRear-9,327,11),local(hxRear-8,337,-11),
     ...inletLeg.toReversed()],4);
   const coolantOuter=tubePath(coolantTube,3.2);
   const coolantBore=union([
@@ -39,18 +42,17 @@ export function buildMotorHeatRecovery(ctx) {
   ]);
 
   // The coolant and hydrogen passages occupy different parts of this block.
-  const hxFront=2068,hxRear=2110;
   const hxBlank=box((hxFront+hxRear)/2,329,0,hxRear-hxFront,43,38);
-  const pumpFront=2002,pumpRear=2025;
+  const pumpFront=lastRear-50,pumpRear=lastRear-27;
   const pumpBlank=union([
-    cylinder(local(pumpFront,370,-25),local(pumpRear,370,-25),8.2,8.2,48),
+    cylinder(local(pumpFront,railRadius,-25),local(pumpRear,railRadius,-25),8.2,8.2,48),
     ...[pumpFront+3,pumpRear-3].map(x=>
-      cylinder(local(x-1.5,370,-25),local(x+1.5,370,-25),9.6,9.6,48)),
+      cylinder(local(x-1.5,railRadius,-25),local(x+1.5,railRadius,-25),9.6,9.6,48)),
   ]);
 
   // The green extension is in series with the existing header. Cross behind
   // the separate exhaust/drain outlets before turning in to the existing port.
-  const H=P.hydrogen,turnX=P.stacks.at(-1).rear+176;
+  const H=P.hydrogen,turnX=lastRear+176;
   const gasPoints=roundPath([
     local(hxFront-9,312,0),local(turnX,312,0),
     polar(turnX,H.headerRadius,H.headerAngle),polar(H.inletX,H.headerRadius,H.headerAngle),
@@ -78,15 +80,15 @@ export function buildMotorHeatRecovery(ctx) {
     gasOuter.subtract(union([hxBlank,gasBore])),pipeFinish);
 
   const clips=[];
-  for(const x of [703,959,1275,1565,1880,1984]){
+  for(const x of [703,959,1275,1565,1880,1984].map(x=>x-P.stackForwardShift)){
     for(const t of [-25,25]){
-      const band=cylinder(local(x-2.4,370,t),local(x+2.4,370,t),5,5,32)
-        .subtract(cylinder(local(x-2.5,370,t),local(x+2.5,370,t),3.3,3.3,32));
-      const foot=box(x,370,Math.sign(t)*17,4.8,7,10);
+      const band=cylinder(local(x-2.4,railRadius,t),local(x+2.4,railRadius,t),5,5,32)
+        .subtract(cylinder(local(x-2.5,railRadius,t),local(x+2.5,railRadius,t),3.3,3.3,32));
+      const foot=box(x,railRadius,Math.sign(t)*17,4.8,7,10);
       clips.push(union([band,foot]));
     }
   }
-  const mount=box(2091,352.75,0,26,4.5,15);
+  const mount=box(hxFront+23,352.75,0,26,4.5,15);
   clips.push(mount);
   add('motor-heat-line-mounts','左纵梁冷却管夹和预热器底座',group,'#85989e',
     union(clips).subtract(coolantOuter),shellFinish);

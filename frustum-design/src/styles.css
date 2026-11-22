@@ -151,6 +151,12 @@ h1 { font-size: 21px; font-weight: 600; line-height: 1.4; letter-spacing: 0.5px;
 .swatch-hydrogen { background: #258763; border: 1px solid #207554; }
 .swatch-return { background: #b4d2b8; border: 1px solid #8bab90; }
 .swatch-coolant { background: #3e9ba4; border: 1px solid #33858e; }
+.heat-recovery-help { margin: 0 0 6px 20px; padding: 0 10px; border: 1px solid #dce7ea; border-radius: 8px; background: #f5f9fa; color: #435f6b; font-size: 13px; line-height: 1.65; }
+.heat-recovery-help summary { padding: 9px 0; cursor: pointer; font-weight: 500; }
+.heat-recovery-help summary::marker { color: #3e8992; }
+.heat-recovery-help summary:focus-visible { outline: 2px solid #548b98; outline-offset: 3px; border-radius: 3px; }
+.heat-recovery-help p { margin: 0 0 11px; }
+.heat-recovery-help strong { font-weight: 600; }
 .layer-copy { display: flex; flex-direction: column; gap: 3px; flex: 1; }
 .layer-label { color: #87959b; font-size: 12px; transition: color 130ms; }
 .is-visible .layer-label { color: #536770; }

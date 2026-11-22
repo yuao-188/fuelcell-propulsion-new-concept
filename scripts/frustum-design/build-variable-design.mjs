@@ -30,10 +30,10 @@ for(const stage of P.variableIntake.stages)for(const g of getIntakeGeometry(P,st
     {clip:true,stage,variableStage:stage,motionRole:g.role,finish:g.role,
       metallic:g.metallic??.85,roughness:g.roughness??.3});
 }
-const report={schema:1,revision:'20261122-common-shaft-heat-recovery',units:'mm',
-  dimensionSource:'first three stacks retained; fourth is a 1.10x geometric copy of the third, with 100 mm stage gaps',
+const report={schema:1,revision:'20261122-three-rail-forward-stacks',units:'mm',
+  dimensionSource:'four stacks shifted 40 mm toward the fan, with 100 mm stage gaps',
   scope:'illustrative hollow frustum stacks; lamella count is not a physical cell count',
-  length:P.layoutRear,schematicStacks:stackCount,
+  length:P.layoutRear,schematicStacks:stackCount,stackForwardShift:P.stackForwardShift,
   moduleCounts:P.stacks.map(s=>s.modules),portCounts:Object.fromEntries(['air','hydrogen','return','cathode'].map(k=>[k,fluids.ports.filter(p=>p.fluid===k).length])),
   ports:fluids.ports,stacks,machinery,shells,plumbing:fluids.checks,supportFrame:support.report,
   motorHeatRecovery:heatRecovery.check,
@@ -41,6 +41,8 @@ const report={schema:1,revision:'20261122-common-shaft-heat-recovery',units:'mm'
     articulation:'independent aperture and two-axis deflection; shared browser/validation solver'},
   parts:parts.length,broadPhasePairs:0,exactPairs:0,collisions:[],fluidChecks:{},errors:[]};
 assert.equal(stacks.length,4);assert.equal(shells.length,380);
+assert.deepEqual(stacks.map(s=>s.front),[700,1100,1450,1770]);
+assert.equal(support.report.railAngles.length,3);
 assert.deepEqual(stacks.map(s=>s.axialLength),[300,250,220,242]);
 assert(stacks.slice(1).every((s,i)=>s.front-stacks[i].rear===100));
 for(const n of Object.values(report.portCounts))assert.equal(n,stackCount);

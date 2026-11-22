@@ -306,6 +306,11 @@ export default function App() {
               <LayerToggle label="阴极尾气与排水" color="swatch-inner" checked={visibility.cathodeWater} onChange={() => toggleLayer('cathodeWater')} />
               <LayerToggle label="阳极气水分离器" color="swatch-return" checked={visibility.anodeSeparator} onChange={() => toggleLayer('anodeSeparator')} />
               <LayerToggle label="电机余热回路" color="swatch-coolant" checked={visibility.motorHeatRecovery} onChange={() => toggleLayer('motorHeatRecovery')} />
+              <details className="heat-recovery-help">
+                <summary>余热回路如何工作</summary>
+                <p><strong>青色冷却液回路：</strong>冷却液在电机夹套内吸热，流到尾部预热器放热，再经循环泵返回夹套。</p>
+                <p><strong>绿色氢气管路：</strong>气态氢经过预热器受热，再进入供氢总管。两套流道隔壁换热，冷却液和氢气互不混合。</p>
+              </details>
               <LayerToggle label="电气线束" color="swatch-stack" checked={visibility.wiring} onChange={() => toggleLayer('wiring')} />
             </div>
           </section>
